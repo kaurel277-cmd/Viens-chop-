@@ -12,47 +12,69 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                    colors: {
-                        brandOrange: '#FF5E1A',
-                        brandPink: '#FF1E56',
-                    }
+                    colors: { brandOrange: '#FF5E1A', brandPink: '#FF1E56' }
                 }
             }
         }
     </script>
     <style>
-        .bg-brand-gradient {
-            background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%);
-        }
-        .text-brand-gradient {
-            background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
+        .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        .mobile-menu.open { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-    <!-- NAVIGATION -->
+    <!-- ===== NAVIGATION COMPLÈTE ===== -->
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-            <div class="flex items-center gap-2">
+            <a href="index.html" class="flex items-center gap-2">
                 <span class="text-2xl">🔥</span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
-            </div>
-            <div class="hidden md:flex space-x-8 font-medium text-sm text-slate-600">
-                <a href="#vibe" class="hover:text-brandPink transition">La Vibe</a>
-                <a href="#soutra" class="hover:text-brandPink transition">Mode Soutra</a>
-                <a href="#maquis" class="hover:text-brandPink transition">Coins Chills</a>
-                <a href="#tarif" class="hover:text-brandPink transition">Gratuit vs VIP</a>
-            </div>
-            <a href="#acces" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition">
-                1 Mois VIP Offert 🎁
             </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
+                <a href="index.html" class="text-brandPink font-bold">Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink transition">Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
+                    Rejoindre 🔥
+                </a>
+                <!-- Mobile Burger -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl">
+                    <i class="fa-solid fa-bars" id="burger-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
+            <div class="flex justify-between items-center mb-8">
+                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+                <a href="index.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
+                <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+                <hr class="border-slate-200">
+                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            </div>
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
+    <!-- ===== HERO SECTION ===== -->
     <header class="pt-28 pb-20 bg-brand-gradient text-white relative overflow-hidden">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -63,11 +85,14 @@
                     Le seul endroit où l'amour et le flirt se gèrent <span class="underline decoration-yellow-300">sans pression.</span>
                 </h1>
                 <p class="text-lg text-white/90 mb-8 leading-relaxed">
-                    Que tu sois en forme ou un peu « coulé » ce mois-ci, viens matcher dans ta ville ou ta commune, écouter la voix de ton crush et gérer tes rancarts en toute sécurité !
+                    Que tu sois en forme ou un peu « coulé » ce mois-ci, viens matcher dans ta ville, écouter la voix de ton crush et gérer tes rancarts en toute sécurité !
                 </p>
                 <div class="flex flex-wrap gap-4">
-                    <a href="#acces" class="bg-white text-brandPink font-extrabold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition flex items-center gap-2 text-lg">
+                    <a href="inscription.html" class="bg-white text-brandPink font-extrabold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition flex items-center gap-2 text-lg">
                         <i class="fa-solid fa-fire"></i> Rejoindre gratuitement
+                    </a>
+                    <a href="comment-ca-marche.html" class="bg-white/20 backdrop-blur-sm text-white font-bold px-6 py-4 rounded-xl hover:bg-white/30 transition flex items-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Comment ça marche ?
                     </a>
                 </div>
                 <p class="text-xs text-white/80 mt-4 flex items-center gap-2">
@@ -75,17 +100,15 @@
                 </p>
             </div>
 
-            <!-- INTERACTIVE DEMO CARD -->
+            <!-- Demo Card -->
             <div class="bg-white text-slate-800 p-6 rounded-3xl shadow-2xl max-w-md mx-auto w-full border-4 border-white/30">
                 <div class="flex justify-between items-center border-b pb-4 mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg blur-[2px]">
-                            ?
-                        </div>
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg blur-[2px]">?</div>
                         <div>
                             <div class="flex items-center gap-1.5">
                                 <h3 class="font-bold">Awa, 22 ans</h3>
-                                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-semibold"><i class="fa-solid fa-circle-check"></i> Profil Vérifié</span>
+                                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-semibold"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
                             </div>
                             <p class="text-xs text-slate-500">📍 Cocody, Angré • 🎵 Himra, Didi B & Tiakola</p>
                         </div>
@@ -93,7 +116,6 @@
                     <span class="text-xs bg-orange-100 text-orange-600 font-bold px-2.5 py-1 rounded-full">Photo Floutée</span>
                 </div>
 
-                <!-- Voice note simulation -->
                 <div class="bg-slate-100 p-3 rounded-xl flex items-center gap-3 mb-4">
                     <button class="w-10 h-10 rounded-full bg-brand-gradient text-white flex items-center justify-center shadow">
                         <i class="fa-solid fa-play"></i>
@@ -106,7 +128,6 @@
                     </div>
                 </div>
 
-                <!-- Icebreaker Generator -->
                 <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-xs font-bold text-orange-600 uppercase tracking-wider">🎲 En manque d'inspi ?</span>
@@ -117,7 +138,6 @@
                     </p>
                 </div>
 
-                <!-- Security Bar -->
                 <div class="flex justify-between items-center pt-2 text-xs font-semibold text-slate-500">
                     <span class="flex items-center gap-1 text-emerald-600"><i class="fa-solid fa-eye-slash"></i> Invisible pour tes contacts</span>
                     <span class="flex items-center gap-1 text-brandPink"><i class="fa-solid fa-heart"></i> 98% Compatible</span>
@@ -126,369 +146,264 @@
         </div>
     </header>
 
-    <!-- POURQUOI TU VAS KIFFER (FONCTIONNALITÉS) -->
-    <section id="vibe" class="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- ===== COMMENT ÇA MARCHE (RÉSUMÉ) ===== -->
+    <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Pourquoi tu vas kiffer <span class="text-brand-gradient">Viens chop</span> ?</h2>
-            <p class="text-slate-600">Oublie les matchs à l'autre bout du monde et les conversations ennuyeuses. Ici, on a les mêmes réfs.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Comment ça marche ? 🤔</h2>
+            <p class="text-slate-600">En 4 étapes simples, tu es prêt(e) à matcher sans pression.</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                <div class="w-12 h-12 bg-orange-100 text-brandOrange rounded-2xl flex items-center justify-center text-2xl mb-6">
-                    📍
-                </div>
-                <h3 class="text-xl font-bold mb-3">Partout en Côte d'Ivoire</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Toutes les communes d'Abidjan et toutes les villes du pays (Bouaké, Yakro, Daloa, Korhogo, San-Pédro, Man, Bassam...). Matche près de chez toi !
-                </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl font-extrabold mx-auto mb-4 shadow-lg">1</div>
+                <h3 class="font-bold text-lg mb-2">Inscris-toi avec ton +225</h3>
+                <p class="text-sm text-slate-500">Un simple SMS pour vérifier ton numéro. Pas besoin d'email ni de carte bancaire.</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl font-extrabold mx-auto mb-4 shadow-lg">2</div>
+                <h3 class="font-bold text-lg mb-2">Crée ton profil vocal</h3>
+                <p class="text-sm text-slate-500">Choisis tes sons (Himra, Damso...), ta commune et enregistre ta voix de 10 secondes.</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl font-extrabold mx-auto mb-4 shadow-lg">3</div>
+                <h3 class="font-bold text-lg mb-2">Écoute, Like & Matche</h3>
+                <p class="text-sm text-slate-500">Découvre les profils autour de toi. Écoute leur voix, lance un quiz et matche si le feeling passe !</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl font-extrabold mx-auto mb-4 shadow-lg">4</div>
+                <h3 class="font-bold text-lg mb-2">Rdv dans un Coin Chill 🍹</h3>
+                <p class="text-sm text-slate-500">Après 5 messages la photo se débloque. Retrouvez-vous dans un maquis ou café certifié !</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-12">
+            <a href="comment-ca-marche.html" class="text-brandPink font-bold hover:underline inline-flex items-center gap-2">
+                En savoir plus sur le fonctionnement <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== POURQUOI TU VAS KIFFER ===== -->
+    <section id="vibe" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Pourquoi tu vas kiffer <span class="text-brand-gradient">Viens chop</span> ?</h2>
+                <p class="text-slate-600">Oublie les matchs à l'autre bout du monde. Ici, on a les mêmes réfs.</p>
             </div>
 
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                <div class="w-12 h-12 bg-pink-100 text-brandPink rounded-2xl flex items-center justify-center text-2xl mb-6">
-                    🎙️
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-orange-100 text-brandOrange rounded-2xl flex items-center justify-center text-2xl mb-6">📍</div>
+                    <h3 class="text-xl font-bold mb-3">Partout en Côte d'Ivoire</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Toutes les communes d'Abidjan et toutes les villes du pays. Matche près de chez toi !</p>
                 </div>
-                <h3 class="text-xl font-bold mb-3">La Voix avant la Photo</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Les photos sont floutées au début ! Écoute sa note vocale de 10 secondes, envoyez-vous 5 messages et la photo se dévoile sans pression.
-                </p>
-            </div>
-
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6">
-                    🔥
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-pink-100 text-brandPink rounded-2xl flex items-center justify-center text-2xl mb-6">🎙️</div>
+                    <h3 class="text-xl font-bold mb-3">La Voix avant la Photo</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Photos floutées au début. Écoute sa note vocale, échangez 5 messages et la photo se dévoile !</p>
                 </div>
-                <h3 class="text-xl font-bold mb-3">Vibes Rap Ivoire & Quiz</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Matche selon tes sons du moment (Himra, Didi B, Sindika, La B, 7 Flocky 45, Damso, Tiako, Ninho...) et lance des mini-jeux pour briser la glace.
-                </p>
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6">🔥</div>
+                    <h3 class="text-xl font-bold mb-3">Vibes Rap Ivoire & Quiz</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Matche selon tes sons du moment et lance des mini-jeux pour briser la glace sans pression.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- SÉCURITÉ "ON EST EN SOUTRA" -->
-    <section id="soutra" class="py-20 bg-slate-900 text-white">
+    <!-- ===== SÉCURITÉ RÉSUMÉ ===== -->
+    <section class="py-20 bg-slate-900 text-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <span class="bg-orange-500/20 text-orange-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Zéro Gnaga • 100% Sûr</span>
                 <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 mb-4">Ici, on est en « Soutra » 🤫</h2>
-                <p class="text-slate-400">Que ce soit sur l'appli ou pendant ton premier rendez-vous, on a tout prévu pour ta tranquillité.</p>
+                <p class="text-slate-400">Ta sécurité c'est notre priorité numéro 1.</p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
                     <div class="text-3xl mb-4">🙈</div>
-                    <h3 class="text-lg font-bold mb-2">Invisible pour ton répertoire</h3>
-                    <p class="text-sm text-slate-400">Ton grand frère, ta tante ou tes collègues ne verront jamais ton profil (Option VIP). Et les captures d'écran sont bloquées !</p>
+                    <h3 class="text-lg font-bold mb-2">Mode Incognito</h3>
+                    <p class="text-sm text-slate-400">Invisible pour les contacts de ton répertoire. Captures d'écran bloquées !</p>
                 </div>
-
                 <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
                     <div class="text-3xl mb-4">📞</div>
-                    <h3 class="text-lg font-bold mb-2">Faux Appel de Secours</h3>
-                    <p class="text-sm text-slate-400">Ton rancart devient bizarre ou ennuyeux ? Appuie sur un bouton discret pour recevoir un vrai-faux appel et t'éclipser poliment.</p>
+                    <h3 class="text-lg font-bold mb-2">Faux Appel Soutra</h3>
+                    <p class="text-sm text-slate-400">Un vrai-faux appel ultra-réaliste pour s'éclipser d'un rancart gênant.</p>
                 </div>
-
                 <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
                     <div class="text-3xl mb-4">✅</div>
                     <h3 class="text-lg font-bold mb-2">Zéro Brouteur</h3>
-                    <p class="text-sm text-slate-400">Fini les fausses photos volées sur Insta ou TikTok. Chaque profil est vérifié par un selfie vidéo rapide.</p>
+                    <p class="text-sm text-slate-400">Chaque profil vérifié par selfie vidéo rapide. Aucune fausse photo tolérée.</p>
                 </div>
-
                 <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
                     <div class="text-3xl mb-4">📍</div>
-                    <h3 class="text-lg font-bold mb-2">Bouton SOS & Check-In</h3>
-                    <p class="text-sm text-slate-400">Gratuit pour tous : partage ta position en direct avec un proche de confiance pendant ton rendez-vous.</p>
+                    <h3 class="text-lg font-bold mb-2">SOS & Check-In</h3>
+                    <p class="text-sm text-slate-400">Partage ta position en direct avec un proche pendant ton rendez-vous.</p>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- BONS PLANS MAQUIS & CAFÉS -->
-    <section id="maquis" class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-gradient-to-r from-orange-50 to-pink-50 rounded-3xl p-8 sm:p-12 border border-orange-100 flex flex-col md:flex-row items-center gap-8">
-            <div class="text-6xl">🍹</div>
-            <div class="flex-1 text-center md:text-left">
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Bons Plans Rancarts</span>
-                <h3 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-3">Les meilleurs Lounges, Maquis & Fast-Foods</h3>
-                <p class="text-slate-600 text-sm sm:text-base">
-                    Tu ne sais pas où l'inviter ? Découvre notre sélection de coins chills, bien éclairés et sécurisés. <strong>Bonus : profite de réductions ou de boissons offertes</strong> en réservant depuis l'application !
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- GRILLE COMPARATIVE : MODE GRATUIT ("COULÉ") VS VIP (700 FCFA) -->
-    <section id="tarif" class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-12">
-            <span class="bg-orange-100 text-brandOrange text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pour toutes les poches</span>
-            <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 mb-4">Même si tu es « coulé », tu peux gérer ! 😎</h2>
-            <p class="text-slate-600">Utilise l'application gratuitement tous les jours, ou débloque le Mode Boss sans pression pour seulement <strong>700 FCFA/mois</strong>.</p>
-        </div>
-
-        <!-- 2 CARTES RÉSUMÉ -->
-        <div class="grid md:grid-cols-2 gap-8 mb-12">
-            <!-- Carte Gratuite (Mode Coulé) -->
-            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full">Mode Gratuit (Spécial « Coulé » 😅)</span>
-                    </div>
-                    <div class="text-4xl font-extrabold text-slate-800 my-4">
-                        0 FCFA <span class="text-base text-slate-400 font-normal">/ toujours gratuit</span>
-                    </div>
-                    <p class="text-sm text-slate-500 mb-6">L'essentiel pour discuter et écouter les notes vocales sans dépenser un rond.</p>
-                    <ul class="space-y-3 text-sm text-slate-700 mb-8">
-                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>10 Likes / Swipes</strong> par jour</li>
-                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Notes vocales : <strong>Écoute & Envoi illimités</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500 font-bold">⏳</span> Mode Flirt (Jeux & Quiz) : <strong>Accès limité (1 session/j)</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Sécurité Soutra SOS & Check-In <strong>inclus</strong></li>
-                        <li class="flex items-center gap-2 text-slate-400"><span>🔒</span> <em>Qui a aimé mon profil : Photos floutées</em></li>
-                        <li class="flex items-center gap-2 text-slate-400"><span>🔒</span> <em>Faux Appel & Masquage répertoire non inclus</em></li>
-                    </ul>
-                </div>
-                <a href="#acces" class="w-full block text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl transition">
-                    Commencer gratuitement
+            <div class="text-center mt-12">
+                <a href="securite.html" class="text-orange-400 font-bold hover:underline inline-flex items-center gap-2">
+                    Découvrir toutes nos mesures de sécurité <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
+        </div>
+    </section>
 
-            <!-- Carte VIP (700 FCFA) -->
-            <div class="bg-white rounded-3xl p-8 border-2 border-brandOrange shadow-xl relative flex flex-col justify-between">
-                <span class="absolute -top-3.5 right-6 bg-brand-gradient text-white text-xs font-bold px-4 py-1 rounded-full shadow">LE PLUS POPULAIRE 🔥</span>
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="bg-orange-100 text-brandOrange text-xs font-bold px-3 py-1 rounded-full">Mode VIP (Le Boss 👑)</span>
-                    </div>
-                    <div class="text-4xl sm:text-5xl font-extrabold text-brand-gradient my-4">
-                        700 FCFA <span class="text-base text-slate-500 font-normal">/ mois</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mb-6">Aucune limite, Mode Flirt illimité et toutes les options secrètes activées. Sans renouvellement piégeux.</p>
-                    <ul class="space-y-3 text-sm text-slate-800 mb-6">
-                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> <strong>Likes & Swipes Illimités</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Mode Flirt (Jeux & Quiz) : <strong>Accès Complet Illimité</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Notes vocales <strong>Illimitées</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Qui a aimé mon profil : <strong>Déverrouillé & Visible</strong></li>
-                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> <strong>Faux Appel d'urgence (Fake Call)</strong> activé</li>
-                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> <strong>Mode Incognito :</strong> Invisible pour ton répertoire</li>
+    <!-- ===== TARIFS RÉSUMÉ ===== -->
+    <section class="py-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold mb-4">Même si tu es « coulé », tu gères ! 😎</h2>
+                <p class="text-slate-600">Gratuit pour toujours, ou passe en VIP pour le prix d'un café.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Gratuit -->
+                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                    <span class="bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full">Mode « Coulé » 😅</span>
+                    <div class="text-4xl font-extrabold text-slate-800 my-4">0 FCFA</div>
+                    <ul class="space-y-3 text-sm text-slate-700 mb-6">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> 10 Likes / jour</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Notes vocales illimitées</li>
+                        <li class="flex items-center gap-2"><span class="text-amber-500 font-bold">⏳</span> Mode Flirt : 1 session / jour</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> SOS & Check-In inclus</li>
+                        <li class="flex items-center gap-2 text-slate-400"><span>🔒</span> Faux Appel & Incognito non inclus</li>
                     </ul>
+                    <a href="inscription.html" class="block text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl transition">Commencer gratuitement</a>
                 </div>
-                <div>
+
+                <!-- VIP -->
+                <div class="bg-white rounded-3xl p-8 border-2 border-brandOrange shadow-xl relative">
+                    <span class="absolute -top-3.5 right-6 bg-brand-gradient text-white text-xs font-bold px-4 py-1 rounded-full shadow">LE PLUS POPULAIRE 🔥</span>
+                    <span class="bg-orange-100 text-brandOrange text-xs font-bold px-3 py-1 rounded-full">Mode Boss 👑</span>
+                    <div class="text-4xl sm:text-5xl font-extrabold text-brand-gradient my-4">700 FCFA <span class="text-base text-slate-500 font-normal">/ mois</span></div>
+                    <ul class="space-y-3 text-sm text-slate-800 mb-6">
+                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Likes & Swipes Illimités</li>
+                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Mode Flirt Illimité</li>
+                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Voir qui t'a liké</li>
+                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Faux Appel d'urgence</li>
+                        <li class="flex items-center gap-2"><span class="text-brandOrange font-bold">★</span> Mode Incognito</li>
+                    </ul>
                     <div class="flex flex-wrap justify-center gap-2 mb-4">
                         <span class="px-2.5 py-1 bg-sky-100 text-sky-800 font-bold rounded-lg text-xs">🐧 Wave</span>
                         <span class="px-2.5 py-1 bg-orange-100 text-orange-800 font-bold rounded-lg text-xs">🟠 Orange Money</span>
                         <span class="px-2.5 py-1 bg-yellow-100 text-yellow-800 font-bold rounded-lg text-xs">🟡 MTN MoMo</span>
                         <span class="px-2.5 py-1 bg-blue-100 text-blue-800 font-bold rounded-lg text-xs">🔵 Moov</span>
                     </div>
-                    <a href="#acces" class="w-full block text-center bg-brand-gradient hover:opacity-95 text-white font-bold py-3.5 rounded-xl shadow-md transition">
-                        Tester le VIP Gratuitement 🎁
-                    </a>
+                    <a href="inscription.html" class="block text-center bg-brand-gradient hover:opacity-95 text-white font-bold py-3.5 rounded-xl shadow-md transition">Tester le VIP Gratuitement 🎁</a>
                 </div>
             </div>
-        </div>
 
-        <!-- TABLEAU COMPARATIF DÉTAILLÉ -->
-        <div class="bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                <h3 class="font-extrabold text-lg text-brandOrange uppercase tracking-wide">Grille Comparative : Mode Gratuit vs VIP (700 FCFA)</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-200 bg-slate-50/50">
-                            <th class="py-4 px-6 font-semibold text-slate-600">Fonctionnalité</th>
-                            <th class="py-4 px-6 font-semibold text-slate-600 text-center">Mode Gratuit (« Coulé »)</th>
-                            <th class="py-4 px-6 font-bold text-brandOrange text-center">Mode VIP (700 FCFA/mois)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200">
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Likes / Swipes quotidiens</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-slate-900">10 Likes par jour</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-brandOrange">Likes Illimités</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Notes Vocales</td>
-                            <td class="py-4 px-6 text-center font-bold text-emerald-600">Écoute & Envoi Illimités</td>
-                            <td class="py-4 px-6 text-center font-bold text-emerald-600">Écoute & Envoi Illimités</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Mode Flirt (Jeux & Quiz)</td>
-                            <td class="py-4 px-6 text-center font-bold text-amber-600">Accès Limité (1 session / jour)</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-brandOrange">Accès Complet Illimité</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Qui a aimé mon profil ?</td>
-                            <td class="py-4 px-6 text-center font-bold text-slate-400">Photos floutées</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-brandOrange">Déverrouillé & Visible</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Soutra SOS & Check-In</td>
-                            <td class="py-4 px-6 text-center font-bold text-emerald-600">Inclus (Incitations Sécurité)</td>
-                            <td class="py-4 px-6 text-center font-bold text-emerald-600">Inclus + Option Fake Call</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Faux Appel (Fake Call)</td>
-                            <td class="py-4 px-6 text-center font-bold text-slate-400">Non disponible</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-brandOrange">Activé (Bouton d'urgence)</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-medium text-slate-800">Mode Incognito / Discret</td>
-                            <td class="py-4 px-6 text-center font-bold text-slate-400">Profil public par défaut</td>
-                            <td class="py-4 px-6 text-center font-extrabold text-brandOrange">Inclus (Masquage Répertoire)</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="text-center mt-8">
+                <a href="tarifs.html" class="text-brandPink font-bold hover:underline inline-flex items-center gap-2">
+                    Voir le comparatif détaillé <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- INSCRIPTION AVANT-PREMIÈRE -->
-    <section id="acces" class="py-20 mt-8 bg-brand-gradient text-white">
-        <div class="max-w-xl mx-auto px-4 text-center">
-            <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase">Offre de Lancement</span>
-            <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 mb-4">Prends ta place en Avant-Première 🎁</h2>
-            <p class="text-white/90 mb-8 text-sm">
-                Même si tu es coulé aujourd'hui, inscris-toi sans pression : les <strong>500 premiers</strong> reçoivent leur accès par SMS avec <strong>1 mois de Mode VIP (700F) 100% OFFERT</strong> !
-            </p>
-            
-            <form onsubmit="handleBetaSubmit(event)" class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl text-left text-slate-800 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Ton Prénom ou Surnom</label>
-                    <input type="text" required placeholder="Ex: Franck / Maïmouna" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brandPink">
-                </div>
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Numéro WhatsApp / SMS</label>
-                        <input type="tel" required placeholder="07 XX XX XX XX" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brandPink">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Ta Commune / Ville</label>
-                        <select required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brandPink bg-white">
-                            <option value="" disabled selected>Choisis ta commune ou ville...</option>
-                            <optgroup label="📍 Grand Abidjan (Communes)">
-                                <option>Abobo</option>
-                                <option>Adjamé</option>
-                                <option>Anyama</option>
-                                <option>Attécoubé</option>
-                                <option>Bingerville</option>
-                                <option>Cocody (Riviera / Angré / 2 Plateaux)</option>
-                                <option>Koumassi</option>
-                                <option>Marcory (Zone 4 / Biétry)</option>
-                                <option>Plateau</option>
-                                <option>Port-Bouët</option>
-                                <option>Songon</option>
-                                <option>Treichville</option>
-                                <option>Yopougon</option>
-                            </optgroup>
-                            <optgroup label="🇨🇮 Villes de Côte d'Ivoire (A - Z)">
-                                <option>Abengourou</option>
-                                <option>Aboisso</option>
-                                <option>Adiaké</option>
-                                <option>Adzopé</option>
-                                <option>Agboville</option>
-                                <option>Agnibilékrou</option>
-                                <option>Akoupé</option>
-                                <option>Alepe</option>
-                                <option>Assinie</option>
-                                <option>Bangolo</option>
-                                <option>Béoumi</option>
-                                <option>Biankouma</option>
-                                <option>Bonoua</option>
-                                <option>Bondoukou</option>
-                                <option>Bongouanou</option>
-                                <option>Bouaflé</option>
-                                <option>Bouaké</option>
-                                <option>Bouna</option>
-                                <option>Boundiali</option>
-                                <option>Dabakala</option>
-                                <option>Dabou</option>
-                                <option>Daloa</option>
-                                <option>Danané</option>
-                                <option>Daoukro</option>
-                                <option>Dimbokro</option>
-                                <option>Divo</option>
-                                <option>Duékoué</option>
-                                <option>Ferkessédougou</option>
-                                <option>Fresco</option>
-                                <option>Gagnoa</option>
-                                <option>Grand-Bassam</option>
-                                <option>Grand-Béréby</option>
-                                <option>Grand-Lahou</option>
-                                <option>Guiglo</option>
-                                <option>Issia</option>
-                                <option>Jacqueville</option>
-                                <option>Katiola</option>
-                                <option>Korhogo</option>
-                                <option>Lakota</option>
-                                <option>Man</option>
-                                <option>Mankono</option>
-                                <option>M'Bahiakro</option>
-                                <option>Odienné</option>
-                                <option>Oumé</option>
-                                <option>Sakassou</option>
-                                <option>San-Pédro</option>
-                                <option>Sassandra</option>
-                                <option>Séguéla</option>
-                                <option>Sinfra</option>
-                                <option>Soubré</option>
-                                <option>Tabou</option>
-                                <option>Tanda</option>
-                                <option>Tiassalé</option>
-                                <option>Tingréla</option>
-                                <option>Touba</option>
-                                <option>Toulepleu</option>
-                                <option>Toumodi</option>
-                                <option>Vavoua</option>
-                                <option>Yamoussoukro</option>
-                                <option>Zuénoula</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-xs text-slate-600 pt-2">
-                    <input type="checkbox" required id="ageCheck" class="rounded text-brandPink">
-                    <label for="ageCheck">Je confirme avoir <strong>18 ans ou plus</strong>.</label>
-                </div>
-                <button type="submit" class="w-full bg-brand-gradient text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-95 transition text-lg">
-                    Obtenir mon Pass VIP Gratuit 🚀
-                </button>
-                <p id="beta-success" class="hidden text-center text-emerald-600 font-bold text-sm pt-2">
-                    🎉 C'est validé ! Surveille tes SMS, ton invitation arrive très vite.
+    <!-- ===== MAQUIS RÉSUMÉ ===== -->
+    <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-orange-50 to-pink-50 rounded-3xl p-8 sm:p-12 border border-orange-100 flex flex-col md:flex-row items-center gap-8">
+            <div class="text-6xl">🍹</div>
+            <div class="flex-1 text-center md:text-left">
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Bons Plans Rancarts</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-3">Les meilleurs Lounges, Maquis & Fast-Foods</h3>
+                <p class="text-slate-600 text-sm sm:text-base mb-4">
+                    Découvre notre sélection de coins chills à Abidjan. <strong>Bonus : réductions et boissons offertes</strong> en réservant via l'app !
                 </p>
-            </form>
+                <a href="maquis.html" class="text-brandPink font-bold hover:underline inline-flex items-center gap-2">
+                    Découvrir les lieux <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- FOOTER SIMPLE -->
-    <footer class="bg-slate-950 text-slate-400 py-10 text-sm">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-            <div>
-                <span class="font-extrabold text-white text-lg">🔥 Viens chop</span>
-                <p class="text-xs mt-1 text-slate-500">Application réservée aux majeurs (+18 ans). Tes données personnelles sont protégées et confidentielles.</p>
+    <!-- ===== CTA FINAL ===== -->
+    <section class="py-20 bg-brand-gradient text-white">
+        <div class="max-w-2xl mx-auto px-4 text-center">
+            <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase">Offre de Lancement</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 mb-4">Prêt(e) à gérer sans pression ? 🔥</h2>
+            <p class="text-white/90 mb-8">
+                Les <strong>500 premiers inscrits</strong> reçoivent <strong>1 mois VIP 100% offert</strong>. Inscris-toi maintenant !
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="inscription.html" class="bg-white text-brandPink font-extrabold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
+                    Rejoindre gratuitement 🚀
+                </a>
+                <a href="faq.html" class="bg-white/20 text-white font-bold px-6 py-4 rounded-xl hover:bg-white/30 transition">
+                    Des questions ? → FAQ
+                </a>
             </div>
-            <div class="text-xs text-slate-500">
-                <p>© 2025 Viens chop Côte d'Ivoire</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER COMPLET ===== -->
+    <footer class="bg-slate-950 text-slate-400 py-16 text-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Brand -->
+                <div>
+                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                </div>
+                <!-- Navigation -->
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="index.html" class="hover:text-white transition">Accueil</a></li>
+                        <li><a href="comment-ca-marche.html" class="hover:text-white transition">Comment ça marche</a></li>
+                        <li><a href="securite.html" class="hover:text-white transition">Sécurité</a></li>
+                        <li><a href="tarifs.html" class="hover:text-white transition">Tarifs</a></li>
+                    </ul>
+                </div>
+                <!-- Ressources -->
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                    </ul>
+                </div>
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Nous contacter</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-500"></i> WhatsApp Business</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-instagram text-pink-500"></i> @vienschop_ci</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-tiktok text-white"></i> @vienschop</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+                <p>© 2025 Viens chop Côte d'Ivoire. Tous droits réservés.</p>
+                <p>Application réservée aux majeurs (+18 ans). Tes données sont protégées et confidentielles.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+
+        // Disquettes
         const disquettes = [
             "« Team Himra ou Team Didi B ? Attention ta réponse peut annuler notre match hein 👀🔥 »",
-            "« Si on sort ce soir sans pression, tu préfères écouter du Tiakola posé dans la voiture ou t'ambiancer sur du Sindika ? »",
-            "« Sur une échelle de 1 à Damso, tu as le cœur brisé comment ? Ou bien tu es un soldat comme Ninho ? 😂 »",
-            "« Franchement ton profil c'est du lourd comme un gros classique de La B ou 7 Flocky 45. On se capte quand ? »",
-            "« Dis-moi la vérité : premier rdv sans pression, tu es plutôt Chawarma/Burger ou tu veux tester un lounge direct ? »"
+            "« Si on sort ce soir sans pression, tu préfères écouter du Tiakola posé ou t'ambiancer sur du Sindika ? »",
+            "« Sur une échelle de 1 à Damso, tu as le cœur brisé comment ? 😂 »",
+            "« Ton profil c'est du lourd comme un classique de La B, on se capte quand ? »",
+            "« Dis-moi la vérité : premier rdv, tu es plutôt Chawarma ou Lounge direct ? »"
         ];
         let idx = 0;
         function changeDisquette() {
             idx = (idx + 1) % disquettes.length;
             document.getElementById('disquette-text').innerText = disquettes[idx];
-        }
-
-        function handleBetaSubmit(e) {
-            e.preventDefault();
-            document.getElementById('beta-success').classList.remove('hidden');
-            e.target.reset();
         }
     </script>
 </body>
