@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sécurité & Soutra — Viens chop</title>
+    <meta
+        name="description"
+        content="Les bons réflexes pour tes rencontres et les outils Soutra en préparation : SOS, check-in, mode discret et vérification des profils."
+    >
+    <meta name="theme-color" content="#FF5E1A">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Outfit", "sans-serif"]
+                    },
+                    colors: {
+                        brandOrange: "#FF5E1A",
+                        brandPink: "#FF1E56"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 6rem;
+        }
+
+        .bg-brand-gradient {
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+        }
+
+        .text-brand-gradient {
+            color: #E74724;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        :focus-visible {
+            outline: 3px solid #C2410C;
+            outline-offset: 4px;
+        }
+
+        #mobile-menu {
+            margin: 0 0 0 auto;
+            width: min(90vw, 21rem);
+            max-width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            max-height: 100vh;
+            max-height: 100dvh;
+            padding: 1.5rem;
+            border: 0;
+            overflow-y: auto;
+            background: white;
+            color: #1E293B;
+        }
+
+        #mobile-menu::backdrop {
+            background: rgba(15, 23, 42, 0.65);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
+
+    <!-- ACCÈS RAPIDE AU CONTENU -->
+    <a
+        href="#contenu"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-3
+               focus:left-3 focus:z-[100] focus:bg-white focus:p-3
+               focus:rounded-xl focus:shadow-lg"
+    >
+        Aller au contenu
+    </a>
+
+    <!-- NAVIGATION -->
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md">
+        <nav
+            class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6"
+            aria-label="Navigation principale"
+        >
+            <a href="index.html" class="flex shrink-0 items-center gap-2">
+                <span class="text-2xl" aria-hidden="true">🔥</span>
+                <span class="text-brand-gradient text-2xl font-extrabold tracking-tight">
+                    Viens chop
+                </span>
+            </a>
+
+            <div class="hidden items-center gap-5 text-sm font-medium text-slate-600 lg:flex">
+                <a href="index.html" class="hover:text-brandPink">Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink">
+                    Comment ça marche
+                </a>
+                <a
+                    href="securite.html"
+                    aria-current="page"
+                    class="font-bold text-brandPink"
+                >
+                    Sécurité
+                </a>
+                <a href="tarifs.html" class="hover:text-brandPink">Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink">Maquis & Cafés</a>
+                <a href="faq.html" class="hover:text-brandPink">FAQ</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a
+                    href="inscription.html"
+                    class="bg-brand-gradient hidden rounded-full px-5 py-2
+                           text-sm font-semibold text-white shadow-sm
+                           hover:opacity-90 sm:inline-flex"
+                >
+                    Rejoindre
+                </a>
+
+                <button
+                    id="open-menu"
+                    type="button"
+                    aria-controls="mobile-menu"
+                    aria-expanded="false"
+                    aria-label="Ouvrir le menu"
+                    class="flex h-11 w-11 items-center justify-center
+                           rounded-xl border border-slate-200 text-2xl lg:hidden"
+                >
+                    <span aria-hidden="true">☰</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MENU MOBILE -->
+    <dialog id="mobile-menu" aria-labelledby="mobile-menu-title">
+        <div class="mb-8 flex items-center justify-between gap-4">
+            <h2 id="mobile-menu-title" class="text-brand-gradient text-xl font-extrabold">
+                🔥 Viens chop
+            </h2>
+
+            <button
+                id="close-menu"
+                type="button"
+                aria-label="Fermer le menu"
+                class="flex h-11 w-11 items-center justify-center rounded-xl
+                       bg-slate-100 text-2xl"
+            >
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+
+        <nav aria-label="Navigation mobile" class="flex flex-col gap-2 font-semibold">
+            <a href="index.html" class="rounded-xl p-3 hover:bg-slate-50">Accueil</a>
+            <a href="comment-ca-marche.html" class="rounded-xl p-3 hover:bg-slate-50">
+                Comment ça marche
+            </a>
+            <a
+                href="securite.html"
+                aria-current="page"
+                class="rounded-xl bg-orange-50 p-3 text-brandPink"
+            >
+                Sécurité
+            </a>
+            <a href="tarifs.html" class="rounded-xl p-3 hover:bg-slate-50">Tarifs</a>
+            <a href="maquis.html" class="rounded-xl p-3 hover:bg-slate-50">
+                Maquis & Cafés
+            </a>
+            <a href="faq.html" class="rounded-xl p-3 hover:bg-slate-50">FAQ</a>
+
+            <a
+                href="inscription.html"
+                class="bg-brand-gradient mt-5 rounded-xl p-4 text-center text-white"
+            >
+                Rejoindre gratuitement
+            </a>
+        </nav>
+    </dialog>
+
+    <main id="contenu">
+
+        <!-- INTRODUCTION -->
+        <section class="bg-brand-gradient px-4 pb-16 pt-28 text-white">
+            <div class="mx-auto max-w-3xl text-center">
+                <span class="inline-block rounded-full bg-white/20 px-4 py-2 text-sm font-semibold">
+                    Sécurité · Respect · Consentement
+                </span>
+
+                <h1 class="mt-6 text-4xl font-extrabold leading-tight sm:text-5xl">
+                    Rencontre sans pression.<br>
+                    Garde la main.
+                </h1>
+
+                <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/95">
+                    Tu choisis avec qui tu échanges, ce que tu partages
+                    et quand tu veux arrêter. Le feeling, oui.
+                    La pression, non.
+                </p>
+
+                <a
+                    href="#conseils"
+                    class="mt-8 inline-block rounded-xl bg-white px-7 py-4
+                           font-bold text-brandPink shadow-lg hover:bg-orange-50"
+                >
+                    Les bons réflexes
+                </a>
+            </div>
+        </section>
+
+        <!-- ÉTAT RÉEL DES FONCTIONNALITÉS -->
+        <aside
+            class="mx-auto mt-8 max-w-5xl px-4 sm:px-6"
+            aria-labelledby="disponibilite-title"
+        >
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+                <h2 id="disponibilite-title" class="font-bold text-amber-950">
+                    🚧 Les outils Soutra sont en préparation
+                </h2>
+
+                <p class="mt-2 text-sm leading-relaxed text-amber-950">
+                    Le site actuel ne transmet pas de SOS, n’envoie pas de SMS
+                    et ne vérifie pas les selfies. Les fonctions présentées
+                    ci-dessous décrivent le fonctionnement prévu.
+                    Ne compte pas sur cette démonstration en cas d’urgence.
+                </p>
+            </div>
+        </aside>
+
+        <!-- OUTILS SOUTRA -->
+        <section id="outils" class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div class="mx-auto mb-10 max-w-2xl text-center">
+                <span class="text-sm font-bold uppercase tracking-wider text-orange-700">
+                    Le Soutra
+                </span>
+
+                <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+                    Des outils pour garder le contrôle
+                </h2>
+
+                <p class="mt-4 leading-relaxed text-slate-600">
+                    La sécurité de base est prévue pour tout le monde,
+                    y compris en mode gratuit. Certaines options de confort
+                    restent réservées au VIP.
+                </p>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+                <!-- SOS -->
+                <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">📍</span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+                            Prévu · Gratuit
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">SOS à un proche</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Partager volontairement ta position avec un contact
+                        de confiance pendant ton rendez-vous.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Dépend du réseau et de tes autorisations.
+                        Ce n’est pas un appel automatique aux secours.
+                    </p>
+                </article>
+
+                <!-- CHECK-IN -->
+                <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">⏰</span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+                            Prévu · Gratuit
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">Check-in de rendez-vous</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Programmer un rappel pour prendre un moment et confirmer
+                        que tout se passe bien.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Sur le web, un rappel peut être retardé ou interrompu
+                        si le navigateur est suspendu.
+                    </p>
+                </article>
+
+                <!-- FAUX APPEL -->
+                <article class="rounded-3xl border border-orange-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">📞</span>
+                        <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
+                            Prévu · VIP
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">Faux appel Soutra</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Afficher une simulation d’appel pour faciliter
+                        ton départ si tu souhaites écourter un rendez-vous.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Ce n’est pas un vrai appel : aucun proche
+                        ni service de secours n’est contacté.
+                    </p>
+                </article>
+
+                <!-- MODE DISCRET -->
+                <article class="rounded-3xl border border-orange-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">🙈</span>
+                        <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
+                            Prévu · VIP
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">Mode discret</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Limiter la visibilité de ton profil auprès de contacts
+                        que tu choisis d’exclure.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Le site ne peut pas lire automatiquement tout ton
+                        répertoire ni garantir une invisibilité totale.
+                    </p>
+                </article>
+
+                <!-- VÉRIFICATION -->
+                <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">✅</span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+                            Prévu · Pour tous
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">Vérification des profils</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Un parcours de vérification, avec des explications
+                        sur l’utilisation du selfie avant toute collecte.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Un badge ne devra apparaître qu’après une vérification
+                        réelle. Il ne garantit pas les intentions d’une personne.
+                    </p>
+                </article>
+
+                <!-- MODÉRATION -->
+                <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <span class="text-3xl" aria-hidden="true">🛑</span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+                            Prévu · Gratuit
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold">Bloquer et signaler</h3>
+
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Couper le contact avec un profil et signaler
+                        un comportement inapproprié sans devoir payer.
+                    </p>
+
+                    <p class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        Le signalement devra être transmis à une équipe
+                        de modération. Ce dispositif n’est pas encore actif.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- CONSENTEMENT -->
+        <section class="bg-slate-900 px-4 py-16 text-white">
+            <div class="mx-auto grid max-w-5xl items-center gap-8 md:grid-cols-2">
+                <div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-orange-300">
+                        La règle du jeu
+                    </span>
+
+                    <h2 class="mt-3 text-3xl font-extrabold">
+                        Le flirt, c’est à deux.
+                    </h2>
+
+                    <p class="mt-5 leading-relaxed text-slate-300">
+                        Le Mode Flirt doit reposer sur l’accord des deux personnes.
+                        Un match n’est pas une obligation de discuter,
+                        d’envoyer une photo ou d’accepter un rendez-vous.
+                    </p>
+                </div>
+
+                <div class="rounded-3xl border border-slate-700 bg-slate-800 p-7">
+                    <ul class="space-y-5 text-sm leading-relaxed text-slate-200">
+                        <li>✓ Chacun peut dire non ou arrêter à tout moment.</li>
+                        <li>✓ Pas d’insistance après un refus.</li>
+                        <li>✓ Pas de partage de photos ou de messages privés sans accord.</li>
+                        <li>✓ Un abonnement VIP ne donne aucun droit sur l’autre.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONSEILS UTILISABLES DÈS MAINTENANT -->
+        <section id="conseils" class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-extrabold sm:text-4xl">
+                    Les bons réflexes, dès maintenant
+                </h2>
+                <p class="mt-4 text-slate-600">
+                    Pas besoin d’attendre une fonctionnalité pour prendre ces précautions.
+                </p>
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+                <article class="rounded-2xl border border-slate-200 bg-white p-6">
+                    <h3 class="text-lg font-bold">🍹 Commence dans un lieu public</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Pour un premier rendez-vous, choisis un endroit fréquenté.
+                        Prévois ton retour et garde la possibilité de partir
+                        par tes propres moyens.
+                    </p>
+                </article>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6">
+                    <h3 class="text-lg font-bold">🤝 Préviens quelqu’un</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Dis à un proche où tu vas et avec qui.
+                        Convenez d’une heure pour vous donner des nouvelles,
+                        même sans utiliser le site.
+                    </p>
+                </article>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6">
+                    <h3 class="text-lg font-bold">🔐 Garde tes codes pour toi</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Ne partage jamais ton code SMS de connexion,
+                        ton PIN Mobile Money ou tes informations bancaires.
+                        Méfie-toi des demandes d’argent d’un profil rencontré en ligne.
+                    </p>
+                </article>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6">
+                    <h3 class="text-lg font-bold">💬 Avance à ton rythme</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                        Ne donne pas immédiatement ton adresse exacte ou
+                        des documents personnels. Si tu es mal à l’aise,
+                        tu peux arrêter l’échange ou quitter le rendez-vous.
+                    </p>
+                </article>
+            </div>
+
+            <div class="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6">
+                <h3 class="text-lg font-bold text-rose-950">
+                    En cas de danger immédiat
+                </h3>
+                <p class="mt-3 text-sm leading-relaxed text-rose-950">
+                    Mets-toi à l’abri si tu peux le faire sans te mettre davantage
+                    en danger. Demande de l’aide à une personne de confiance
+                    ou au personnel du lieu, et contacte les services d’urgence locaux.
+                    Viens chop n’est pas un service de secours.
+                </p>
+            </div>
+        </section>
+
+        <!-- QUESTIONS FRÉQUENTES -->
+        <section class="border-y border-slate-100 bg-white px-4 py-16">
+            <div class="mx-auto max-w-3xl">
+                <h2 class="mb-8 text-center text-3xl font-extrabold">
+                    On préfère être clairs
+                </h2>
+
+                <div class="space-y-4">
+                    <details class="rounded-2xl border border-slate-200 p-5">
+                        <summary class="cursor-pointer font-bold">
+                            Le site peut-il bloquer les captures d’écran ?
+                        </summary>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                            Non, pas de manière fiable sur un navigateur.
+                            Une personne peut également photographier un écran
+                            avec un autre appareil. Ne partage que ce que
+                            tu es à l’aise de montrer.
+                        </p>
+                    </details>
+
+                    <details class="rounded-2xl border border-slate-200 p-5">
+                        <summary class="cursor-pointer font-bold">
+                            Un profil vérifié est-il forcément fiable ?
+                        </summary>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                            Non. Une vérification peut aider à réduire certaines
+                            usurpations, mais elle ne garantit pas le comportement
+                            d’une personne. Un numéro confirmé ne prouve pas
+                            non plus, à lui seul, que son titulaire est majeur.
+                        </p>
+                    </details>
+
+                    <details class="rounded-2xl border border-slate-200 p-5">
+                        <summary class="cursor-pointer font-bold">
+                            Ma position sera-t-elle suivie en permanence ?
+                        </summary>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                            Le partage prévu sera volontaire, destiné au proche
+                            que tu choisis et pourra être arrêté.
+                            Attention : sur le web, fermer la page ou verrouiller
+                            le téléphone peut interrompre le suivi.
+                            Pour le moment, aucun partage de trajet n’est actif.
+                        </p>
+                    </details>
+
+                    <details class="rounded-2xl border border-slate-200 p-5">
+                        <summary class="cursor-pointer font-bold">
+                            Le mode discret garantit-il que mes contacts ne me verront jamais ?
+                        </summary>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                            Non. Le dispositif prévu vise à limiter la visibilité
+                            auprès de contacts sélectionnés. Il ne peut pas
+                            reconnaître avec certitude une personne utilisant
+                            un autre numéro ou un autre compte.
+                        </p>
+                    </details>
+
+                    <details class="rounded-2xl border border-slate-200 p-5">
+                        <summary class="cursor-pointer font-bold">
+                            Le service est-il accessible aux mineurs ?
+                        </summary>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                            Non. Viens chop est réservé aux personnes de
+                            18 ans et plus. Les modalités de contrôle de l’âge
+                            devront être mises en place et expliquées avant
+                            l’ouverture du service.
+                        </p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="px-4 py-16 text-center">
+            <div class="mx-auto max-w-2xl">
+                <h2 class="text-3xl font-extrabold">
+                    Le feeling oui. La pression non.
+                </h2>
+
+                <p class="mt-4 leading-relaxed text-slate-600">
+                    Découvre le fonctionnement de Viens chop et les différences
+                    entre le mode gratuit et le VIP à 700 FCFA par mois.
+                </p>
+
+                <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+                    <a
+                        href="comment-ca-marche.html"
+                        class="bg-brand-gradient rounded-xl px-7 py-4
+                               font-bold text-white shadow-md hover:opacity-90"
+                    >
+                        Comment ça marche
+                    </a>
+
+                    <a
+                        href="tarifs.html"
+                        class="rounded-xl border border-slate-200 bg-white
+                               px-7 py-4 font-bold hover:bg-slate-100"
+                    >
+                        Gratuit ou VIP ?
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 px-4 py-12 text-sm text-slate-400">
+        <div class="mx-auto max-w-6xl sm:px-2">
+            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                    <a href="index.html" class="text-xl font-extrabold text-white">
+                        🔥 Viens chop
+                    </a>
+                    <p class="mt-3 leading-relaxed">
+                        L’amour et le flirt sans pression.
+                        Pensé pour les rencontres en Côte d’Ivoire.
+                    </p>
+                </div>
+
+                <div>
+                    <h2 class="mb-4 font-bold text-white">Navigation</h2>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="hover:text-white">Accueil</a></li>
+                        <li>
+                            <a href="comment-ca-marche.html" class="hover:text-white">
+                                Comment ça marche
+                            </a>
+                        </li>
+                        <li><a href="securite.html" class="hover:text-white">Sécurité</a></li>
+                        <li><a href="tarifs.html" class="hover:text-white">Tarifs</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="mb-4 font-bold text-white">Ressources</h2>
+                    <ul class="space-y-3">
+                        <li><a href="maquis.html" class="hover:text-white">Maquis & Cafés</a></li>
+                        <li><a href="faq.html" class="hover:text-white">FAQ</a></li>
+                        <li>
+                            <a href="inscription.html" class="hover:text-white">
+                                Inscription
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mentions-legales.html" class="hover:text-white">
+                                Mentions légales & confidentialité
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="mb-4 font-bold text-white">Bon à savoir</h2>
+                    <p class="leading-relaxed">
+                        Réservé aux 18 ans et plus.
+                        Les outils Soutra sont en préparation.
+                        Aucun outil ne peut garantir une rencontre sans risque.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-10 border-t border-slate-800 pt-6 text-xs">
+                © <span id="year"></span> Viens chop Côte d’Ivoire.
+                Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent =
+            new Date().getFullYear();
+
+        const menu = document.getElementById("mobile-menu");
+        const openButton = document.getElementById("open-menu");
+        const closeButton = document.getElementById("close-menu");
+
+        let previousOverflow = "";
+
+        openButton.addEventListener("click", () => {
+            if (menu.open) return;
+
+            previousOverflow = document.body.style.overflow;
+            menu.showModal();
+
+            document.body.style.overflow = "hidden";
+            openButton.setAttribute("aria-expanded", "true");
+        });
+
+        closeButton.addEventListener("click", () => {
+            menu.close();
+        });
+
+        menu.addEventListener("close", () => {
+            document.body.style.overflow = previousOverflow;
+            openButton.setAttribute("aria-expanded", "false");
+        });
+
+        // Fermer en cliquant à l’extérieur du panneau.
+        menu.addEventListener("click", (event) => {
+            if (event.target !== menu) return;
+
+            const bounds = menu.getBoundingClientRect();
+            const outside =
+                event.clientX < bounds.left ||
+                event.clientX > bounds.right ||
+                event.clientY < bounds.top ||
+                event.clientY > bounds.bottom;
+
+            if (outside) menu.close();
+        });
+
+        menu.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => menu.close());
+        });
+
+        // Éviter de garder le menu mobile ouvert sur grand écran.
+        const desktopView = window.matchMedia("(min-width: 1024px)");
+
+        desktopView.addEventListener("change", (event) => {
+            if (event.matches && menu.open) {
+                menu.close();
+            }
+        });
+    </script>
+</body>
+</html>
