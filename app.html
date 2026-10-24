@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Viens chop — L'App</title>
+    <meta name="theme-color" content="#FF5E1A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        /* ===== UTILITIES ===== */
+        .gradient-bg { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
+        .gradient-text {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .screen { display: none; min-height: 100vh; min-height: 100dvh; position: relative; }
+        .screen.active { display: flex; flex-direction: column; }
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%);
+            color: #fff; border: none; padding: 16px 32px; border-radius: 16px;
+            font-family: 'Outfit'; font-weight: 700; font-size: 16px;
+            cursor: pointer; width: 100%; transition: all 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            padding: 14px 24px; border-radius: 14px; font-family: 'Outfit'; font-weight: 600;
+            font-size: 14px; cursor: pointer; width: 100%; transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        .input-field {
+            width: 100%; padding: 16px 20px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 14px;
+            color: #fff; font-family: 'Outfit'; font-size: 16px; outline: none; transition: all 0.2s;
+        }
+        .input-field::placeholder { color: rgba(255,255,255,0.4); }
+        .input-field:focus { border-color: #FF6B00; background: rgba(255,255,255,0.12); }
+        select.input-field { appearance: none; -webkit-appearance: none; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+        }
+        .tag.selected { background: linear-gradient(135deg, #FF6B00, #FF1E56); border-color: transparent; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700;
+        }
+
+        /* ===== SCREEN 1: SPLASH ===== */
+        #splash {
+            justify-content: center; align-items: center;
+            background: linear-gradient(160deg, #0f0f0f 0%, #1a0a00 50%, #1a0011 100%);
+        }
+        #splash .logo-glow {
+            width: 120px; height: 120px; border-radius: 30px;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 56px; box-shadow: 0 0 60px rgba(255,107,0,0.4);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 40px rgba(255,107,0,0.3); }
+            50% { box-shadow: 0 0 80px rgba(255,30,86,0.5); }
+        }
+
+        /* ===== SCREEN 2: LOGIN ===== */
+        #login { justify-content: center; padding: 24px; }
+        .otp-inputs { display: flex; gap: 10px; justify-content: center; }
+        .otp-inputs input {
+            width: 48px; height: 56px; text-align: center; font-size: 22px; font-weight: 700;
+            background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px; color: #fff; font-family: 'Outfit'; outline: none;
+        }
+        .otp-inputs input:focus { border-color: #FF6B00; }
+
+        /* ===== SCREEN 3: PROFILE SETUP ===== */
+        #profile-setup { padding: 24px; padding-top: 60px; overflow-y: auto; }
+        .step-indicator {
+            display: flex; gap: 6px; justify-content: center; margin-bottom: 32px;
+        }
+        .step-dot {
+            width: 32px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.15);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: linear-gradient(90deg, #FF6B00, #FF1E56); width: 48px; }
+        .step-dot.done { background: #FF6B00; }
+
+        /* ===== SCREEN 4: SWIPE / DISCOVER ===== */
+        #discover { padding-bottom: 80px; }
+        .discover-header {
+            padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-stack { flex: 1; position: relative; padding: 0 16px; }
+        .profile-card {
+            width: 100%; aspect-ratio: 3/4; border-radius: 24px; overflow: hidden;
+            position: relative; background: #1a1a1a;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .profile-card .photo-area {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            position: relative;
+        }
+        .photo-area.blurred::after {
+            content: ''; position: absolute; inset: 0;
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            background: rgba(0,0,0,0.2);
+        }
+        .photo-area .blur-overlay {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 2; gap: 8px;
+        }
+        .profile-card .card-info {
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9)); z-index: 3;
+        }
+        .action-buttons {
+            display: flex; justify-content: center; align-items: center; gap: 16px;
+            padding: 20px;
+        }
+        .action-btn {
+            width: 60px; height: 60px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+            border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .action-btn:hover { transform: scale(1.1); }
+        .action-btn.pass { background: rgba(255,255,255,0.1); color: #ff4444; border: 2px solid #ff4444; }
+        .action-btn.like { background: linear-gradient(135deg, #FF6B00, #FF1E56); color: #fff; width: 72px; height: 72px; font-size: 28px; }
+        .action-btn.voice { background: rgba(255,255,255,0.1); color: #6ee7b7; border: 2px solid #6ee7b7; }
+        .action-btn.soutra { background: rgba(255,255,255,0.1); color: #fbbf24; border: 2px solid #fbbf24; }
+
+        .likes-counter {
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border-radius: 50px; font-size: 13px; font-weight: 700;
+        }
+        .likes-counter .count { color: #FF6B00; }
+
+        /* ===== SCREEN 5: CHAT ===== */
+        #chat { padding-bottom: 80px; }
+        .chat-header {
+            padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .chat-messages {
+            flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+        }
+        .msg {
+            max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5;
+        }
+        .msg.sent { background: linear-gradient(135deg, #FF6B00, #FF1E56); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.received { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.system {
+            align-self: center; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+            font-size: 12px; text-align: center; border-radius: 12px; max-width: 90%;
+        }
+        .chat-input-bar {
+            padding: 12px 16px; display: flex; gap: 10px; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.08); background: #0f0f0f;
+        }
+        .chat-input-bar input {
+            flex: 1; padding: 12px 16px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 50px;
+            color: #fff; font-family: 'Outfit'; font-size: 14px; outline: none;
+        }
+        .chat-input-bar button {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+            border: none; color: #fff; font-size: 18px; cursor: pointer;
+        }
+
+        /* ===== MODE FLIRT QUIZ ===== */
+        .quiz-card {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 24px; text-align: center;
+        }
+        .quiz-option {
+            padding: 14px 20px; border-radius: 14px; font-weight: 600; font-size: 15px;
+            cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06); margin-top: 10px;
+        }
+        .quiz-option:hover { background: rgba(255,107,0,0.2); border-color: #FF6B00; }
+        .quiz-option.selected { background: linear-gradient(135deg, #FF6B00, #FF1E56); border-color: transparent; }
+
+        /* ===== FAKE CALL OVERLAY ===== */
+        #fake-call-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+            flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+        }
+        #fake-call-overlay.active { display: flex; }
+        .call-avatar {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center; font-size: 48px;
+            animation: call-ring 1.5s ease-in-out infinite;
+        }
+        @keyframes call-ring {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); }
+            50% { box-shadow: 0 0 0 30px rgba(102,126,234,0); }
+        }
+        .call-actions { display: flex; gap: 48px; margin-top: 40px; }
+        .call-btn {
+            width: 64px; height: 64px; border-radius: 50%; border: none;
+            font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .call-btn.decline { background: #ff3b30; color: #fff; }
+        .call-btn.accept { background: #34c759; color: #fff; }
+
+        /* ===== VIP MODAL ===== */
+        #vip-modal {
+            display: none; position: fixed; inset: 0; z-index: 8888;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        #vip-modal.active { display: flex; }
+        .vip-card {
+            background: #1a1a1a; border: 2px solid #FF6B00; border-radius: 28px;
+            padding: 32px 24px; max-width: 400px; width: 100%; text-align: center;
+        }
+        .payment-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px; border-radius: 14px; font-weight: 700; font-size: 14px;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06); color: #fff; transition: all 0.2s; width: 100%;
+        }
+        .payment-btn:hover { background: rgba(255,255,255,0.12); }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(15,15,15,0.95); backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4);
+            cursor: pointer; padding: 8px 12px; transition: all 0.2s;
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #FF6B00; }
+        .nav-item .notif-dot {
+            width: 8px; height: 8px; background: #FF1E56; border-radius: 50%;
+            position: absolute; top: 4px; right: 8px;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .anim-slide-up { animation: slideUp 0.5s ease forwards; }
+        .anim-fade-in { animation: fadeIn 0.4s ease forwards; }
+
+        /* ===== SWIPE ANIMATION ===== */
+        .card-swipe-left { animation: swipeLeft 0.4s ease forwards; }
+        .card-swipe-right { animation: swipeRight 0.4s ease forwards; }
+        @keyframes swipeLeft { to { transform: translateX(-120%) rotate(-15deg); opacity: 0; } }
+        @keyframes swipeRight { to { transform: translateX(120%) rotate(15deg); opacity: 0; } }
+
+        /* ===== LIKE STAMP ===== */
+        .stamp {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0);
+            font-size: 80px; z-index: 10; pointer-events: none;
+        }
+        .stamp.show { animation: stampPop 0.5s ease forwards; }
+        @keyframes stampPop { 0% { transform: translate(-50%,-50%) scale(0) rotate(-30deg); } 50% { transform: translate(-50%,-50%) scale(1.2) rotate(10deg); } 100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== ÉCRAN 1: SPLASH ==================== -->
+    <div id="splash" class="screen active">
+        <div style="text-align:center;" class="anim-fade-in">
+            <div class="logo-glow" style="margin:0 auto 24px;">🔥</div>
+            <h1 style="font-size:36px; font-weight:800; margin-bottom:8px;">
+                <span class="gradient-text">Viens chop</span>
+            </h1>
+            <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:48px;">L'amour et le flirt sans pression</p>
+            <button class="btn-primary" onclick="goTo('login')" style="max-width:280px; margin:0 auto;">
+                Commencer 🔥
+            </button>
+            <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:16px;">Réservé aux +18 ans</p>
+        </div>
+    </div>
+
+    <!-- ==================== ÉCRAN 2: LOGIN ==================== -->
+    <div id="login" class="screen">
+        <div style="max-width:400px; margin:0 auto; width:100%;" class="anim-slide-up">
+            <div style="text-align:center; margin-bottom:40px;">
+                <span style="font-size:48px;">📱</span>
+                <h2 style="font-size:24px; font-weight:800; margin-top:16px;">Ton numéro ivoirien</h2>
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-top:8px;">On t'envoie un code par SMS pour vérifier que c'est bien toi</p>
+            </div>
+
+            <!-- Phone Input -->
+            <div id="phone-step">
+                <div style="display:flex; gap:10px; margin-bottom:16px;">
+                    <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">🇨🇮 +225</div>
+                    <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14">
+                </div>
+                <button class="btn-primary" onclick="sendOTP()">
+                    Recevoir mon code SMS
+                </button>
+            </div>
+
+            <!-- OTP Input -->
+            <div id="otp-step" style="display:none;">
+                <p style="text-align:center; color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:20px;">
+                    Code envoyé au <span id="phone-display" style="color:#FF6B00; font-weight:700;"></span>
+                </p>
+                <div class="otp-inputs" style="margin-bottom:24px;">
+                    <input type="text" maxlength="1" oninput="otpNext(this,1)">
+                    <input type="text" maxlength="1" oninput="otpNext(this,2)">
+                    <input type="text" maxlength="1" oninput="otpNext(this,3)">
+                    <input type="text" maxlength="1" oninput="otpNext(this,4)">
+                </div>
+                <button class="btn-primary" onclick="verifyOTP()">
+                    Vérifier ✓
+                </button>
+                <p style="text-align:center; margin-top:16px;">
+                    <button style="background:none; border:none; color:#FF6B00; font-weight:600; font-size:13px; cursor:pointer;" onclick="sendOTP()">Renvoyer le code</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ÉCRAN 3: CRÉATION PROFIL ==================== -->
+    <div id="profile-setup" class="screen">
+        <div style="max-width:440px; margin:0 auto; width:100%;">
+            
+            <!-- Step Indicators -->
+            <div class="step-indicator">
+                <div class="step-dot active" id="sd1"></div>
+                <div class="step-dot" id="sd2"></div>
+                <div class="step-dot" id="sd3"></div>
+            </div>
+
+            <!-- STEP 1: Infos de base -->
+            <div id="setup-step-1" class="anim-slide-up">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">On fait connaissance 👋</h2>
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:28px;">C'est rapide, sans pression !</p>
+
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ton prénom ou surnom</label>
+                        <input type="text" id="setup-name" class="input-field" placeholder="Ex: Franck / Maïmouna" style="margin-top:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ton âge</label>
+                        <input type="number" id="setup-age" class="input-field" placeholder="Ex: 22" min="18" max="99" style="margin-top:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je suis</label>
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" onclick="selectGender(this,'Homme')">🙋‍♂️ Un Homme</button>
+                            <button class="tag" onclick="selectGender(this,'Femme')">🙋‍♀️ Une Femme</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" onclick="selectSeeking(this,'Homme')">🙋‍♂️ Homme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Femme')">🙋‍♀️ Femme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Tous')">🌍 Tous</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ta commune / ville</label>
+                        <select id="setup-city" class="input-field" style="margin-top:6px;">
+                            <option value="" disabled selected>Choisis ta ville...</option>
+                            <optgroup label="📍 Grand Abidjan">
+                                <option>Abobo</option><option>Adjamé</option><option>Anyama</option>
+                                <option>Attécoubé</option><option>Bingerville</option>
+                                <option>Cocody (Riviera / Angré / 2 Plateaux)</option>
+                                <option>Koumassi</option><option>Marcory (Zone 4 / Biétry)</option>
+                                <option>Plateau</option><option>Port-Bouët</option><option>Songon</option>
+                                <option>Treichville</option><option>Yopougon</option>
+                            </optgroup>
+                            <optgroup label="🇨🇮 Villes de Côte d'Ivoire">
+                                <option>Abengourou</option><option>Aboisso</option><option>Adiaké</option>
+                                <option>Adzopé</option><option>Agboville</option><option>Agnibilékrou</option>
+                                <option>Akoupé</option><option>Alepe</option><option>Assinie</option>
+                                <option>Bangolo</option><option>Béoumi</option><option>Biankouma</option>
+                                <option>Bondoukou</option><option>Bongouanou</option><option>Bonoua</option>
+                                <option>Bouaflé</option><option>Bouaké</option><option>Bouna</option>
+                                <option>Boundiali</option><option>Dabakala</option><option>Dabou</option>
+                                <option>Daloa</option><option>Danané</option><option>Daoukro</option>
+                                <option>Dimbokro</option><option>Divo</option><option>Duékoué</option>
+                                <option>Ferkessédougou</option><option>Fresco</option><option>Gagnoa</option>
+                                <option>Grand-Bassam</option><option>Grand-Béréby</option><option>Grand-Lahou</option>
+                                <option>Guiglo</option><option>Issia</option><option>Jacqueville</option>
+                                <option>Katiola</option><option>Korhogo</option><option>Lakota</option>
+                                <option>Man</option><option>Mankono</option><option>M'Bahiakro</option>
+                                <option>Odienné</option><option>Oumé</option><option>Sakassou</option>
+                                <option>San-Pédro</option><option>Sassandra</option><option>Séguéla</option>
+                                <option>Sinfra</option><option>Soubré</option><option>Tabou</option>
+                                <option>Tanda</option><option>Tiassalé</option><option>Tingréla</option>
+                                <option>Touba</option><option>Toulepleu</option><option>Toumodi</option>
+                                <option>Vavoua</option><option>Yamoussoukro</option><option>Zuénoula</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()">Continuer →</button>
+            </div>
+
+            <!-- STEP 2: Vibes musicales -->
+            <div id="setup-step-2" style="display:none;">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Tes sons du moment 🎵</h2>
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">Choisis tes artistes préférés pour matcher avec les bonnes personnes !</p>
+
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🇨🇮 Rap Ivoire & Afro</span>
+                    <button class="tag" onclick="toggleArtist(this)">🔥 Himra</button>
+                    <button class="tag" onclick="toggleArtist(this)">💎 Didi B</button>
+                    <button class="tag" onclick="toggleArtist(this)">⚡ Sindika</button>
+                    <button class="tag" onclick="toggleArtist(this)">🎤 La B</button>
+                    <button class="tag" onclick="toggleArtist(this)">🌊 7 Flocky 45</button>
+                    <button class="tag" onclick="toggleArtist(this)">🎶 Couper-Décaler</button>
+                    <button class="tag" onclick="toggleArtist(this)">🥁 Amapiano</button>
+                    <button class="tag" onclick="toggleArtist(this)">💃 Afrobeats</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🌍 Rap FR & International</span>
+                    <button class="tag" onclick="toggleArtist(this)">🖤 Damso</button>
+                    <button class="tag" onclick="toggleArtist(this)">🎸 Tiakola</button>
+                    <button class="tag" onclick="toggleArtist(this)">🦅 Ninho</button>
+                    <button class="tag" onclick="toggleArtist(this)">🎵 Gazo</button>
+                    <button class="tag" onclick="toggleArtist(this)">💿 Werenoi</button>
+                    <button class="tag" onclick="toggleArtist(this)">🌙 SDM</button>
+                    <button class="tag" onclick="toggleArtist(this)">🎧 Rema</button>
+                    <button class="tag" onclick="toggleArtist(this)">✨ Burna Boy</button>
+                </div>
+
+                <button class="btn-primary" onclick="profileStep3()">Continuer →</button>
+                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep1()">← Retour</button>
+            </div>
+
+            <!-- STEP 3: Note vocale & Selfie -->
+            <div id="setup-step-3" style="display:none;">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Ta note vocale (10s) 🎙️</h2>
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">
+                    Enregistre ta voix pour te présenter sans pression. C'est ça que ton crush écoutera en premier !
+                </p>
+
+                <!-- Voice Recorder UI -->
+                <div style="text-align:center; margin-bottom:32px;">
+                    <div id="voice-btn" onclick="toggleRecording()" style="width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:36px; transition:all 0.3s;">
+                        <i class="fa-solid fa-microphone"></i>
+                    </div>
+                    <p id="voice-status" style="color:rgba(255,255,255,0.5); font-size:13px; margin-top:12px;">Appuie pour enregistrer (10s max)</p>
+                    <div id="voice-timer" style="display:none; font-size:28px; font-weight:800; color:#FF6B00; margin-top:8px;">0:00</div>
+                </div>
+
+                <!-- Selfie Verification -->
+                <div style="padding:20px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); text-align:center; margin-bottom:24px;">
+                    <span style="font-size:32px;">📸</span>
+                    <h3 style="font-size:16px; font-weight:700; margin-top:8px;">Vérifie ton profil (Selfie rapide)</h3>
+                    <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Un selfie vidéo de 3 secondes pour prouver que tu es réel(le). Zéro brouteur autorisé !</p>
+                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie()">
+                        <i class="fa-solid fa-camera"></i> Prendre le selfie
+                    </button>
+                    <p id="selfie-done" style="display:none; color:#34d399; font-weight:700; font-size:13px; margin-top:10px;">✅ Selfie vérifié ! Badge Profil Certifié ajouté</p>
+                </div>
+
+                <button class="btn-primary" onclick="finishProfile()">
+                    C'est parti ! 🔥
+                </button>
+                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep2Back()">← Retour</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ÉCRAN 4: DÉCOUVERTE (SWIPE) ==================== -->
+    <div id="discover" class="screen">
+        <div class="discover-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:22px;">🔥</span>
+                <span class="gradient-text" style="font-size:20px; font-weight:800;">Viens chop</span>
+            </div>
+            <div class="likes-counter glass">
+                <i class="fa-solid fa-heart" style="color:#FF1E56;"></i>
+                <span id="likes-left" class="count">10</span><span style="color:rgba(255,255,255,0.5);">/ 10 Likes</span>
+            </div>
+        </div>
+
+        <!-- Card Stack -->
+        <div class="card-stack">
+            <div class="profile-card" id="current-card">
+                <div class="photo-area blurred" id="card-photo" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b);">
+                    <div style="font-size:64px; opacity:0.3; position:absolute;">👤</div>
+                    <div class="blur-overlay">
+                        <i class="fa-solid fa-lock" style="font-size:24px; opacity:0.7;"></i>
+                        <span style="font-size:12px; font-weight:600; opacity:0.7;">Photo visible après 5 messages</span>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <!-- Voice note bar -->
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.1); border-radius:12px;">
+                        <button onclick="playVoiceNote()" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); border:none; color:#fff; font-size:14px; cursor:pointer;">
+                            <i class="fa-solid fa-play" id="play-icon"></i>
+                        </button>
+                        <div style="flex:1;">
+                            <div style="height:4px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden;">
+                                <div id="voice-progress" style="width:0%; height:100%; background:linear-gradient(90deg,#FF6B00,#FF1E56); transition:width 0.1s;"></div>
+                            </div>
+                            <span style="font-size:10px; color:rgba(255,255,255,0.5); margin-top:4px; display:block;">🎙️ Note vocale (10s)</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <h3 id="card-name" style="font-size:22px; font-weight:800;">Awa, 22</h3>
+                        <span class="badge" style="background:rgba(59,130,246,0.2); color:#60a5fa;"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
+                    </div>
+                    <p id="card-location" style="font-size:13px; color:rgba(255,255,255,0.6);">📍 Cocody, Angré</p>
+                    <div id="card-artists" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                        <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🔥 Himra</span>
+                        <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🖤 Damso</span>
+                        <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎸 Tiakola</span>
+                    </div>
+                </div>
+                <div class="stamp" id="like-stamp">❤️</div>
+                <div class="stamp" id="pass-stamp">👋</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-btn pass" onclick="swipePass()" title="Passer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button class="action-btn voice" onclick="playVoiceNote()" title="Écouter la voix">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button class="action-btn like" onclick="swipeLike()" title="Liker ❤️">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+            <button class="action-btn soutra" onclick="triggerFakeCall()" title="Faux Appel Soutra">
+                <i class="fa-solid fa-phone"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== ÉCRAN 5: CHAT & MODE FLIRT ==================== -->
+    <div id="chat" class="screen">
+        <div class="chat-header">
+            <button onclick="goTo('discover')" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px);">👤</div>
+            <div style="flex:1;">
+                <h3 style="font-size:15px; font-weight:700;" id="chat-name">Awa</h3>
+                <p style="font-size:11px; color:rgba(255,255,255,0.4);">📍 Cocody • Photo après <span id="msg-countdown">5</span> messages</p>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button onclick="showQuiz()" style="background:none; border:none; color:#FF6B00; font-size:20px; cursor:pointer;" title="Mode Flirt">
+                    <i class="fa-solid fa-gamepad"></i>
+                </button>
+                <button onclick="triggerFakeCall()" style="background:none; border:none; color:#fbbf24; font-size:20px; cursor:pointer;" title="Faux Appel">
+                    <i class="fa-solid fa-phone-volume"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="msg system">
+                🔒 Ses photos sont floutées. Échangez 5 messages pour les débloquer sans pression !
+            </div>
+            <div class="msg system">
+                🎲 Lance un quiz Mode Flirt avec l'icône 🎮 en haut à droite !
+            </div>
+        </div>
+
+        <!-- Quiz Mode Flirt (inline) -->
+        <div id="quiz-container" style="display:none; padding:16px;">
+            <div class="quiz-card">
+                <span style="font-size:11px; font-weight:700; color:#FF6B00; text-transform:uppercase; letter-spacing:1px;">🔥 Mode Flirt — Quiz</span>
+                <h3 id="quiz-question" style="font-size:18px; font-weight:700; margin-top:12px;">Chawarma/Burger ou Alloco/Poisson braisé ?</h3>
+                <div id="quiz-options" style="margin-top:16px;">
+                    <div class="quiz-option" onclick="answerQuiz(this)">🌯 Chawarma/Burger</div>
+                    <div class="quiz-option" onclick="answerQuiz(this)">🍌 Alloco/Poisson braisé</div>
+                </div>
+                <p id="quiz-limit-msg" style="display:none; color:#fbbf24; font-size:12px; margin-top:12px; font-weight:600;"></p>
+            </div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chat-input" placeholder="Écris ton message..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- ==================== FAUX APPEL OVERLAY ==================== -->
+    <div id="fake-call-overlay">
+        <div class="call-avatar">📞</div>
+        <h2 style="font-size:22px; font-weight:700;" id="caller-name">Maman 📱</h2>
+        <p style="color:rgba(255,255,255,0.5); font-size:14px;">Appel entrant...</p>
+        <div class="call-actions">
+            <button class="call-btn decline" onclick="endFakeCall()"><i class="fa-solid fa-phone-slash"></i></button>
+            <button class="call-btn accept" onclick="acceptFakeCall()"><i class="fa-solid fa-phone"></i></button>
+        </div>
+        <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:32px;">🤫 Faux Appel Soutra — Personne ne saura</p>
+    </div>
+
+    <!-- ==================== VIP MODAL ==================== -->
+    <div id="vip-modal">
+        <div class="vip-card anim-slide-up">
+            <span style="font-size:48px;">👑</span>
+            <h2 style="font-size:22px; font-weight:800; margin-top:12px;" class="gradient-text">Passe en Mode VIP !</h2>
+            <p style="color:rgba(255,255,255,0.6); font-size:14px; margin:12px 0 20px;" id="vip-reason">
+                Tu as utilisé tes 10 Likes du jour. Repasse demain ou débloque les Likes illimités !
+            </p>
+            <div style="font-size:36px; font-weight:800; margin-bottom:4px;" class="gradient-text">700 FCFA</div>
+            <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Par mois • Sans renouvellement piégeux</p>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+                <button class="payment-btn" onclick="fakePayment('Wave')">🐧 Payer avec Wave</button>
+                <button class="payment-btn" onclick="fakePayment('Orange Money')">🟠 Payer avec Orange Money</button>
+                <button class="payment-btn" onclick="fakePayment('MTN MoMo')">🟡 Payer avec MTN MoMo</button>
+                <button class="payment-btn" onclick="fakePayment('Moov Money')">🔵 Payer avec Moov Money</button>
+            </div>
+            <button onclick="closeVipModal()" style="background:none; border:none; color:rgba(255,255,255,0.4); font-size:13px; cursor:pointer; font-family:'Outfit';">
+                Non merci, je reste en mode « coulé » 😅
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== BOTTOM NAVIGATION ==================== -->
+    <div class="bottom-nav" id="bottom-nav" style="display:none;">
+        <div class="nav-item active" onclick="switchTab('discover')">
+            <i class="fa-solid fa-fire"></i>
+            <span>Découvrir</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('chat')" style="position:relative;">
+            <i class="fa-solid fa-comment"></i>
+            <span>Messages</span>
+            <div class="notif-dot" id="chat-notif" style="display:none;"></div>
+        </div>
+        <div class="nav-item" onclick="showQuiz()">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>Mode Flirt</span>
+        </div>
+        <div class="nav-item" onclick="triggerFakeCall()">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Soutra</span>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ===== STATE =====
+        let userProfile = {};
+        let likesRemaining = 10;
+        let isVIP = false;
+        let messageCount = 0;
+        let photoUnlocked = false;
+        let quizSessionsToday = 0;
+        const MAX_FREE_QUIZ = 1;
+        let currentProfileIndex = 0;
+        let isRecording = false;
+        let recordTimer = null;
+        let recordSeconds = 0;
+        let voicePlaying = false;
+        let voiceInterval = null;
+        let fakeCallAudio = null;
+
+        // ===== FAKE PROFILES =====
+        const profiles = [
+            { name: "Awa", age: 22, city: "Cocody, Angré", artists: ["Himra","Damso","Tiakola"], color: "linear-gradient(135deg,#2d1b4e,#1b3a4b)" },
+            { name: "Prisca", age: 20, city: "Yopougon, Académie", artists: ["Didi B","Ninho","Amapiano"], color: "linear-gradient(135deg,#1b3a4b,#0f3443)" },
+            { name: "Fatou", age: 23, city: "Marcory, Zone 4", artists: ["Sindika","Tiakola","Gazo"], color: "linear-gradient(135deg,#1a1a2e,#4a1942)" },
+            { name: "Christelle", age: 21, city: "Plateau", artists: ["La B","Damso","Rema"], color: "linear-gradient(135deg,#0f3443,#34073d)" },
+            { name: "Marie", age: 24, city: "Cocody, 2 Plateaux", artists: ["7 Flocky 45","Werenoi","Burna Boy"], color: "linear-gradient(135deg,#1a0a2e,#2d1b4e)" },
+            { name: "Aïcha", age: 19, city: "Abobo, PK18", artists: ["Himra","Gazo","SDM"], color: "linear-gradient(135deg,#16213e,#1a1a2e)" },
+            { name: "Emmanuella", age: 25, city: "Bouaké", artists: ["Didi B","Tiakola","Afrobeats"], color: "linear-gradient(135deg,#0d1b2a,#1b263b)" },
+            { name: "Inès", age: 22, city: "Yamoussoukro", artists: ["Sindika","Ninho","Amapiano"], color: "linear-gradient(135deg,#1b3a4b,#1a1a2e)" },
+            { name: "Linda", age: 20, city: "Daloa", artists: ["La B","Damso","Himra"], color: "linear-gradient(135deg,#2d1b4e,#16213e)" },
+            { name: "Grâce", age: 23, city: "San-Pédro", artists: ["7 Flocky 45","Tiakola","Rema"], color: "linear-gradient(135deg,#0f3443,#1a0a2e)" }
+        ];
+
+        // ===== QUIZ QUESTIONS =====
+        const quizzes = [
+            { q: "Premier rdv sans pression, tu choisis quoi ?", a: ["🌯 Chawarma / Burger", "🍌 Alloco / Poisson braisé"] },
+            { q: "Soirée parfaite, c'est quoi le programme ?", a: ["🎵 Lounge tranquille posé", "🎤 Concert Himra / Didi B"] },
+            { q: "Tu préfères qu'on t'envoie quoi en premier ?", a: ["🎙️ Une note vocale douce", "💬 Une disquette de ouf"] },
+            { q: "Ton red flag absolu chez un crush ?", a: ["📵 Répond jamais aux messages", "🤥 Utilise des fausses photos"] },
+            { q: "Pour un weekend en amoureux c'est où ?", a: ["🏖️ Assinie / Grand-Bassam", "🏨 Hôtel chill à Cocody"] },
+            { q: "C'est quoi le plus important pour toi ?", a: ["😂 L'humour avant tout", "💎 L'ambition et les projets"] },
+            { q: "Ton love language c'est quoi ?", a: ["🎁 Les petites attentions / cadeaux", "🤗 Le temps de qualité ensemble"] },
+            { q: "Damso ou Ninho ?", a: ["🖤 Damso — mélancolie", "🦅 Ninho — la ténacité"] },
+        ];
+        let currentQuizIndex = 0;
+
+        // ===== DISQUETTES =====
+        const disquettes = [
+            "Team Himra ou Team Didi B ? Attention ta réponse peut annuler notre match hein 👀🔥",
+            "Si on sort ce soir sans pression, tu préfères écouter du Tiakola posé ou t'ambiancer sur du Sindika ?",
+            "Sur une échelle de 1 à Damso, tu as le cœur brisé comment ? 😂",
+            "Ton profil c'est du lourd comme un classique de La B, on se capte quand ?",
+            "Dis-moi la vérité : premier rdv, tu es plutôt Chawarma ou Lounge direct ?",
+            "Si j'étais un son de 7 Flocky 45, lequel tu mettrais en boucle pour moi ? 🎵",
+            "Tu es la seule notification que j'ai envie de checker aujourd'hui 📱🔥"
+        ];
+
+        // ===== FAKE CALL NAMES =====
+        const callerNames = ["Maman 📱", "Papa 📱", "Grand Frère 📱", "Meilleure Amie 📱", "Patron 💼", "Tonton 📱"];
+
+        // ===== NAVIGATION =====
+        function goTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            const navScreens = ['discover', 'chat'];
+            document.getElementById('bottom-nav').style.display = navScreens.includes(screenId) ? 'flex' : 'none';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            goTo(tab);
+            if(tab === 'chat') document.getElementById('chat-notif').style.display = 'none';
+        }
+
+        // ===== LOGIN =====
+        function sendOTP() {
+            const phone = document.getElementById('phone-input').value.trim();
+            if(phone.length < 8) { alert("Entre un numéro valide !"); return; }
+            document.getElementById('phone-display').textContent = "+225 " + phone;
+            document.getElementById('phone-step').style.display = 'none';
+            document.getElementById('otp-step').style.display = 'block';
+            document.getElementById('otp-step').classList.add('anim-slide-up');
+            // Focus first OTP input
+            setTimeout(() => document.querySelector('.otp-inputs input').focus(), 300);
+        }
+
+        function otpNext(el, nextIdx) {
+            if(el.value.length === 1 && nextIdx < 4) {
+                el.nextElementSibling?.focus();
+            }
+        }
+
+        function verifyOTP() {
+            const inputs = document.querySelectorAll('.otp-inputs input');
+            let code = '';
+            inputs.forEach(i => code += i.value);
+            if(code.length < 4) { alert("Entre le code complet !"); return; }
+            // Simulate success
+            goTo('profile-setup');
+        }
+
+        // ===== PROFILE SETUP =====
+        let selectedGender = '';
+        let selectedSeeking = '';
+
+        function selectGender(el, val) {
+            selectedGender = val;
+            el.parentElement.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        function selectSeeking(el, val) {
+            selectedSeeking = val;
+            el.parentElement.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        function toggleArtist(el) {
+            el.classList.toggle('selected');
+        }
+
+        function profileStep2() {
+            const name = document.getElementById('setup-name').value.trim();
+            const age = parseInt(document.getElementById('setup-age').value);
+            const city = document.getElementById('setup-city').value;
+            if(!name) { alert("Entre ton prénom ou surnom !"); return; }
+            if(!age || age < 18) { alert("Tu dois avoir au moins 18 ans !"); return; }
+            if(!city) { alert("Choisis ta commune ou ta ville !"); return; }
+            if(!selectedGender) { alert("Indique si tu es un homme ou une femme !"); return; }
+            if(!selectedSeeking) { alert("Indique qui tu recherches !"); return; }
+
+            userProfile = { name, age, city, gender: selectedGender, seeking: selectedSeeking };
+            document.getElementById('setup-step-1').style.display = 'none';
+            document.getElementById('setup-step-2').style.display = 'block';
+            document.getElementById('setup-step-2').classList.add('anim-slide-up');
+            document.getElementById('sd1').classList.remove('active');
+            document.getElementById('sd1').classList.add('done');
+            document.getElementById('sd2').classList.add('active');
+        }
+
+        function profileStep1() {
+            document.getElementById('setup-step-2').style.display = 'none';
+            document.getElementById('setup-step-1').style.display = 'block';
+            document.getElementById('sd2').classList.remove('active');
+            document.getElementById('sd1').classList.add('active');
+            document.getElementById('sd1').classList.remove('done');
+        }
+
+        function profileStep3() {
+            document.getElementById('setup-step-2').style.display = 'none';
+            document.getElementById('setup-step-3').style.display = 'block';
+            document.getElementById('setup-step-3').classList.add('anim-slide-up');
+            document.getElementById('sd2').classList.remove('active');
+            document.getElementById('sd2').classList.add('done');
+            document.getElementById('sd3').classList.add('active');
+        }
+
+        function profileStep2Back() {
+            document.getElementById('setup-step-3').style.display = 'none';
+            document.getElementById('setup-step-2').style.display = 'block';
+            document.getElementById('sd3').classList.remove('active');
+            document.getElementById('sd2').classList.add('active');
+            document.getElementById('sd2').classList.remove('done');
+        }
+
+        // Voice recording simulation
+        function toggleRecording() {
+            const btn = document.getElementById('voice-btn');
+            const status = document.getElementById('voice-status');
+            const timer = document.getElementById('voice-timer');
+
+            if(!isRecording) {
+                isRecording = true;
+                recordSeconds = 0;
+                btn.style.boxShadow = '0 0 0 0 rgba(255,30,86,0.5)';
+                btn.innerHTML = '<i class="fa-solid fa-stop"></i>';
+                btn.style.animation = 'pulse-glow 0.8s ease-in-out infinite';
+                status.textContent = 'Enregistrement en cours...';
+                timer.style.display = 'block';
+                recordTimer = setInterval(() => {
+                    recordSeconds++;
+                    timer.textContent = `0:${recordSeconds.toString().padStart(2,'0')}`;
+                    if(recordSeconds >= 10) toggleRecording();
+                }, 1000);
+            } else {
+                isRecording = false;
+                clearInterval(recordTimer);
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btn.style.animation = 'none';
+                btn.style.background = '#34d399';
+                status.textContent = '✅ Note vocale enregistrée !';
+            }
+        }
+
+        function fakeSelfie() {
+            document.getElementById('selfie-done').style.display = 'block';
+            event.target.textContent = '✅ Selfie validé';
+            event.target.disabled = true;
+        }
+
+        function finishProfile() {
+            loadProfile(0);
+            goTo('discover');
+        }
+
+        // ===== DISCOVER / SWIPE =====
+        function loadProfile(index) {
+            if(index >= profiles.length) index = 0;
+            currentProfileIndex = index;
+            const p = profiles[index];
+            document.getElementById('card-name').textContent = `${p.name}, ${p.age}`;
+            document.getElementById('card-location').textContent = `📍 ${p.city}`;
+            document.getElementById('card-photo').style.background = p.color;
+            
+            const artistsDiv = document.getElementById('card-artists');
+            artistsDiv.innerHTML = p.artists.map(a => `<span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎵 ${a}</span>`).join('');
+
+            // Reset card
+            const card = document.getElementById('current-card');
+            card.className = 'profile-card';
+            card.style.display = 'block';
+
+            // Reset voice
+            document.getElementById('voice-progress').style.width = '0%';
+            document.getElementById('play-icon').className = 'fa-solid fa-play';
+            if(voiceInterval) clearInterval(voiceInterval);
+            voicePlaying = false;
+        }
+
+        function swipeLike() {
+            if(likesRemaining <= 0 && !isVIP) {
+                showVipModal("Tu as utilisé tes 10 Likes du jour ! Repasse demain ou débloque les Likes illimités 👑");
+                return;
+            }
+
+            if(!isVIP) {
+                likesRemaining--;
+                document.getElementById('likes-left').textContent = likesRemaining;
+            }
+
+            // Show stamp
+            const stamp = document.getElementById('like-stamp');
+            stamp.classList.add('show');
+            setTimeout(() => stamp.classList.remove('show'), 600);
+
+            // Animate card
+            const card = document.getElementById('current-card');
+            card.classList.add('card-swipe-right');
+
+            // Simulate match (random 40% chance)
+            const isMatch = Math.random() < 0.4;
+
+            setTimeout(() => {
+                if(isMatch) {
+                    openChat(profiles[currentProfileIndex]);
+                } else {
+                    loadProfile(currentProfileIndex + 1);
+                }
+            }, 500);
+        }
+
+        function swipePass() {
+            const stamp = document.getElementById('pass-stamp');
+            stamp.classList.add('show');
+            setTimeout(() => stamp.classList.remove('show'), 600);
+
+            const card = document.getElementById('current-card');
+            card.classList.add('card-swipe-left');
+            setTimeout(() => loadProfile(currentProfileIndex + 1), 500);
+        }
+
+        function playVoiceNote() {
+            if(voicePlaying) return;
+            voicePlaying = true;
+            document.getElementById('play-icon').className = 'fa-solid fa-pause';
+            let progress = 0;
+            voiceInterval = setInterval(() => {
+                progress += 1;
+                document.getElementById('voice-progress').style.width = (progress * 10) + '%';
+                if(progress >= 10) {
+                    clearInterval(voiceInterval);
+                    voicePlaying = false;
+                    document.getElementById('play-icon').className = 'fa-solid fa-play';
+                    document.getElementById('voice-progress').style.width = '0%';
+                }
+            }, 1000);
+        }
+
+        // ===== CHAT =====
+        function openChat(profile) {
+            document.getElementById('chat-name').textContent = profile.name;
+            messageCount = 0;
+            photoUnlocked = false;
+            document.getElementById('msg-countdown').textContent = '5';
+            
+            // Clear messages
+            const msgContainer = document.getElementById('chat-messages');
+            msgContainer.innerHTML = `
+                <div class="msg system">🎉 Match avec ${profile.name} ! C'est le moment de gérer sans pression.</div>
+                <div class="msg system">🔒 Photos floutées. Échangez 5 messages pour les débloquer !</div>
+                <div class="msg system">🎲 Lance un quiz Mode Flirt avec l'icône 🎮 en haut à droite !</div>
+            `;
+
+            // Show chat notif
+            document.getElementById('chat-notif').style.display = 'block';
+
+            goTo('chat');
+
+            // Auto reply after delay
+            setTimeout(() => {
+                const randomDisquette = disquettes[Math.floor(Math.random() * disquettes.length)];
+                addMessage(randomDisquette, 'received');
+            }, 2000);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            addMessage(text, 'sent');
+            input.value = '';
+            messageCount++;
+
+            updatePhotoCountdown();
+
+            // Auto reply
+            setTimeout(() => {
+                const replies = [
+                    "Haha trop bien ça 😂🔥",
+                    "J'aime ta vibe ! Tu écoutes quoi là maintenant ? 🎵",
+                    "Hmm intéressant... dis-moi plus 👀",
+                    "Tu es de quel coin exactement ? Moi je suis à Cocody là",
+                    "Waouh on a les mêmes goûts ! C'est le destin non ? 😊",
+                    "Envoie ta plus belle disquette, je veux voir ton niveau 😏",
+                    "Franchement t'as l'air cool, on devrait se voir dans un maquis certifié !",
+                    "J'adore ton énergie ! Ça change des messages ennuyeux de Tinder 😅"
+                ];
+                addMessage(replies[Math.floor(Math.random() * replies.length)], 'received');
+                messageCount++;
+                updatePhotoCountdown();
+            }, 1500 + Math.random() * 2000);
+        }
+
+        function addMessage(text, type) {
+            const container = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = `msg ${type} anim-slide-up`;
+            msg.textContent = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updatePhotoCountdown() {
+            const remaining = Math.max(0, 5 - Math.floor(messageCount / 2));
+            document.getElementById('msg-countdown').textContent = remaining;
+            
+            if(remaining <= 0 && !photoUnlocked) {
+                photoUnlocked = true;
+                addMessage("🔓 Photo débloquée ! La photo de ton crush est maintenant visible 🔥", 'system');
+            }
+        }
+
+        // ===== MODE FLIRT QUIZ =====
+        function showQuiz() {
+            if(quizSessionsToday >= MAX_FREE_QUIZ && !isVIP) {
+                showVipModal("Tu as utilisé ta session Mode Flirt du jour ! Passe en VIP pour des sessions illimitées 🎮👑");
+                return;
+            }
+
+            goTo('chat');
+            const container = document.getElementById('quiz-container');
+            container.style.display = 'block';
+            loadQuiz();
+        }
+
+        function loadQuiz() {
+            const quiz = quizzes[currentQuizIndex % quizzes.length];
+            document.getElementById('quiz-question').textContent = quiz.q;
+            const optionsDiv = document.getElementById('quiz-options');
+            optionsDiv.innerHTML = quiz.a.map(a => `<div class="quiz-option" onclick="answerQuiz(this)">${a}</div>`).join('');
+            document.getElementById('quiz-limit-msg').style.display = 'none';
+        }
+
+        function answerQuiz(el) {
+            el.classList.add('selected');
+            const options = el.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(o => { if(o !== el) o.style.opacity = '0.4'; o.style.pointerEvents = 'none'; });
+            
+            // Send answer as message
+            addMessage(`🎲 Quiz : ${el.textContent}`, 'sent');
+
+            // Auto reply
+            setTimeout(() => {
+                const reactions = [
+                    "On a choisi la même chose !! 🔥🔥 Le match est validé haha",
+                    "Hmm intéressant ton choix... pas la même team mais j'aime ta personnalité 😏",
+                    "Exactement ce que j'aurais choisi ! On est connectés 🤝",
+                    "Bonne réponse ! Tu gagnes +10 points de compatibilité 💯"
+                ];
+                addMessage(reactions[Math.floor(Math.random() * reactions.length)], 'received');
+                messageCount += 2;
+                updatePhotoCountdown();
+            }, 1500);
+
+            currentQuizIndex++;
+            quizSessionsToday++;
+
+            setTimeout(() => {
+                if(quizSessionsToday >= MAX_FREE_QUIZ && !isVIP) {
+                    document.getElementById('quiz-limit-msg').textContent = "⏳ Session Mode Flirt terminée pour aujourd'hui (Mode Gratuit = 1/jour)";
+                    document.getElementById('quiz-limit-msg').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('quiz-container').style.display = 'none';
+                    }, 3000);
+                } else {
+                    loadQuiz();
+                }
+            }, 2500);
+        }
+
+        // ===== FAKE CALL =====
+        function triggerFakeCall() {
+            if(!isVIP) {
+                showVipModal("Le Faux Appel d'urgence est réservé aux membres VIP. Protège-toi sans pression pour seulement 700F ! 📞👑");
+                return;
+            }
+            const name = callerNames[Math.floor(Math.random() * callerNames.length)];
+            document.getElementById('caller-name').textContent = name;
+            document.getElementById('fake-call-overlay').classList.add('active');
+            
+            // Vibrate if supported
+            if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+        }
+
+        function endFakeCall() {
+            document.getElementById('fake-call-overlay').classList.remove('active');
+            if(navigator.vibrate) navigator.vibrate(0);
+        }
+
+        function acceptFakeCall() {
+            document.getElementById('caller-name').textContent += " — En cours...";
+            setTimeout(() => endFakeCall(), 3000);
+        }
+
+        // ===== VIP MODAL =====
+        function showVipModal(reason) {
+            document.getElementById('vip-reason').textContent = reason;
+            document.getElementById('vip-modal').classList.add('active');
+        }
+
+        function closeVipModal() {
+            document.getElementById('vip-modal').classList.remove('active');
+        }
+
+        function fakePayment(method) {
+            // Simulate payment
+            isVIP = true;
+            likesRemaining = Infinity;
+            document.getElementById('likes-left').textContent = '∞';
+            
+            closeVipModal();
+            
+            // Show success
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:slideDown 0.3s ease;';
+            successMsg.textContent = `✅ Paiement ${method} confirmé ! Tu es maintenant VIP 👑`;
+            document.body.appendChild(successMsg);
+            setTimeout(() => successMsg.remove(), 4000);
+        }
+
+        // ===== INIT : Auto go to splash =====
+        goTo('splash');
+    </script>
+</body>
+</html>
