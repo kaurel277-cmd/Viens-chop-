@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — Viens chop</title>
+    <meta name="description" content="Toutes les réponses à tes questions sur Viens chop : inscription, profil vocal, Mode Coulé et Mode Boss, paiement Mobile Money, sécurité et lieux certifiés.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { brandOrange: '#FF5E1A', brandPink: '#FF1E56' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
+        .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        .mobile-menu.open { transform: translateX(0); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        .faq-answer { animation: faqIn .2s ease; }
+        @keyframes faqIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-2xl">🔥</span>
+                <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
+            </a>
+            <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
+                <a href="index.html" class="hover:text-brandPink transition">Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink transition">Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="faq.html" class="text-brandPink font-bold">FAQ</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
+                    Rejoindre 🔥
+                </a>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
+            <div class="flex justify-between items-center mb-8">
+                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+                <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
+                <a href="faq.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+                <hr class="border-slate-200">
+                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== HERO + RECHERCHE ===== -->
+    <header class="pt-28 pb-16 bg-brand-gradient text-white text-center">
+        <div class="max-w-3xl mx-auto px-4">
+            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Centre d'aide</span>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Une question ? On a la réponse 💬</h1>
+            <p class="text-lg text-white/90 mb-8">Inscription, profil vocal, Mode Boss, paiement, sécurité, rancarts : tout est expliqué simplement.</p>
+
+            <div class="relative max-w-xl mx-auto">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input id="faq-search" type="search" autocomplete="off" aria-label="Rechercher dans la FAQ"
+                       placeholder="Cherche un mot : Boss, SMS, photos, SOS..."
+                       class="w-full bg-white text-slate-800 placeholder-slate-400 rounded-2xl pl-12 pr-12 py-4 text-sm shadow-xl focus:outline-none focus:ring-4 focus:ring-white/40">
+                <button id="faq-clear" type="button" onclick="setSearch('')" class="hidden absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-slate-400 hover:text-brandPink" aria-label="Effacer la recherche">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
+                <span class="text-white/70 font-semibold">Souvent recherché :</span>
+                <button onclick="setSearch('Boss')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition">Boss</button>
+                <button onclick="setSearch('SMS')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition">SMS</button>
+                <button onclick="setSearch('photos')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition">Photos</button>
+                <button onclick="setSearch('paiement')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition">Paiement</button>
+                <button onclick="setSearch('SOS')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition">SOS</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== BANDEAU URGENCE ===== -->
+    <div class="bg-red-50 border-b border-red-100">
+        <div class="max-w-4xl mx-auto px-4 py-3 text-center text-xs sm:text-sm text-red-700">
+            🚨 <strong>Tu es en danger en ce moment ?</strong> Appelle directement les secours :
+            <strong>Police 110 / 111</strong> • <strong>SAMU 185</strong> • <strong>Pompiers 180</strong>.
+            Ensuite, utilise le bouton SOS de l'appli.
+        </div>
+    </div>
+
+    <!-- ===== CATÉGORIES + LISTE ===== -->
+    <section class="py-14 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div id="faq-chips" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-6"></div>
+
+        <p class="text-sm text-slate-500 mb-5"><strong id="faq-count" class="text-slate-800">0</strong> question(s)</p>
+
+        <div id="faq-list" class="space-y-3"></div>
+
+        <!-- État vide -->
+        <div id="faq-empty" class="hidden text-center py-14">
+            <p class="text-5xl mb-4">🤷🏽</p>
+            <h3 class="text-xl font-extrabold mb-2">Aucune réponse pour cette recherche</h3>
+            <p class="text-slate-500 text-sm mb-6">Essaie avec un autre mot, ou pose-nous directement ta question.</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="resetAll()" class="border-2 border-slate-200 hover:border-brandPink font-bold px-6 py-3 rounded-xl transition text-sm">Tout afficher</button>
+                <a href="#contact" class="bg-brand-gradient text-white font-bold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition text-sm">Nous écrire</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section id="contact" class="py-20 bg-white scroll-mt-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-extrabold mb-3">Tu n'as pas trouvé ta réponse ? 🙋🏽</h2>
+            <p class="text-slate-500 mb-10">Notre équipe est là. Écris-nous sur le réseau qui t'arrange.</p>
+            <div class="grid sm:grid-cols-3 gap-5">
+                <a id="wa-link" href="#" target="_blank" rel="noopener" class="group bg-slate-50 border border-slate-100 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition">
+                    <div class="w-14 h-14 mx-auto bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-4"><i class="fa-brands fa-whatsapp"></i></div>
+                    <h3 class="font-extrabold mb-1">WhatsApp</h3>
+                    <p class="text-xs text-slate-500">Le plus rapide pour une question ou un souci technique.</p>
+                </a>
+                <a href="https://instagram.com/vienschop_ci" target="_blank" rel="noopener" class="group bg-slate-50 border border-slate-100 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition">
+                    <div class="w-14 h-14 mx-auto bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center text-2xl mb-4"><i class="fa-brands fa-instagram"></i></div>
+                    <h3 class="font-extrabold mb-1">Instagram</h3>
+                    <p class="text-xs text-slate-500">@vienschop_ci : écris-nous en message privé.</p>
+                </a>
+                <a href="https://tiktok.com/@vienschop" target="_blank" rel="noopener" class="group bg-slate-50 border border-slate-100 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition">
+                    <div class="w-14 h-14 mx-auto bg-slate-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-4"><i class="fa-brands fa-tiktok"></i></div>
+                    <h3 class="font-extrabold mb-1">TikTok</h3>
+                    <p class="text-xs text-slate-500">@vienschop : les actus et les coulisses.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== LIENS UTILES ===== -->
+    <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid sm:grid-cols-3 gap-5">
+            <a href="comment-ca-marche.html" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-brandPink transition">
+                <p class="text-2xl mb-2">🤔</p>
+                <h3 class="font-extrabold text-sm mb-1">Comment ça marche</h3>
+                <p class="text-xs text-slate-500">Le parcours complet en 4 étapes.</p>
+            </a>
+            <a href="tarifs.html" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-brandPink transition">
+                <p class="text-2xl mb-2">💸</p>
+                <h3 class="font-extrabold text-sm mb-1">Tarifs</h3>
+                <p class="text-xs text-slate-500">Mode Coulé vs Mode Boss.</p>
+            </a>
+            <a href="securite.html" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-brandPink transition">
+                <p class="text-2xl mb-2">🛡️</p>
+                <h3 class="font-extrabold text-sm mb-1">Sécurité</h3>
+                <p class="text-xs text-slate-500">Toutes nos protections.</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="py-20 bg-brand-gradient text-white text-center">
+        <div class="max-w-2xl mx-auto px-4">
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Prêt(e) à chopper ? 🔥</h2>
+            <p class="text-white/90 mb-8">Inscris-toi avec ton numéro en 2 minutes. Les 500 premiers inscrits reçoivent 1 mois VIP offert.</p>
+            <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
+                Je m'inscris gratuitement 🚀
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-slate-950 text-slate-400 py-16 text-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="index.html" class="hover:text-white transition">Accueil</a></li>
+                        <li><a href="comment-ca-marche.html" class="hover:text-white transition">Comment ça marche</a></li>
+                        <li><a href="securite.html" class="hover:text-white transition">Sécurité</a></li>
+                        <li><a href="tarifs.html" class="hover:text-white transition">Tarifs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Nous contacter</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-500"></i> WhatsApp Business</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-instagram text-pink-500"></i> @vienschop_ci</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-tiktok text-white"></i> @vienschop</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+                <p>© 2025 Viens chop Côte d'Ivoire. Tous droits réservés.</p>
+                <p>Application réservée aux majeurs (+18 ans).</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+
+        /* ------------------------------------------------------------
+           CONFIG — ⚠️ à remplacer par ton vrai numéro WhatsApp Business
+           Format international sans « + » ni espaces. Ex : 2250700000000
+           ------------------------------------------------------------ */
+        const WHATSAPP_NUMBER = "225XXXXXXXXXX";
+
+        /* ------------------------------------------------------------
+           DONNÉES — pour ajouter une question : copie un bloc { cat, q, a }
+           cat : start | profil | tarifs | secu | lieux | compte
+           ------------------------------------------------------------ */
+        const categories = [
+            { id: "start",  label: "Démarrer",        emoji: "🚀" },
+            { id: "profil", label: "Profil & Matchs", emoji: "🎙️" },
+            { id: "tarifs", label: "Tarifs",          emoji: "💸" },
+            { id: "secu",   label: "Sécurité",        emoji: "🛡️" },
+            { id: "lieux",  label: "Rancarts & Lieux", emoji: "🍹" },
+            { id: "compte", label: "Compte & Aide",   emoji: "🙋🏽" }
+        ];
+
+        const a = (href, text) => `<a href="${href}" class="text-brandPink font-bold hover:underline">${text}</a>`;
+
+        const faqs = [
+            /* ---------- DÉMARRER ---------- */
+            { cat: "start", q: `C'est quoi Viens chop ?`,
+              a: `<strong>Viens chop</strong> est une application de rencontre pensée pour la jeunesse ivoirienne. Ici, on commence par la <strong>voix</strong> (une note vocale de 10 secondes), les photos sont floutées au départ, et la sécurité est intégrée : SOS, Check-In et lieux certifiés pour les rancarts. ${a("comment-ca-marche.html", "Voir le parcours complet")}.` },
+            { cat: "start", q: `Comment je m'inscris ?`,
+              a: `Tu entres juste ton <strong>numéro ivoirien</strong>, tu reçois un code par SMS, et c'est réglé en 2 minutes environ. Pas d'email, pas de mot de passe compliqué, pas de carte bancaire. ${a("inscription.html", "Je m'inscris maintenant")}.` },
+            { cat: "start", q: `Faut-il avoir un âge minimum ?`,
+              a: `Oui : Viens chop est <strong>réservée aux +18 ans</strong>. La vérification d'âge est stricte et les mineurs sont bloqués.` },
+            { cat: "start", q: `Mon numéro de téléphone est-il visible par les autres ?`,
+              a: `Non. Ton numéro sert uniquement à créer et sécuriser ton compte. <strong>Personne ne le verra</strong> sur ton profil.` },
+            { cat: "start", q: `Puis-je créer plusieurs comptes ?`,
+              a: `Non, c'est <strong>un seul compte par numéro</strong>. C'est une des façons de limiter les faux profils en double.` },
+            { cat: "start", q: `L'application est-elle déjà disponible ?`,
+              a: `Viens chop est en phase <strong>bêta</strong> : tu peux t'inscrire dès maintenant pour faire partie des premiers membres. Les 500 premiers inscrits reçoivent 1 mois de Mode Boss offert. Pour l'instant, l'inscription se fait avec un numéro ivoirien (+225).` },
+            { cat: "start", q: `Je ne reçois pas mon code SMS, que faire ?`,
+              a: `Vérifie que ton numéro est bien saisi (10 chiffres) et que tu as du réseau. Patiente une minute, puis redemande un code. Si ça ne marche toujours pas, ${a("#contact", "écris-nous")} et on t'aide.` },
+
+            /* ---------- PROFIL & MATCHS ---------- */
+            { cat: "profil", q: `Pourquoi une note vocale ?`,
+              a: `Parce que la voix en dit plus qu'une photo. En 10 secondes, tu te présentes avec ton style, et c'est elle que ton crush écoute en premier. Les notes vocales sont <strong>illimitées</strong>, même en Mode Coulé.` },
+            { cat: "profil", q: `Pourquoi les photos sont-elles floutées ?`,
+              a: `Pour qu'on découvre d'abord la voix et la personnalité, pas seulement le physique. Les photos se débloquent automatiquement après <strong>5 messages échangés</strong> avec ton match. 🔓` },
+            { cat: "profil", q: `Comment fonctionne le match ?`,
+              a: `Tu écoutes les notes vocales des profils autour de toi et tu likes ceux dont la vibe te plaît. Si c'est réciproque, c'est un <strong>match</strong> : vous pouvez discuter.` },
+            { cat: "profil", q: `Combien de likes puis-je envoyer ?`,
+              a: `<strong>10 likes par jour</strong> en Mode Coulé (gratuit) et <strong>likes & swipes illimités</strong> en Mode Boss. ${a("tarifs.html", "Voir les tarifs")}.` },
+            { cat: "profil", q: `À quoi servent mes artistes préférés et ma commune ?`,
+              a: `Tes artistes (Himra, Didi B, Sindika, Damso, Tiakola...) permettent de matcher avec des gens qui ont les mêmes goûts que toi. Ta commune ou ta ville aide à trouver des personnes vraiment près de toi.` },
+            { cat: "profil", q: `Comment obtenir le badge « Profil Vérifié » ?`,
+              a: `En faisant ton <strong>selfie de vérification</strong> (3 secondes) quand tu crées ton profil. Le badge rassure les autres membres et montre que tu es bien la personne de tes photos.` },
+            { cat: "profil", q: `C'est quoi le Mode Flirt ?`,
+              a: `Ce sont des <strong>quiz pour briser la glace</strong> avec ton match. En Mode Coulé, tu as 1 session par jour ; en Mode Boss, c'est illimité. En panne d'inspi, le générateur de disquettes est aussi là pour t'aider.` },
+
+            /* ---------- TARIFS ---------- */
+            { cat: "tarifs", q: `Quelle est la différence entre Mode Coulé et Mode Boss ?`,
+              a: `<strong>Mode Coulé 🥰 (gratuit)</strong> : 10 likes par jour, notes vocales illimitées, 1 session Mode Flirt par jour, SOS & Check-In.<br><strong>Mode Boss 👑 (700 FCFA/mois)</strong> : likes & swipes illimités, Mode Flirt illimité, voir qui t'a liké, Faux Appel d'urgence et Mode Incognito. ${a("tarifs.html", "Comparer en détail")}.` },
+            { cat: "tarifs", q: `Combien coûte le Mode Boss ?`,
+              a: `<strong>700 FCFA par mois</strong>, soit à peine 23 FCFA par jour. Un seul prix, pas d'options cachées.` },
+            { cat: "tarifs", q: `Comment marche le mois VIP offert ?`,
+              a: `Les <strong>500 premiers inscrits</strong> reçoivent 1 mois de Mode Boss offert. À la fin du mois, tu repasses en Mode Coulé, sauf si tu choisis de payer 700 FCFA pour continuer.` },
+            { cat: "tarifs", q: `Comment je paie le Mode Boss ?`,
+              a: `Par <strong>Mobile Money</strong> : Wave, Orange Money, MTN MoMo ou Moov. Pas besoin de carte bancaire. Le Mode Boss s'active dès que le paiement est confirmé.` },
+            { cat: "tarifs", q: `Le Mode Boss se renouvelle-t-il tout seul ?`,
+              a: `Non, il n'y a <strong>pas de prélèvement surprise</strong>. Quand le mois se termine, tu reviens en Mode Coulé et tu réactives le Boss quand tu veux.` },
+            { cat: "tarifs", q: `Est-ce que je perds mes matchs si je repasse en gratuit ?`,
+              a: `Non. Ton profil, tes matchs et tes conversations restent. Tu retrouves simplement les limites du Mode Coulé.` },
+
+            /* ---------- SÉCURITÉ ---------- */
+            { cat: "secu", q: `Quelles protections sont gratuites ?`,
+              a: `Le <strong>SOS</strong> et le <strong>Check-In</strong> sont inclus dans les deux modes, tout comme l'accès aux lieux certifiés. Le <strong>Faux Appel d'urgence</strong> et le <strong>Mode Incognito</strong> sont réservés au Mode Boss.` },
+            { cat: "secu", q: `Comment fonctionne le bouton SOS ?`,
+              a: `Pendant un rancart, le bouton SOS te permet de demander de l'aide rapidement si la situation tourne mal. Tous les détails sont sur la ${a("securite.html", "page Sécurité")}.` },
+            { cat: "secu", q: `C'est quoi le Check-In automatique ?`,
+              a: `Pendant ton rancart, l'appli fait un point automatique (par exemple à 21h) pour vérifier que tout va bien. C'est un filet de sécurité de plus, sans que tu aies à y penser.` },
+            { cat: "secu", q: `Comment marche le Faux Appel d'urgence ?`,
+              a: `Le rancart tourne mal ou tu n'es pas à l'aise ? Ton téléphone sonne comme pour un vrai appel : tu as une <strong>excuse parfaite pour partir</strong> en douceur. Cette option est incluse dans le Mode Boss.` },
+            { cat: "secu", q: `À quoi sert le Mode Incognito ?`,
+              a: `Il te permet de parcourir les profils discrètement et de garder la main sur qui te découvre. Il est inclus dans le Mode Boss.` },
+            { cat: "secu", q: `Quelqu'un me met mal à l'aise : comment le signaler ou le bloquer ?`,
+              a: `Tu peux <strong>bloquer et signaler</strong> un profil depuis la conversation. Tu n'as pas à justifier ton malaise : si quelque chose te gêne, tu peux arrêter l'échange à tout moment. Tu peux aussi ${a("#contact", "nous écrire")} directement.` },
+            { cat: "secu", q: `Je suis en danger, que faire ?`,
+              a: `Ta sécurité passe avant tout. Mets-toi dans un endroit public et fréquenté, appelle les secours (<strong>Police 110 / 111, SAMU 185, Pompiers 180</strong>) et déclenche le SOS de l'appli. Ne reste pas seul(e) avec la personne.` },
+
+            /* ---------- RANCARTS & LIEUX ---------- */
+            { cat: "lieux", q: `C'est quoi un lieu « Certifié sûr » ?`,
+              a: `Un maquis, lounge ou café vérifié par notre équipe : <strong>bien éclairé</strong>, personnel accueillant, lieu public et fréquenté, retour facile en taxi ou VTC, réseau mobile correct. ${a("maquis.html", "Voir les lieux certifiés")}.` },
+            { cat: "lieux", q: `Comment avoir la réduction dans un lieu partenaire ?`,
+              a: `En <strong>réservant via Viens chop</strong>, le lieu partenaire te fait une réduction sur l'addition. Le pourcentage est affiché sur la fiche de chaque lieu.` },
+            { cat: "lieux", q: `Comment activer le partage de trajet ?`,
+              a: `Avant de te rendre à ton rancart, active le partage de trajet dans l'appli et choisis un <strong>proche de confiance</strong>. Il saura où tu es pendant tout le déplacement.` },
+            { cat: "lieux", q: `Je gère un maquis ou un café : comment devenir partenaire ?`,
+              a: `Remplis le formulaire sur la page ${a("maquis.html#partenaire", "Maquis & Cafés")}. Notre équipe te recontacte sur WhatsApp pour organiser la visite de ton lieu.` },
+
+            /* ---------- COMPTE & AIDE ---------- */
+            { cat: "compte", q: `Comment contacter l'équipe Viens chop ?`,
+              a: `Écris-nous sur <strong>WhatsApp</strong>, en message privé sur <strong>Instagram (@vienschop_ci)</strong> ou sur <strong>TikTok (@vienschop)</strong>. ${a("#contact", "Voir les liens")}.` },
+            { cat: "compte", q: `Comment supprimer mon compte ?`,
+              a: `Tu peux demander la suppression de ton compte depuis les paramètres de l'appli ou en ${a("#contact", "nous écrivant")}. Tu es libre de partir quand tu veux.` },
+            { cat: "compte", q: `L'appli bug ou un paiement ne s'est pas activé, que faire ?`,
+              a: `${a("#contact", "Écris-nous sur WhatsApp")} avec ton numéro, une capture d'écran et, pour un paiement, la confirmation de ton opérateur. On règle ça au plus vite.` },
+            { cat: "compte", q: `Où trouver les conditions d'utilisation ?`,
+              a: `Elles sont dans les ${a("mentions-legales.html", "Mentions légales & CGU")}.` }
+        ];
+
+        /* ---------- Préparation ---------- */
+        const catById = Object.fromEntries(categories.map(c => [c.id, c]));
+        const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent.replace(/\s+/g, ' ').trim(); };
+        faqs.forEach(f => { f.text = plain(f.a); f.hay = norm(f.q + ' ' + f.text); });
+
+        const state = { q: "", cat: "all" };
+
+        function matchesSearch(f) {
+            const words = norm(state.q).split(/\s+/).filter(Boolean);
+            return words.every(w => f.hay.includes(w));
+        }
+
+        /* ---------- Rendu ---------- */
+        function renderChips() {
+            const counts = { all: 0 };
+            categories.forEach(c => counts[c.id] = 0);
+            faqs.forEach(f => { if (matchesSearch(f)) { counts.all++; counts[f.cat]++; } });
+
+            const items = [{ id: "all", label: "Toutes", emoji: "✨" }, ...categories];
+            document.getElementById('faq-chips').innerHTML = items.map(c => {
+                const active = state.cat === c.id;
+                const cls = active
+                    ? "bg-brand-gradient text-white border-transparent shadow"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-brandPink";
+                return `<button data-cat="${c.id}" class="shrink-0 text-xs font-bold px-4 py-2 rounded-full border transition ${cls}">
+                            ${c.emoji} ${c.label} <span class="opacity-70 ml-1">${counts[c.id]}</span>
+                        </button>`;
+            }).join('');
+        }
+
+        function itemHTML(f, open) {
+            const c = catById[f.cat];
+            return `
+            <details class="group bg-white rounded-2xl border border-slate-200 hover:border-slate-300 transition" ${open ? "open" : ""}>
+                <summary class="flex items-start justify-between gap-4 cursor-pointer p-5">
+                    <span>
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brandOrange mb-1">${c.emoji} ${c.label}</span>
+                        <span class="font-bold leading-snug">${f.q}</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs mt-2 shrink-0 group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="faq-answer px-5 pb-5 text-sm text-slate-600 leading-relaxed">${f.a}</div>
+            </details>`;
+        }
+
+        function render() {
+            const list = faqs.filter(f => (state.cat === "all" || f.cat === state.cat) && matchesSearch(f));
+            const autoOpen = state.q.trim() !== "" && list.length <= 3;
+
+            document.getElementById('faq-list').innerHTML = list.map(f => itemHTML(f, autoOpen)).join('');
+            document.getElementById('faq-count').textContent = list.length;
+            document.getElementById('faq-empty').classList.toggle('hidden', list.length > 0);
+            document.getElementById('faq-clear').classList.toggle('hidden', state.q === "");
+            renderChips();
+        }
+
+        /* ---------- Actions ---------- */
+        function setSearch(value) {
+            state.q = value;
+            const input = document.getElementById('faq-search');
+            input.value = value;
+            render();
+            if (value) document.getElementById('faq-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            else input.focus();
+        }
+
+        function setCategory(id) {
+            state.cat = id;
+            history.replaceState(null, '', id === "all" ? location.pathname + location.search : '#' + id);
+            render();
+        }
+
+        function resetAll() {
+            state.q = ""; state.cat = "all";
+            document.getElementById('faq-search').value = "";
+            history.replaceState(null, '', location.pathname + location.search);
+            render();
+        }
+
+        document.getElementById('faq-search').addEventListener('input', e => { state.q = e.target.value; render(); });
+        document.getElementById('faq-chips').addEventListener('click', e => {
+            const btn = e.target.closest('[data-cat]');
+            if (btn) setCategory(btn.dataset.cat);
+        });
+
+        /* ---------- Lien direct vers une catégorie : faq.html#tarifs ---------- */
+        function applyHash() {
+            const h = location.hash.slice(1);
+            if (catById[h]) { state.cat = h; render(); }
+        }
+        window.addEventListener('hashchange', applyHash);
+
+        /* ---------- WhatsApp ---------- */
+        document.getElementById('wa-link').href =
+            "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent("Bonjour Viens chop 👋 J'ai une question : ");
+
+        /* ---------- SEO : données structurées FAQPage ---------- */
+        (function injectSchema() {
+            const ld = document.createElement('script');
+            ld.type = 'application/ld+json';
+            ld.textContent = JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faqs.map(f => ({
+                    "@type": "Question",
+                    "name": f.q,
+                    "acceptedAnswer": { "@type": "Answer", "text": f.text }
+                }))
+            });
+            document.head.appendChild(ld);
+        })();
+
+        render();
+        applyHash();
+    </script>
+</body>
+</html>
