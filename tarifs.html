@@ -22,7 +22,7 @@
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
         .mobile-menu.open { transform: translateX(0); }
-        .card-vip { box-shadow: 0 20px 50px -12px rgba(255, 30, 86, 0.35); }
+        .card-boss { box-shadow: 0 20px 50px -12px rgba(255, 94, 26, 0.35); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
@@ -46,16 +46,17 @@
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
                     Rejoindre 🔥
                 </a>
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl">
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
+        <!-- Mobile Menu -->
         <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
             <div class="flex justify-between items-center mb-8">
                 <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
-                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
                 <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
@@ -74,8 +75,8 @@
     <header class="pt-28 pb-16 bg-brand-gradient text-white text-center">
         <div class="max-w-3xl mx-auto px-4">
             <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Simple • Transparent • Sans piège</span>
-            <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Les tarifs, c’est clair 💸</h1>
-            <p class="text-lg text-white/90">Tu commences gratuitement. Tu passes VIP seulement si tu veux accélérer. Pas de carte bancaire, paiement Mobile Money.</p>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Deux modes. Zéro prise de tête. 💸</h1>
+            <p class="text-lg text-white/90">Tu commences en <strong>Mode Coulé</strong>, c'est gratuit. Tu passes en <strong>Mode Boss</strong> à 700 FCFA par mois si tu veux aller plus vite. Paiement 100% Mobile Money.</p>
             <div class="mt-8 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 text-sm font-semibold">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 Les 500 premiers inscrits : <strong>1 mois VIP offert</strong>
@@ -83,232 +84,209 @@
         </div>
     </header>
 
-    <!-- ===== TOGGLE MENSUEL / HEBDO ===== -->
-    <section class="pt-12 pb-4">
-        <div class="max-w-5xl mx-auto px-4 text-center">
-            <p class="text-sm text-slate-500 mb-4">Choisis la durée qui te convient</p>
-            <div class="inline-flex bg-white border border-slate-200 rounded-full p-1 shadow-sm">
-                <button id="btn-week" onclick="setBilling('week')" class="px-5 py-2 rounded-full text-sm font-bold text-slate-500 hover:text-slate-800 transition">À la semaine</button>
-                <button id="btn-month" onclick="setBilling('month')" class="px-5 py-2 rounded-full text-sm font-bold bg-brand-gradient text-white shadow">Au mois</button>
-                <button id="btn-quarter" onclick="setBilling('quarter')" class="px-5 py-2 rounded-full text-sm font-bold text-slate-500 hover:text-slate-800 transition">3 mois</button>
-            </div>
-        </div>
-    </section>
-
     <!-- ===== CARTES TARIFS ===== -->
-    <section class="py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-3 gap-8 items-stretch">
+    <section class="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-8 items-stretch">
 
-            <!-- GRATUIT -->
+            <!-- MODE COULÉ -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 flex flex-col">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Pour tester la vibe</p>
-                <h2 class="text-2xl font-extrabold mb-1">Gratuit</h2>
-                <p class="text-slate-500 text-sm mb-6">Tout le nécessaire pour chopper, sans payer.</p>
-                <div class="mb-6">
-                    <span class="text-4xl font-extrabold">0</span>
-                    <span class="text-slate-500 font-semibold"> F CFA</span>
-                    <p class="text-xs text-slate-400 mt-1">Pour toujours</p>
+                <div>
+                    <span class="inline-block bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-full">Mode « Coulé » 🥰</span>
                 </div>
-                <ul class="space-y-3 text-sm text-slate-700 flex-1 mb-8">
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Inscription SMS + profil vocal</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> <strong>10 likes / jour</strong></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Match & chat illimité</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Photos débloquées après 5 messages</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Générateur de disquettes (5/jour)</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Accès aux maquis & cafés certifiés</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> SOS + check-in automatique</li>
-                    <li class="flex items-start gap-3 text-slate-400"><span class="font-bold">–</span> Voir qui t’a liké</li>
-                    <li class="flex items-start gap-3 text-slate-400"><span class="font-bold">–</span> Faux Appel & Boost</li>
+                <div class="mt-6 mb-6">
+                    <span class="text-5xl font-extrabold text-slate-900">0 FCFA</span>
+                    <p class="text-xs text-slate-400 mt-2">Gratuit, pour toujours</p>
+                </div>
+                <ul class="space-y-4 text-sm text-slate-700 flex-1 mb-8">
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> 10 Likes / jour</li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> Notes vocales illimitées</li>
+                    <li class="flex items-start gap-3"><span class="w-5 text-center">⏳</span> Mode Flirt : 1 session / jour</li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> SOS & Check-In inclus</li>
+                    <li class="flex items-start gap-3 text-slate-400"><span class="w-5 text-center">🔒</span> Faux Appel & Incognito non inclus</li>
                 </ul>
-                <a href="inscription.html" class="block text-center border-2 border-slate-200 hover:border-brandPink text-slate-800 font-bold py-3 rounded-xl transition">
+                <a href="inscription.html" class="block text-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-4 rounded-xl transition">
                     Commencer gratuitement
                 </a>
             </div>
 
-            <!-- VIP -->
-            <div class="relative bg-white rounded-3xl border-2 border-brandPink card-vip p-8 flex flex-col md:-translate-y-4">
-                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-gradient text-white text-[11px] font-extrabold uppercase tracking-wider px-4 py-1 rounded-full shadow">
-                    Le plus choisi 🔥
+            <!-- MODE BOSS -->
+            <div class="relative bg-white rounded-3xl border-2 border-brandOrange card-boss p-8 flex flex-col">
+                <div class="absolute -top-3 right-6 bg-brand-gradient text-white text-[11px] font-extrabold uppercase tracking-wider px-4 py-1.5 rounded-full shadow">
+                    Le plus populaire 🔥
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brandPink mb-2">Pour matcher plus vite</p>
-                <h2 class="text-2xl font-extrabold mb-1 flex items-center gap-2">VIP <span class="text-sm bg-orange-100 text-brandOrange px-2 py-0.5 rounded-full font-bold">PRO</span></h2>
-                <p class="text-slate-500 text-sm mb-6">Likes illimités, visibilité max, protections extra.</p>
-                <div class="mb-6">
-                    <span id="vip-price" class="text-4xl font-extrabold text-brand-gradient">2 500</span>
-                    <span class="text-slate-500 font-semibold"> F CFA</span>
-                    <p id="vip-period" class="text-xs text-slate-400 mt-1">par mois • soit ~83 F / jour</p>
+                <div>
+                    <span class="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full">Mode Boss 👑</span>
                 </div>
-                <ul class="space-y-3 text-sm text-slate-700 flex-1 mb-8">
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> <strong>Tout le plan Gratuit</strong></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> <strong>Likes illimités</strong> + 5 Super Likes / jour</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Voir qui t’a liké (plus de mystère)</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> 1 Boost / semaine (tu apparais en premier)</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Faux Appel de secours</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Mode Invisible (tu vois sans être vu)</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Annuler un like envoyé par erreur</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Disquettes illimitées + quiz Mode Flirt</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold">✓</span> Badge VIP + réductions partenaires jusqu’à -20%</li>
+                <div class="mt-6 mb-6">
+                    <span class="text-5xl font-extrabold text-brand-gradient">700 FCFA</span>
+                    <span class="text-brandPink font-semibold text-sm ml-1">/ mois</span>
+                    <p class="text-xs text-slate-400 mt-2">Soit à peine ~23 FCFA par jour</p>
+                </div>
+                <ul class="space-y-4 text-sm text-slate-700 flex-1 mb-6">
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Likes & Swipes Illimités</li>
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Mode Flirt Illimité</li>
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Voir qui t'a liké</li>
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Faux Appel d'urgence</li>
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Mode Incognito</li>
                 </ul>
-                <a href="inscription.html" class="block text-center bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
-                    Passer VIP 🚀
-                </a>
-                <p class="text-[11px] text-center text-slate-400 mt-3">Annulable à tout moment. Pas de reconduction surprise.</p>
-            </div>
-
-            <!-- PACKS À L’UNITÉ -->
-            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 flex flex-col">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sans abonnement</p>
-                <h2 class="text-2xl font-extrabold mb-1">Packs express</h2>
-                <p class="text-slate-500 text-sm mb-6">Tu payes seulement ce dont tu as besoin, quand tu en as besoin.</p>
-                <div class="space-y-3 flex-1 mb-8">
-                    <div class="flex items-center justify-between bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <div>
-                            <p class="font-bold text-sm">⚡ Boost 30 min</p>
-                            <p class="text-[11px] text-slate-500">Apparais en tête du feed</p>
-                        </div>
-                        <span class="font-extrabold text-sm">300 F</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <div>
-                            <p class="font-bold text-sm">💜 5 Super Likes</p>
-                            <p class="text-[11px] text-slate-500">Tu sors du lot, direct</p>
-                        </div>
-                        <span class="font-extrabold text-sm">400 F</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <div>
-                            <p class="font-bold text-sm">👀 Voir tes likes</p>
-                            <p class="text-[11px] text-slate-500">Valable 24 heures</p>
-                        </div>
-                        <span class="font-extrabold text-sm">500 F</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <div>
-                            <p class="font-bold text-sm">🔥 Journée VIP</p>
-                            <p class="text-[11px] text-slate-500">Toutes les options, 24h</p>
-                        </div>
-                        <span class="font-extrabold text-sm">700 F</span>
-                    </div>
+                <div class="flex flex-wrap justify-center gap-2 mb-6">
+                    <span class="inline-flex items-center gap-1.5 bg-sky-100 text-sky-700 text-[11px] font-bold px-3 py-1.5 rounded-lg"><span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>Wave</span>
+                    <span class="inline-flex items-center gap-1.5 bg-orange-100 text-orange-800 text-[11px] font-bold px-3 py-1.5 rounded-lg"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>Orange Money</span>
+                    <span class="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-800 text-[11px] font-bold px-3 py-1.5 rounded-lg"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>MTN MoMo</span>
+                    <span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-800 text-[11px] font-bold px-3 py-1.5 rounded-lg"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Moov</span>
                 </div>
-                <a href="inscription.html" class="block text-center border-2 border-slate-200 hover:border-brandOrange text-slate-800 font-bold py-3 rounded-xl transition">
-                    Acheter un pack
+                <a href="inscription.html" class="block text-center bg-brand-gradient text-white font-extrabold py-4 rounded-xl shadow-md hover:opacity-90 transition">
+                    Tester le VIP Gratuitement 🎁
                 </a>
+            </div>
+        </div>
+        <p class="text-center text-xs text-slate-400 mt-8">Tous les prix sont en FCFA. Pas de carte bancaire nécessaire.</p>
+    </section>
+
+    <!-- ===== CE QUE TU DÉBLOQUES ===== -->
+    <section class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Mode Boss 👑</span>
+                <h2 class="text-3xl font-extrabold mt-2 mb-3">Ce que tu débloques à 700 FCFA</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto">Pas de gadgets inutiles : que des options qui t'aident à matcher plus vite et à te sentir en confiance.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">♾️</div>
+                    <h3 class="font-extrabold mb-1">Likes & Swipes illimités</h3>
+                    <p class="text-sm text-slate-600">Plus de limite à 10 par jour. Tu écoutes, tu likes et tu swipes autant que tu veux.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">💬</div>
+                    <h3 class="font-extrabold mb-1">Mode Flirt illimité</h3>
+                    <p class="text-sm text-slate-600">Quiz pour briser la glace : autant de sessions que tu veux, au lieu d'une seule par jour.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">👀</div>
+                    <h3 class="font-extrabold mb-1">Voir qui t'a liké</h3>
+                    <p class="text-sm text-slate-600">Fini le mystère : tu vois qui a craqué pour ta voix et tu peux matcher directement.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">📞</div>
+                    <h3 class="font-extrabold mb-1">Faux Appel d'urgence</h3>
+                    <p class="text-sm text-slate-600">Le rancart tourne mal ? Ton téléphone sonne : tu as une excuse parfaite pour partir en douceur.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">🕶️</div>
+                    <h3 class="font-extrabold mb-1">Mode Incognito</h3>
+                    <p class="text-sm text-slate-600">Tu parcours les profils discrètement. Tu gardes la main sur qui te découvre.</p>
+                </div>
+                <div class="bg-brand-gradient text-white rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <p class="text-3xl mb-3">🎁</p>
+                        <h3 class="font-extrabold mb-1">Teste avant de payer</h3>
+                        <p class="text-sm text-white/90">Les 500 premiers inscrits reçoivent 1 mois VIP offert.</p>
+                    </div>
+                    <a href="inscription.html" class="mt-5 inline-block bg-white text-brandPink font-extrabold text-sm text-center px-5 py-2.5 rounded-xl hover:bg-slate-100 transition">Je tente ma chance</a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- ===== COMPARAISON ===== -->
-    <section class="py-20 bg-white">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold mb-3">Gratuit vs VIP, en un coup d’œil 👀</h2>
-                <p class="text-slate-500">Pas de petites lignes cachées. Tout est là.</p>
-            </div>
-            <div class="overflow-x-auto rounded-3xl border border-slate-200 shadow-sm">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-50 text-left">
-                        <tr>
-                            <th class="px-6 py-4 font-bold text-slate-600">Fonctionnalité</th>
-                            <th class="px-6 py-4 font-bold text-center">Gratuit</th>
-                            <th class="px-6 py-4 font-bold text-center bg-orange-50 text-brandPink">VIP</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr>
-                            <td class="px-6 py-4">Likes par jour</td>
-                            <td class="px-6 py-4 text-center font-semibold">10</td>
-                            <td class="px-6 py-4 text-center font-extrabold bg-orange-50/50 text-brandPink">Illimités</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Note vocale de présentation</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Chat après match</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Voir qui t’a liké</td>
-                            <td class="px-6 py-4 text-center text-slate-300">—</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Super Likes</td>
-                            <td class="px-6 py-4 text-center text-slate-300">—</td>
-                            <td class="px-6 py-4 text-center font-extrabold bg-orange-50/50">5 / jour</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Boost de visibilité</td>
-                            <td class="px-6 py-4 text-center text-slate-300">—</td>
-                            <td class="px-6 py-4 text-center font-extrabold bg-orange-50/50">1 / semaine</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Mode Invisible</td>
-                            <td class="px-6 py-4 text-center text-slate-300">—</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Faux Appel (sortie de rancart)</td>
-                            <td class="px-6 py-4 text-center text-slate-300">—</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">SOS + partage de trajet</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Générateur de disquettes</td>
-                            <td class="px-6 py-4 text-center">5 / jour</td>
-                            <td class="px-6 py-4 text-center font-extrabold bg-orange-50/50">Illimité</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Réductions maquis partenaires</td>
-                            <td class="px-6 py-4 text-center">jusqu’à -10%</td>
-                            <td class="px-6 py-4 text-center font-extrabold bg-orange-50/50">jusqu’à -20%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Badge Profil Vérifié</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
-                            <td class="px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓ + Badge VIP</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <section class="py-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold mb-3">Coulé vs Boss, en un coup d'œil 👀</h2>
+            <p class="text-slate-500">Pas de petites lignes cachées. Tout est là.</p>
+        </div>
+        <div class="overflow-x-auto rounded-3xl border border-slate-200 shadow-sm bg-white">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-left">
+                    <tr>
+                        <th class="px-5 sm:px-6 py-4 font-bold text-slate-600">Fonctionnalité</th>
+                        <th class="px-5 sm:px-6 py-4 font-bold text-center">Coulé 🥰<br><span class="text-xs font-semibold text-slate-400">0 FCFA</span></th>
+                        <th class="px-5 sm:px-6 py-4 font-bold text-center bg-orange-50 text-brandOrange">Boss 👑<br><span class="text-xs font-semibold text-brandPink">700 FCFA / mois</span></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Likes & Swipes</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-semibold">10 likes / jour</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-extrabold bg-orange-50/50 text-brandOrange">Illimités</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Notes vocales</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-semibold">Illimitées</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-semibold bg-orange-50/50">Illimitées</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Match & chat</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Mode Flirt</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-semibold">1 session / jour</td>
+                        <td class="px-5 sm:px-6 py-4 text-center font-extrabold bg-orange-50/50 text-brandOrange">Illimité</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Voir qui t'a liké</td>
+                        <td class="px-5 sm:px-6 py-4 text-center">🔒</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">SOS & Check-In</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Faux Appel d'urgence</td>
+                        <td class="px-5 sm:px-6 py-4 text-center">🔒</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Mode Incognito</td>
+                        <td class="px-5 sm:px-6 py-4 text-center">🔒</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Badge Profil Vérifié</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                    <tr>
+                        <td class="px-5 sm:px-6 py-4">Lieux certifiés (Maquis & Cafés)</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold">✓</td>
+                        <td class="px-5 sm:px-6 py-4 text-center text-emerald-500 font-bold bg-orange-50/50">✓</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
     <!-- ===== PAIEMENT ===== -->
-    <section class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
+    <section class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
             <div>
                 <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Paiement 100% local</span>
-                <h2 class="text-3xl font-extrabold mt-2 mb-4">Tu paies comme tu vis : au Mobile Money 📱</h2>
+                <h2 class="text-3xl font-extrabold mt-2 mb-4">Tu paies comme tu vis : en Mobile Money 📱</h2>
                 <p class="text-slate-600 leading-relaxed mb-6">
-                    Pas de Visa, pas de Mastercard obligatoire. Tu recharges en <strong>Orange Money, MTN MoMo, Moov Money ou Wave</strong>. Le VIP s’active dès que le paiement est confirmé.
+                    Pas besoin de carte bancaire. Tu paies avec <strong>Wave, Orange Money, MTN MoMo ou Moov</strong>, et le Mode Boss s'active dès que le paiement est confirmé.
                 </p>
                 <ul class="space-y-3 text-sm text-slate-700">
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Reçu instantané</strong> par SMS + dans l’app.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pas de prélèvement automatique</strong> : tu choisis quand renouveler.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Prix TTC affichés</strong> : ce que tu vois, c’est ce que tu paies.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Remboursement sous 48h</strong> si le service ne s’active pas (voir CGU).</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Activation immédiate</strong> après confirmation du paiement.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pas de prélèvement surprise</strong> : tu choisis quand tu renouvelles.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Un seul prix</strong> : 700 FCFA par mois, pas d'options cachées.</span></li>
                 </ul>
             </div>
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+            <div class="bg-slate-50 p-8 rounded-3xl shadow-lg border border-slate-100">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-4">Moyens acceptés</p>
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-orange-600">Orange Money</div>
-                    <div class="border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-yellow-500">MTN MoMo</div>
-                    <div class="border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-blue-600">Moov Money</div>
-                    <div class="border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-sky-500">Wave</div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-sky-600">Wave</div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-orange-600">Orange Money</div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-yellow-500">MTN MoMo</div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center font-extrabold text-blue-600">Moov</div>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-5 text-sm">
-                    <p class="font-bold mb-2">Exemple — VIP 1 mois</p>
-                    <div class="flex justify-between text-slate-600 mb-1"><span>Abonnement</span><span>2 500 F</span></div>
-                    <div class="flex justify-between text-slate-600 mb-1"><span>Frais opérateur</span><span>0 F</span></div>
-                    <div class="border-t border-slate-200 mt-2 pt-2 flex justify-between font-extrabold"><span>Total</span><span class="text-brandPink">2 500 F CFA</span></div>
+                <div class="bg-white rounded-2xl p-5 text-sm border border-slate-200">
+                    <p class="font-bold mb-2">Exemple : Mode Boss 👑</p>
+                    <div class="flex justify-between text-slate-600 mb-1"><span>Abonnement 1 mois</span><span>700 FCFA</span></div>
+                    <div class="border-t border-slate-200 mt-2 pt-2 flex justify-between font-extrabold"><span>Total</span><span class="text-brandPink">700 FCFA</span></div>
                 </div>
             </div>
         </div>
@@ -319,15 +297,15 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="bg-brand-gradient px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider">Offre de lancement</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold mt-5 mb-4">Les 500 premiers : 1 mois VIP cadeau 🎁</h2>
-            <p class="text-slate-300 mb-8 max-w-2xl mx-auto">Tu t’inscris, tu vérifies ton profil, et le mois VIP s’active tout seul. Ensuite tu restes en gratuit ou tu continues — à toi de voir.</p>
+            <p class="text-slate-300 mb-8 max-w-2xl mx-auto">Tu t'inscris parmi les 500 premiers et tu profites du Mode Boss pendant un mois, sans rien payer. Ensuite, tu restes en Mode Coulé ou tu continues à 700 FCFA : à toi de voir.</p>
             <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-10">
                 <div class="bg-white/5 rounded-2xl p-4">
                     <p class="text-2xl font-extrabold text-brand-gradient">500</p>
                     <p class="text-[11px] text-slate-400 mt-1">places VIP offertes</p>
                 </div>
                 <div class="bg-white/5 rounded-2xl p-4">
-                    <p class="text-2xl font-extrabold text-brand-gradient">0 F</p>
-                    <p class="text-[11px] text-slate-400 mt-1">à l’inscription</p>
+                    <p class="text-2xl font-extrabold text-brand-gradient">0 FCFA</p>
+                    <p class="text-[11px] text-slate-400 mt-1">à l'inscription</p>
                 </div>
                 <div class="bg-white/5 rounded-2xl p-4">
                     <p class="text-2xl font-extrabold text-brand-gradient">+18</p>
@@ -345,53 +323,60 @@
         <h2 class="text-3xl font-extrabold text-center mb-10">Questions fréquentes sur les tarifs 💬</h2>
         <div class="space-y-4">
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group" open>
-                <summary class="font-bold cursor-pointer flex justify-between items-center">
-                    Est-ce que je peux vraiment tout faire gratuitement ?
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Est-ce que je peux vraiment utiliser l'appli gratuitement ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui. Inscription, profil vocal, likes (10/jour), matchs, chat, lieux certifiés et bouton SOS sont gratuits. Le VIP sert à aller plus vite et à débloquer le confort (qui t’a liké, boost, faux appel…).</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui. En Mode Coulé, tu as ton profil avec notes vocales illimitées, 10 likes par jour, 1 session Mode Flirt par jour, ainsi que le SOS et le Check-In. Le Mode Boss sert à aller plus vite et à débloquer plus de confort.</p>
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
-                <summary class="font-bold cursor-pointer flex justify-between items-center">
-                    Le VIP se renouvelle tout seul ?
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Le SOS et le Check-In sont-ils vraiment gratuits ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Non. Chez Viens chop, pas de prélèvement surprise. Quand la période se termine, tu reviens au plan Gratuit. Tu réactives si tu veux.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui, ils sont inclus dans les deux modes. Seul le Faux Appel d'urgence est réservé au Mode Boss.</p>
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
-                <summary class="font-bold cursor-pointer flex justify-between items-center">
-                    Je peux passer d’un pack à l’abonnement ?
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Comment marche le mois VIP offert ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui, à tout moment. Les packs express (Boost, Super Likes, Journée VIP) restent utilisables même sans abonnement.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Les 500 premiers inscrits reçoivent 1 mois de Mode Boss offert. À la fin du mois, tu repasses en Mode Coulé, sauf si tu décides de payer 700 FCFA pour continuer.</p>
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
-                <summary class="font-bold cursor-pointer flex justify-between items-center">
-                    Les réductions dans les maquis, c’est pour qui ?
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Comment je paie le Mode Boss ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Tous les membres vérifiés ont accès aux spots certifiés. Les réductions partenaires vont jusqu’à -10% en Gratuit et -20% en VIP, en réservant via l’app.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Par Mobile Money : Wave, Orange Money, MTN MoMo ou Moov. Pas besoin de carte bancaire.</p>
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
-                <summary class="font-bold cursor-pointer flex justify-between items-center">
-                    Et si je n’ai plus envie d’être VIP ?
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Le Mode Boss se renouvelle tout seul ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Tu n’as rien à résilier : ça s’arrête tout seul à la date indiquée. Ton profil, tes matchs et tes conversations restent.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Non, pas de prélèvement surprise. Quand le mois se termine, tu reviens en Mode Coulé et tu réactives le Boss quand tu veux.</p>
+            </details>
+            <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
+                <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
+                    Je perds mes matchs si je repasse en gratuit ?
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Non. Ton profil, tes matchs et tes conversations restent. Tu retrouves simplement les limites du Mode Coulé.</p>
             </details>
         </div>
         <p class="text-center text-sm text-slate-500 mt-8">
-            D’autres questions ? <a href="faq.html" class="text-brandPink font-bold hover:underline">Voir la FAQ complète</a>
+            D'autres questions ? <a href="faq.html" class="text-brandPink font-bold hover:underline">Voir la FAQ complète</a>
         </p>
     </section>
 
     <!-- ===== CTA ===== -->
     <section class="py-20 bg-brand-gradient text-white text-center">
         <div class="max-w-2xl mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Commence à 0 F. Upgrade plus tard. 🔥</h2>
-            <p class="text-white/90 mb-8">Crée ton profil vocal en 5 minutes. Les 500 premiers emportent 1 mois VIP.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Commence à 0 FCFA. Passe Boss quand tu veux. 🔥</h2>
+            <p class="text-white/90 mb-8">Crée ton profil vocal en quelques minutes. Les 500 premiers emportent 1 mois VIP.</p>
             <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
-                Je m’inscris gratuitement 🚀
+                Je m'inscris gratuitement 🚀
             </a>
         </div>
     </section>
@@ -441,25 +426,6 @@
     <script>
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('open');
-        }
-
-        const plans = {
-            week:    { price: '1 000', period: 'par semaine • soit ~143 F / jour' },
-            month:   { price: '2 500', period: 'par mois • soit ~83 F / jour' },
-            quarter: { price: '5 500', period: 'pour 3 mois • soit ~61 F / jour • -26%' }
-        };
-
-        function setBilling(type) {
-            document.getElementById('vip-price').textContent = plans[type].price;
-            document.getElementById('vip-period').textContent = plans[type].period;
-            ['week', 'month', 'quarter'].forEach(function (key) {
-                const btn = document.getElementById('btn-' + key);
-                if (key === type) {
-                    btn.className = 'px-5 py-2 rounded-full text-sm font-bold bg-brand-gradient text-white shadow';
-                } else {
-                    btn.className = 'px-5 py-2 rounded-full text-sm font-bold text-slate-500 hover:text-slate-800 transition';
-                }
-            });
         }
     </script>
 </body>
