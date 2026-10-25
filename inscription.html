@@ -200,21 +200,18 @@
                         </fieldset>
 
                         <fieldset>
-                            <legend class="block text-xs font-bold text-slate-500 uppercase mb-1">Je veux rencontrer</legend>
-                            <div class="grid grid-cols-3 gap-2">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="seeking" value="F" class="peer sr-only">
-                                    <span class="block text-center text-xs font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">Des femmes</span>
+                            <legend class="block text-xs font-bold text-slate-500 uppercase mb-1">Je veux rencontrer <span class="normal-case font-semibold text-slate-400">(automatique)</span></legend>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-not-allowed">
+                                    <input type="radio" name="seeking" value="F" class="peer sr-only" disabled>
+                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition opacity-40 peer-checked:opacity-100 peer-checked:border-brandPink peer-checked:bg-orange-50">👩🏾 Des femmes</span>
                                 </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="seeking" value="M" class="peer sr-only">
-                                    <span class="block text-center text-xs font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">Des hommes</span>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="seeking" value="A" class="peer sr-only">
-                                    <span class="block text-center text-xs font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">Peu importe</span>
+                                <label class="cursor-not-allowed">
+                                    <input type="radio" name="seeking" value="M" class="peer sr-only" disabled>
+                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition opacity-40 peer-checked:opacity-100 peer-checked:border-brandPink peer-checked:bg-orange-50">👨🏾 Des hommes</span>
                                 </label>
                             </div>
+                            <p id="seeking-hint" class="text-[11px] text-slate-400 mt-2">Choisis d'abord si tu es une femme ou un homme.</p>
                         </fieldset>
 
                         <div>
@@ -430,8 +427,10 @@
 
         async function registerUser(payload) {
             if (CONFIG.DEMO_MODE) { await wait(800); return true; }
-            // TODO : envoyer payload au backend. Le serveur doit AUSSI vérifier l'âge (18+)
-            //        et refuser un numéro déjà inscrit (1 compte par numéro).
+            // TODO : envoyer payload au backend. Le serveur doit AUSSI :
+            //        - vérifier l'âge (18+)
+            //        - refuser un numéro déjà inscrit (1 compte par numéro)
+            //        - imposer seeking = l'opposé de gender
             throw new Error('API non branchée');
         }
 
@@ -606,6 +605,20 @@
             return age;
         }
 
+        /* ---------- Genre → « je veux rencontrer » automatique (femme ↔ homme) ---------- */
+        const OPPOSITE = { F: 'M', M: 'F' };
+
+        document.querySelectorAll('input[name="gender"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const target = OPPOSITE[radio.value];
+                document.querySelector('input[name="seeking"][value="' + target + '"]').checked = true;
+                $('seeking-hint').textContent = radio.value === 'M'
+                    ? "Tu verras des profils de femmes."
+                    : "Tu verras des profils d'hommes.";
+                hideError('err-3');
+            });
+        });
+
         ['pseudo', 'birth', 'city'].forEach(id => $(id).addEventListener('input', () => { $(id).classList.remove('invalid'); hideError('err-3'); }));
 
         $('step-3').addEventListener('submit', async e => {
@@ -616,7 +629,7 @@
             const pseudo = $('pseudo').value.trim();
             const birth = $('birth').value;
             const gender = (document.querySelector('input[name="gender"]:checked') || {}).value;
-            const seeking = (document.querySelector('input[name="seeking"]:checked') || {}).value;
+            const seeking = OPPOSITE[gender];
             const city = $('city').value;
 
             if (!/^[\p{L}\p{N} ._-]{2,20}$/u.test(pseudo)) { $('pseudo').classList.add('invalid'); return showError('err-3', "Choisis un pseudo de 2 à 20 caractères (lettres, chiffres, espaces, . _ -)."); }
@@ -626,7 +639,6 @@
             if (age < 18) { $('birth').classList.add('invalid'); return showError('err-3', "Désolé, Viens chop est réservée aux +18 ans. Reviens le jour de tes 18 ans 😉"); }
             if (age > 99) { $('birth').classList.add('invalid'); return showError('err-3', "Cette date de naissance n'est pas valide."); }
             if (!gender) return showError('err-3', "Dis-nous si tu es une femme ou un homme.");
-            if (!seeking) return showError('err-3', "Dis-nous qui tu veux rencontrer.");
             if (!city) { $('city').classList.add('invalid'); return showError('err-3', "Choisis ta commune ou ta ville."); }
             if (!$('terms').checked) return showError('err-3', "Coche la case pour confirmer ton âge et accepter les CGU.");
 
