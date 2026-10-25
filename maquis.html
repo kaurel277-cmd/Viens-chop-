@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maquis & Cafés certifiés — Viens chop</title>
+    <meta name="description" content="Le répertoire des maquis et cafés certifiés Viens chop est en cours de constitution. Découvre nos critères de sécurité et propose un lieu.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -22,9 +23,6 @@
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
         .mobile-menu.open { transform: translateX(0); }
-        .chip-active { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); color: #fff; border-color: transparent; }
-        .modal-enter { animation: modalIn .25s ease; }
-        @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -78,267 +76,256 @@
     <!-- ===== HERO ===== -->
     <header class="pt-28 pb-16 bg-brand-gradient text-white text-center">
         <div class="max-w-3xl mx-auto px-4">
-            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Rancarts en toute sécurité</span>
+            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Répertoire en cours de constitution</span>
             <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Maquis & Cafés certifiés 🍹</h1>
-            <p class="text-lg text-white/90">Le feeling est bon ? Choisis un coin chill, bien éclairé, avec un personnel de confiance. Et en plus, tu as des réductions.</p>
+            <p class="text-lg text-white/90">On sélectionne actuellement les premiers lieux sûrs pour vos premiers rancarts. Aucun partenaire n’est encore publié : on préfère prendre le temps de bien vérifier chaque endroit.</p>
+
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <a href="#lieux" class="bg-white text-brandPink font-extrabold px-7 py-3 rounded-xl shadow-lg hover:bg-slate-100 transition">Explorer les lieux 📍</a>
-                <a href="#partenaire" class="bg-white/15 border border-white/30 text-white font-bold px-7 py-3 rounded-xl hover:bg-white/25 transition">Je suis gérant de lieu</a>
+                <a href="#partenaire" class="bg-white text-brandPink font-extrabold px-7 py-3 rounded-xl shadow-lg hover:bg-slate-100 transition">Proposer un lieu 📍</a>
+                <a href="inscription.html" class="bg-white/15 border border-white/30 text-white font-bold px-7 py-3 rounded-xl hover:bg-white/25 transition">Être prévenu du lancement</a>
             </div>
+
             <div class="mt-10 grid grid-cols-3 gap-3 max-w-md mx-auto">
-                <div class="bg-white/15 rounded-2xl py-3">
-                    <p id="stat-venues" class="text-2xl font-extrabold">–</p>
-                    <p class="text-[11px] text-white/80">lieux certifiés</p>
+                <div class="bg-white/15 rounded-2xl py-3 px-2">
+                    <p class="text-2xl font-extrabold">0</p>
+                    <p class="text-[11px] text-white/80">lieu publié pour le moment</p>
                 </div>
-                <div class="bg-white/15 rounded-2xl py-3">
-                    <p id="stat-cities" class="text-2xl font-extrabold">–</p>
-                    <p class="text-[11px] text-white/80">villes</p>
+                <div class="bg-white/15 rounded-2xl py-3 px-2">
+                    <p class="text-2xl font-extrabold">6</p>
+                    <p class="text-[11px] text-white/80">critères de certification</p>
                 </div>
-                <div class="bg-white/15 rounded-2xl py-3">
-                    <p class="text-2xl font-extrabold">-20%</p>
-                    <p class="text-[11px] text-white/80">max en VIP</p>
+                <div class="bg-white/15 rounded-2xl py-3 px-2">
+                    <p class="text-2xl font-extrabold">100%</p>
+                    <p class="text-[11px] text-white/80">des lieux visités avant publication</p>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- ===== FILTRES + LISTE ===== -->
-    <section id="lieux" class="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl font-extrabold mb-2">Trouve ton spot 📍</h2>
-            <p class="text-slate-500">Filtre par ville, type de lieu ou budget. Tous les lieux ci-dessous ont passé notre certification.</p>
-        </div>
+    <!-- ===== ÉTAT DU RÉPERTOIRE ===== -->
+    <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl border-2 border-dashed border-orange-300 p-8 sm:p-10 text-center shadow-sm">
+            <p class="text-6xl mb-5">🚧</p>
+            <span class="bg-orange-100 text-orange-700 text-[11px] font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-full">Bientôt disponible</span>
+            <h2 class="text-3xl font-extrabold mt-5 mb-3">Le premier répertoire arrive bientôt</h2>
+            <p class="text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
+                Nous recrutons et vérifions actuellement les premiers maquis, cafés, restaurants, lounges et terrasses partenaires. Tant qu’un lieu n’a pas été visité et validé, il n’apparaîtra pas ici.
+            </p>
 
-        <!-- Barre de filtres -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6 mb-8">
-            <div class="grid md:grid-cols-3 gap-4 mb-5">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input id="f-search" type="search" placeholder="Rechercher un lieu, un quartier..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+            <div class="grid sm:grid-cols-3 gap-4 text-left mb-8">
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 1</p>
+                    <h3 class="font-extrabold mb-1">Proposition du lieu</h3>
+                    <p class="text-sm text-slate-600">Un gérant ou un membre nous propose un endroit adapté aux rencontres.</p>
                 </div>
-                <select id="f-city" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
-                    <option value="all">📍 Toutes les villes</option>
-                </select>
-                <select id="f-budget" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
-                    <option value="all">💰 Tous les budgets</option>
-                    <option value="1">💰 Petit budget (moins de 3 000 F)</option>
-                    <option value="2">💰💰 Moyen (3 000 – 7 000 F)</option>
-                    <option value="3">💰💰💰 Chic (7 000 F et +)</option>
-                </select>
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 2</p>
+                    <h3 class="font-extrabold mb-1">Visite et vérification</h3>
+                    <p class="text-sm text-slate-600">On contrôle l’éclairage, l’accueil, l’accès, le réseau et le retour en transport.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 3</p>
+                    <h3 class="font-extrabold mb-1">Publication certifiée</h3>
+                    <p class="text-sm text-slate-600">Seulement après validation, le lieu reçoit le badge « Certifié sûr ».</p>
+                </div>
             </div>
 
-            <div class="flex items-center justify-between gap-4">
-                <div id="type-chips" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                    <!-- chips injectés par JS -->
-                </div>
-                <button onclick="resetFilters()" class="shrink-0 text-xs font-bold text-slate-500 hover:text-brandPink transition">
-                    <i class="fa-solid fa-rotate-left mr-1"></i> Réinitialiser
-                </button>
-            </div>
+            <a href="#partenaire" class="inline-block bg-brand-gradient text-white font-extrabold px-8 py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
+                Je propose un lieu 🚀
+            </a>
         </div>
-
-        <p class="text-sm text-slate-500 mb-5"><strong id="result-count" class="text-slate-800">0</strong> lieu(x) trouvé(s)</p>
-
-        <!-- Grille -->
-        <div id="venues-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-        <!-- État vide -->
-        <div id="empty-state" class="hidden text-center py-16">
-            <p class="text-5xl mb-4">🔍</p>
-            <h3 class="text-xl font-extrabold mb-2">Aucun lieu ne correspond</h3>
-            <p class="text-slate-500 text-sm mb-6">Essaie d'élargir ta recherche ou de changer de ville.</p>
-            <button onclick="resetFilters()" class="bg-brand-gradient text-white font-bold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition">Tout afficher</button>
-        </div>
-
-        <p class="text-center text-xs text-slate-400 mt-10">La liste s'agrandit au fil des partenaires. Ton quartier n'y est pas encore ? Propose-nous un lieu plus bas 👇</p>
     </section>
 
-    <!-- ===== POURQUOI CERTIFIÉ ===== -->
-    <section class="py-20 bg-white">
+    <!-- ===== ZONES PRIORITAIRES ===== -->
+    <section class="py-16 bg-white">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Le badge « Certifié sûr »</span>
-                <h2 class="text-3xl font-extrabold mt-2 mb-3">Ce qu'on vérifie avant de mettre un lieu ✅</h2>
-                <p class="text-slate-500 max-w-2xl mx-auto">Un premier rancart, ça doit rester cool. Chaque lieu doit cocher ces cases pour apparaître ici.</p>
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Recrutement en cours</span>
+                <h2 class="text-3xl font-extrabold mt-2 mb-3">Nos premières zones prioritaires 📍</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto">Ce ne sont pas encore des lieux partenaires. Ce sont les zones où nous cherchons activement les premiers établissements à certifier.</p>
             </div>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">💡</div>
-                    <h3 class="font-extrabold mb-1">Bien éclairé</h3>
-                    <p class="text-sm text-slate-600">Salle, terrasse et accès au lieu : pas de coin sombre ni isolé.</p>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 text-center">
+                    <p class="text-4xl mb-3">🏙️</p>
+                    <h3 class="font-extrabold">Abidjan</h3>
+                    <p class="text-xs text-slate-500 mt-1">Cocody, Yopougon, Marcory, Plateau, Treichville, Koumassi, Abobo…</p>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">🤝</div>
-                    <h3 class="font-extrabold mb-1">Personnel de confiance</h3>
-                    <p class="text-sm text-slate-600">Une équipe accueillante, sensibilisée pour aider discrètement un client mal à l'aise.</p>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 text-center">
+                    <p class="text-4xl mb-3">🏖️</p>
+                    <h3 class="font-extrabold">Grand-Bassam</h3>
+                    <p class="text-xs text-slate-500 mt-1">Pour les rancarts détente et les sorties du week-end.</p>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">🚕</div>
-                    <h3 class="font-extrabold mb-1">Retour facile</h3>
-                    <p class="text-sm text-slate-600">Taxis ou VTC accessibles à toute heure d'ouverture, pour rentrer sans stress.</p>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 text-center">
+                    <p class="text-4xl mb-3">🌆</p>
+                    <h3 class="font-extrabold">Bouaké</h3>
+                    <p class="text-xs text-slate-500 mt-1">Une des prochaines villes visées après Abidjan.</p>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">📶</div>
-                    <h3 class="font-extrabold mb-1">Réseau mobile correct</h3>
-                    <p class="text-sm text-slate-600">Pour que le SOS, le check-in et le partage de trajet fonctionnent vraiment.</p>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">👥</div>
-                    <h3 class="font-extrabold mb-1">Lieu public et fréquenté</h3>
-                    <p class="text-sm text-slate-600">Ouvert à tous, avec du monde. Jamais de lieu privé ou caché.</p>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">⭐</div>
-                    <h3 class="font-extrabold mb-1">Avis des membres</h3>
-                    <p class="text-sm text-slate-600">Après un rancart, tu notes le lieu. Un spot mal noté peut perdre son badge.</p>
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 text-center">
+                    <p class="text-4xl mb-3">🏛️</p>
+                    <h3 class="font-extrabold">Yamoussoukro</h3>
+                    <p class="text-xs text-slate-500 mt-1">Recrutement de cafés et lounges partenaires en préparation.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== COMMENT PROFITER ===== -->
+    <!-- ===== CRITÈRES CERTIFICATION ===== -->
     <section class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Tes avantages</span>
-                <h2 class="text-3xl font-extrabold mt-2 mb-4">Réserve via l'app, paie moins cher 🎁</h2>
-                <p class="text-slate-600 leading-relaxed mb-6">
-                    Les lieux partenaires te font une réduction sur l'addition quand tu passes par Viens chop. Plus de <strong>friction</strong>, plus de <strong>bon plan</strong>.
-                </p>
-                <ol class="space-y-5">
-                    <li class="flex gap-4">
-                        <span class="w-9 h-9 shrink-0 bg-brand-gradient text-white rounded-xl flex items-center justify-center font-extrabold text-sm">1</span>
-                        <p class="text-sm text-slate-700"><strong>Choisis le lieu</strong> avec ton match, directement depuis votre chat.</p>
-                    </li>
-                    <li class="flex gap-4">
-                        <span class="w-9 h-9 shrink-0 bg-brand-gradient text-white rounded-xl flex items-center justify-center font-extrabold text-sm">2</span>
-                        <p class="text-sm text-slate-700"><strong>Confirme la réservation</strong> dans l'app et active le partage de trajet avec un proche.</p>
-                    </li>
-                    <li class="flex gap-4">
-                        <span class="w-9 h-9 shrink-0 bg-brand-gradient text-white rounded-xl flex items-center justify-center font-extrabold text-sm">3</span>
-                        <p class="text-sm text-slate-700"><strong>Montre ton code Viens chop</strong> au serveur : la réduction s'applique à l'addition.</p>
-                    </li>
-                </ol>
+        <div class="text-center mb-12">
+            <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Le badge « Certifié sûr »</span>
+            <h2 class="text-3xl font-extrabold mt-2 mb-3">Ce qu’on vérifiera avant de publier un lieu ✅</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">Aucun lieu ne sera ajouté uniquement parce qu’il est populaire. Il devra d’abord répondre à ces critères.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">💡</div>
+                <h3 class="font-extrabold mb-1">Bien éclairé</h3>
+                <p class="text-sm text-slate-600">Salle, terrasse et accès au lieu : pas de coin sombre ni isolé.</p>
             </div>
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
-                <p class="text-xs font-bold text-slate-400 uppercase mb-4">Réductions partenaires</p>
-                <div class="grid grid-cols-2 gap-4 mb-5">
-                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center">
-                        <p class="text-xs font-bold text-slate-500 mb-1">Plan Gratuit</p>
-                        <p class="text-3xl font-extrabold">-10%</p>
-                        <p class="text-[11px] text-slate-400 mt-1">jusqu'à</p>
-                    </div>
-                    <div class="bg-orange-50 border-2 border-brandPink rounded-2xl p-5 text-center">
-                        <p class="text-xs font-bold text-brandPink mb-1">Plan VIP 🔥</p>
-                        <p class="text-3xl font-extrabold text-brand-gradient">-20%</p>
-                        <p class="text-[11px] text-slate-400 mt-1">jusqu'à</p>
-                    </div>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-4 text-xs text-slate-600 leading-relaxed">
-                    <p class="font-bold text-slate-800 mb-1">À savoir</p>
-                    Le pourcentage exact dépend de chaque lieu et est affiché sur sa fiche. Réduction valable sur l'addition, hors offres déjà en cours dans le lieu.
-                </div>
-                <a href="tarifs.html" class="inline-flex items-center gap-2 text-brandPink font-bold hover:underline mt-5 text-sm">
-                    Voir les tarifs VIP <i class="fa-solid fa-arrow-right"></i>
-                </a>
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">🤝</div>
+                <h3 class="font-extrabold mb-1">Personnel accueillant</h3>
+                <p class="text-sm text-slate-600">Une équipe capable d’aider discrètement une personne mal à l’aise.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">🚕</div>
+                <h3 class="font-extrabold mb-1">Retour facile</h3>
+                <p class="text-sm text-slate-600">Taxis ou VTC accessibles pour rentrer sans stress après le rancart.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">📶</div>
+                <h3 class="font-extrabold mb-1">Réseau mobile correct</h3>
+                <p class="text-sm text-slate-600">Pour que le SOS, le Check-In et le partage de trajet fonctionnent.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">👥</div>
+                <h3 class="font-extrabold mb-1">Lieu public et fréquenté</h3>
+                <p class="text-sm text-slate-600">Ouvert au public, avec du monde. Jamais de lieu privé ou caché.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 bg-brand-gradient rounded-xl flex items-center justify-center text-xl mb-4">⭐</div>
+                <h3 class="font-extrabold mb-1">Avis des membres</h3>
+                <p class="text-sm text-slate-600">Après le lancement, les retours des utilisateurs aideront à garder ou retirer le badge.</p>
             </div>
         </div>
     </section>
 
-    <!-- ===== CONSEILS PREMIER RANCART ===== -->
+    <!-- ===== SÉCURITÉ RANCART ===== -->
     <section class="py-20 bg-slate-900 text-white">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold mb-3">Nos conseils pour un premier rancart tranquille 🧠</h2>
-                <p class="text-slate-400">Même dans un lieu certifié, quelques réflexes simples font la différence.</p>
+                <h2 class="text-3xl font-extrabold mb-3">Même sans lieu certifié, protège ton premier rancart 🛡️</h2>
+                <p class="text-slate-400">En attendant le répertoire, choisis toujours un endroit public et applique ces réflexes simples.</p>
             </div>
+
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
-                    <p class="text-3xl mb-3">🚶🏽</p>
-                    <h3 class="font-bold text-sm mb-1">Viens par tes propres moyens</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Pas de passage pris en voiture. Tu arrives et tu repars quand tu veux.</p>
-                </div>
-                <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
                     <p class="text-3xl mb-3">📍</p>
-                    <h3 class="font-bold text-sm mb-1">Préviens un proche</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Active le partage de trajet et dis à quelqu'un où tu es et avec qui.</p>
+                    <h3 class="font-bold text-sm mb-1">Lieu public</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Choisis un café, un restaurant ou un maquis fréquenté et bien éclairé.</p>
                 </div>
                 <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
-                    <p class="text-3xl mb-3">🍹</p>
-                    <h3 class="font-bold text-sm mb-1">Garde ton verre à l'œil</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Ne laisse jamais ta boisson sans surveillance, et reste maître de ta soirée.</p>
+                    <p class="text-3xl mb-3">🚶🏽</p>
+                    <h3 class="font-bold text-sm mb-1">Tes propres moyens</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Arrive et repars par toi-même pour garder ton indépendance.</p>
+                </div>
+                <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
+                    <p class="text-3xl mb-3">👨‍👩‍👧</p>
+                    <h3 class="font-bold text-sm mb-1">Préviens un proche</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Dis-lui où tu vas, avec qui et à quelle heure tu dois rentrer.</p>
                 </div>
                 <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
                     <p class="text-3xl mb-3">🚪</p>
-                    <h3 class="font-bold text-sm mb-1">Ton instinct a raison</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Pas à l'aise ? Tu pars. Utilise le SOS ou demande de l'aide au personnel.</p>
+                    <h3 class="font-bold text-sm mb-1">Tu peux partir</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Si tu n’es pas à l’aise, tu n’as pas à te justifier. Pars et mets-toi en sécurité.</p>
                 </div>
             </div>
+
             <p class="text-center mt-10">
                 <a href="securite.html" class="inline-flex items-center gap-2 text-white font-bold hover:underline">
-                    Découvrir toutes nos protections <i class="fa-solid fa-arrow-right"></i>
+                    Découvrir les protections Soutra <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </p>
         </div>
     </section>
 
-    <!-- ===== DEVENIR PARTENAIRE ===== -->
+    <!-- ===== PROPOSER UN LIEU / PARTENAIRE ===== -->
     <section id="partenaire" class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div class="grid md:grid-cols-2 gap-12 items-start">
             <div>
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Pour les gérants</span>
-                <h2 class="text-3xl font-extrabold mt-2 mb-4">Tu as un maquis, un café, un lounge ? 🏪</h2>
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Gérants et membres</span>
+                <h2 class="text-3xl font-extrabold mt-2 mb-4">Tu connais un lieu adapté ? 🏪</h2>
                 <p class="text-slate-600 leading-relaxed mb-6">
-                    Deviens lieu certifié Viens chop et accueille des jeunes qui cherchent justement un endroit sûr pour se rencontrer.
+                    Nous construisons le premier répertoire. Tu peux proposer ton propre établissement ou recommander un lieu que tu connais.
                 </p>
                 <ul class="space-y-3 text-sm text-slate-700">
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>De nouveaux clients</strong> : ton lieu est mis en avant auprès des membres de ta ville.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Le badge « Certifié sûr »</strong> pour rassurer et fidéliser.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Zéro commission à l'ouverture</strong> : tu offres une réduction, on t'amène du monde.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Une petite formation</strong> pour ton équipe : savoir réagir avec tact.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pour les gérants :</strong> mets ton lieu en avant auprès des futurs membres.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pour les membres :</strong> recommande un endroit public, propre et rassurant.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Visite obligatoire :</strong> chaque proposition sera étudiée avant une éventuelle certification.</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Aucune publication automatique :</strong> envoyer ce formulaire ne rend pas le lieu partenaire.</span></li>
                 </ul>
             </div>
 
             <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
                 <form id="partner-form" class="space-y-4" novalidate>
                     <div>
-                        <label for="p-name" class="block text-xs font-bold text-slate-500 uppercase mb-1">Nom du lieu</label>
-                        <input id="p-name" name="name" type="text" required placeholder="Ex : Chez Tantie Marie" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                        <label for="p-role" class="block text-xs font-bold text-slate-500 uppercase mb-1">Tu es</label>
+                        <select id="p-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <option value="gerant">Gérant du lieu</option>
+                            <option value="membre">Membre qui propose un lieu</option>
+                        </select>
                     </div>
+
+                    <div>
+                        <label for="p-name" class="block text-xs font-bold text-slate-500 uppercase mb-1">Nom du lieu</label>
+                        <input id="p-name" type="text" required placeholder="Ex : Café ou maquis du quartier" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="p-city" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ville / commune</label>
-                            <input id="p-city" name="city" type="text" required placeholder="Ex : Yopougon" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <input id="p-city" type="text" required placeholder="Ex : Yopougon" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
                         </div>
                         <div>
                             <label for="p-type" class="block text-xs font-bold text-slate-500 uppercase mb-1">Type</label>
-                            <select id="p-type" name="type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <select id="p-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
                                 <option>Maquis</option>
                                 <option>Lounge</option>
                                 <option>Café</option>
                                 <option>Restaurant</option>
                                 <option>Terrasse</option>
+                                <option>Autre lieu public</option>
                             </select>
                         </div>
                     </div>
+
                     <div>
                         <label for="p-phone" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ton numéro WhatsApp</label>
                         <div class="flex gap-2">
                             <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 font-bold text-sm">+225</span>
-                            <input id="p-phone" name="phone" type="tel" inputmode="numeric" required placeholder="07 XX XX XX XX" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <input id="p-phone" type="tel" inputmode="numeric" required placeholder="07 XX XX XX XX" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
                         </div>
                     </div>
+
+                    <div>
+                        <label for="p-message" class="block text-xs font-bold text-slate-500 uppercase mb-1">Pourquoi ce lieu ? <span class="normal-case font-semibold text-slate-400">(optionnel)</span></label>
+                        <textarea id="p-message" rows="3" placeholder="Bien éclairé, très fréquenté, taxis à proximité..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink"></textarea>
+                    </div>
+
                     <p id="p-error" class="hidden text-xs font-semibold text-red-500"></p>
+
                     <button type="submit" class="w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
-                        Je veux devenir partenaire 🚀
+                        Envoyer la proposition 🚀
                     </button>
-                    <p class="text-[11px] text-center text-slate-400">On te rappelle sur WhatsApp sous quelques jours. Aucun engagement.</p>
+                    <p class="text-[11px] text-center text-slate-400">Nous étudierons la proposition avant tout contact ou visite. Aucun engagement.</p>
                 </form>
 
                 <div id="p-success" class="hidden text-center py-8">
                     <p class="text-5xl mb-4">🎉</p>
-                    <h3 class="text-xl font-extrabold mb-2">Merci, c'est reçu !</h3>
-                    <p class="text-sm text-slate-600">Notre équipe te contacte très vite sur WhatsApp pour organiser la visite de ton lieu.</p>
+                    <h3 class="text-xl font-extrabold mb-2">Merci, proposition reçue !</h3>
+                    <p class="text-sm text-slate-600">Notre équipe étudiera le lieu. S’il correspond à nos critères, nous prendrons contact pour organiser une visite.</p>
                 </div>
             </div>
         </div>
@@ -347,8 +334,8 @@
     <!-- ===== CTA ===== -->
     <section class="py-20 bg-brand-gradient text-white text-center">
         <div class="max-w-2xl mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Trouve ton match, puis ton spot ! 🔥</h2>
-            <p class="text-white/90 mb-8">Les 500 premiers inscrits reçoivent 1 mois VIP offert, donc des réductions jusqu'à -20% dans les lieux partenaires.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Sois parmi les premiers membres 🔥</h2>
+            <p class="text-white/90 mb-8">Inscris-toi dès maintenant pour être prévenu du lancement et profiter de l’offre des 500 premiers inscrits.</p>
             <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
                 Je m'inscris gratuitement 🚀
             </a>
@@ -397,223 +384,43 @@
         </div>
     </footer>
 
-    <!-- ===== MODAL FICHE LIEU ===== -->
-    <div id="venue-modal" class="hidden fixed inset-0 z-[60] bg-slate-900/70 backdrop-blur-sm items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this) closeVenue()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div id="venue-modal-content" class="modal-enter bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden max-h-[92vh] overflow-y-auto"></div>
-    </div>
-
     <script>
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('open');
         }
 
-        /* ------------------------------------------------------------
-           DONNÉES — ⚠️ Lieux fictifs à remplacer par vos vrais partenaires
-           budget : 1 = < 3 000 F | 2 = 3 000–7 000 F | 3 = 7 000 F et +
-           ------------------------------------------------------------ */
-        const venues = [
-            { id: 1,  name: "Le Spot Lounge",       city: "Cocody",       area: "Riviera 2",     type: "Lounge",     budget: 2, rating: 4.8, emoji: "🌆", c1: "#fed7aa", c2: "#fbcfe8", hours: "16h – 02h",  free: 10, vip: 15, tags: ["Bien éclairé", "Personnel accueillant", "Parking", "Musique douce"], desc: "Un lounge cosy où l'on s'entend parler. Idéal pour un premier verre sans pression." },
-            { id: 2,  name: "Chez Tantie Rosalie",  city: "Yopougon",     area: "Siporex",       type: "Maquis",     budget: 1, rating: 4.6, emoji: "🐟", c1: "#fde68a", c2: "#fdba74", hours: "11h – 23h",  free: 10, vip: 20, tags: ["Poisson braisé", "Ambiance familiale", "Taxis à proximité"], desc: "Le maquis du quartier, convivial et bien fréquenté. Cuisine généreuse, addition douce." },
-            { id: 3,  name: "Café Lagune",          city: "Plateau",      area: "Rue du Commerce", type: "Café",     budget: 1, rating: 4.7, emoji: "☕", c1: "#bae6fd", c2: "#e9d5ff", hours: "7h – 20h",   free: 5,  vip: 10, tags: ["Wi-Fi", "Ouvert en journée", "Climatisé", "Bien éclairé"], desc: "Parfait pour un rancart de jour : calme, climatisé, et toujours du monde." },
-            { id: 4,  name: "Rooftop 225",          city: "Marcory",      area: "Zone 4",        type: "Lounge",     budget: 3, rating: 4.9, emoji: "🌇", c1: "#fbcfe8", c2: "#c4b5fd", hours: "17h – 01h",  free: 10, vip: 20, tags: ["Vue panoramique", "Sécurité à l'entrée", "Cocktails", "Parking gardé"], desc: "Pour marquer le coup. Vue sur la ville, sécurité à l'entrée et service aux petits soins." },
-            { id: 5,  name: "Le Garba Chic",        city: "Treichville",  area: "Avenue 16",     type: "Restaurant", budget: 1, rating: 4.5, emoji: "🍛", c1: "#fef08a", c2: "#fed7aa", hours: "10h – 22h",  free: 5,  vip: 10, tags: ["Cuisine locale", "Rapide", "Prix doux"], desc: "Un garba revisité, simple et sympa pour une rencontre sans chichi." },
-            { id: 6,  name: "Maquis Le Bon Coin",   city: "Abobo",        area: "Abobo Baoulé",  type: "Maquis",     budget: 1, rating: 4.4, emoji: "🍗", c1: "#fecaca", c2: "#fed7aa", hours: "12h – 23h",  free: 10, vip: 15, tags: ["Poulet braisé", "Terrasse", "Personnel accueillant"], desc: "Ambiance chaleureuse, grande terrasse et service rapide. Le bon plan du coin." },
-            { id: 7,  name: "Terrasse des Anges",   city: "Cocody",       area: "Angré 8e tranche", type: "Terrasse", budget: 2, rating: 4.6, emoji: "🌴", c1: "#bbf7d0", c2: "#bae6fd", hours: "15h – 00h",  free: 10, vip: 15, tags: ["Plein air", "Bien éclairé", "Parking", "Musique live le week-end"], desc: "Une terrasse aérée et lumineuse, très prisée le week-end avec des artistes en live." },
-            { id: 8,  name: "Café du Marché",       city: "Koumassi",     area: "Remblais",      type: "Café",       budget: 1, rating: 4.3, emoji: "🥐", c1: "#fed7aa", c2: "#fde68a", hours: "7h – 19h",   free: 5,  vip: 10, tags: ["Petit-déj", "Ouvert en journée", "Accès facile"], desc: "Un café simple et accueillant, parfait pour se rencontrer en plein jour." },
-            { id: 9,  name: "La Plage des Amis",    city: "Grand-Bassam", area: "Bord de mer",   type: "Terrasse",   budget: 2, rating: 4.7, emoji: "🏖️", c1: "#a5f3fc", c2: "#fde68a", hours: "10h – 22h",  free: 10, vip: 20, tags: ["Vue mer", "Fruits de mer", "Ambiance détente", "Très fréquenté"], desc: "Les pieds dans le sable, le coucher de soleil en toile de fond. Un rancart de week-end idéal." },
-            { id: 10, name: "Le Palmier Bleu",      city: "Bingerville",  area: "Centre",        type: "Restaurant", budget: 2, rating: 4.5, emoji: "🍽️", c1: "#bfdbfe", c2: "#bbf7d0", hours: "11h – 23h",  free: 10, vip: 15, tags: ["Jardin", "Calme", "Parking", "Bien éclairé"], desc: "Un cadre verdoyant et calme, pour prendre le temps de se découvrir." },
-            { id: 11, name: "Café Baoulé",          city: "Bouaké",       area: "Commerce",      type: "Café",       budget: 1, rating: 4.4, emoji: "🍵", c1: "#fde68a", c2: "#fbcfe8", hours: "7h – 21h",   free: 5,  vip: 10, tags: ["Wi-Fi", "Ambiance tranquille", "Accueil chaleureux"], desc: "Le point de rendez-vous des jeunes de Bouaké. Calme, propre et accueillant." },
-            { id: 12, name: "Lounge de la Paix",    city: "Yamoussoukro", area: "Quartier Millionnaire", type: "Lounge", budget: 2, rating: 4.6, emoji: "🛋️", c1: "#e9d5ff", c2: "#fecaca", hours: "16h – 01h",  free: 10, vip: 15, tags: ["Bien éclairé", "Sécurité", "Cocktails", "Parking"], desc: "Un lounge élégant et sécurisé, à deux pas des grands axes de la ville." }
-        ];
-
-        const budgetLabels = {
-            1: { icons: "💰",     range: "Moins de 3 000 F / pers." },
-            2: { icons: "💰💰",   range: "3 000 – 7 000 F / pers." },
-            3: { icons: "💰💰💰", range: "7 000 F et + / pers." }
-        };
-        const typeEmojis = { "Maquis": "🍗", "Lounge": "🛋️", "Café": "☕", "Restaurant": "🍽️", "Terrasse": "🌴" };
-
-        const state = { q: "", city: "all", type: "all", budget: "all" };
-
-        /* ---------- Initialisation ---------- */
-        function init() {
-            // Stats hero
-            const cities = [...new Set(venues.map(v => v.city))].sort((a, b) => a.localeCompare(b, 'fr'));
-            document.getElementById('stat-venues').textContent = venues.length;
-            document.getElementById('stat-cities').textContent = cities.length;
-
-            // Select villes
-            const citySelect = document.getElementById('f-city');
-            cities.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c; opt.textContent = "📍 " + c;
-                citySelect.appendChild(opt);
-            });
-
-            // Chips types
-            const types = ["all", ...Object.keys(typeEmojis)];
-            const chips = document.getElementById('type-chips');
-            chips.innerHTML = types.map(t => {
-                const label = t === "all" ? "Tous" : typeEmojis[t] + " " + t;
-                return `<button data-type="${t}" class="type-chip shrink-0 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:border-brandPink transition">${label}</button>`;
-            }).join('');
-            chips.querySelectorAll('.type-chip').forEach(btn => {
-                btn.addEventListener('click', () => { state.type = btn.dataset.type; render(); });
-            });
-
-            // Écouteurs filtres
-            document.getElementById('f-search').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
-            citySelect.addEventListener('change', e => { state.city = e.target.value; render(); });
-            document.getElementById('f-budget').addEventListener('change', e => { state.budget = e.target.value; render(); });
-
-            render();
-        }
-
-        /* ---------- Filtrage + rendu ---------- */
-        function getFiltered() {
-            return venues.filter(v => {
-                const haystack = (v.name + " " + v.city + " " + v.area + " " + v.type + " " + v.tags.join(" ")).toLowerCase();
-                return (!state.q || haystack.includes(state.q))
-                    && (state.city === "all" || v.city === state.city)
-                    && (state.type === "all" || v.type === state.type)
-                    && (state.budget === "all" || String(v.budget) === state.budget);
-            }).sort((a, b) => b.rating - a.rating);
-        }
-
-        function render() {
-            const list = getFiltered();
-            document.getElementById('result-count').textContent = list.length;
-            document.getElementById('venues-grid').innerHTML = list.map(cardHTML).join('');
-            document.getElementById('empty-state').classList.toggle('hidden', list.length > 0);
-
-            document.querySelectorAll('.type-chip').forEach(btn => {
-                btn.classList.toggle('chip-active', btn.dataset.type === state.type);
-            });
-        }
-
-        function cardHTML(v) {
-            const b = budgetLabels[v.budget];
-            const tags = v.tags.slice(0, 3).map(t => `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2.5 py-1 rounded-full">${t}</span>`).join('');
-            return `
-            <article class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition overflow-hidden flex flex-col">
-                <div class="relative h-36 flex items-center justify-center text-6xl" style="background: linear-gradient(135deg, ${v.c1}, ${v.c2});">
-                    ${v.emoji}
-                    <span class="absolute top-3 left-3 bg-white/95 text-emerald-700 text-[10px] font-extrabold px-2.5 py-1 rounded-full">✓ CERTIFIÉ SÛR</span>
-                    <span class="absolute top-3 right-3 bg-slate-900/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">${v.type}</span>
-                </div>
-                <div class="p-5 flex flex-col flex-1">
-                    <div class="flex items-start justify-between gap-3 mb-1">
-                        <h3 class="font-extrabold text-lg leading-tight">${v.name}</h3>
-                        <span class="shrink-0 text-xs font-bold bg-amber-50 text-amber-600 px-2 py-1 rounded-lg">⭐ ${v.rating.toFixed(1)}</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mb-3"><i class="fa-solid fa-location-dot text-brandPink mr-1"></i>${v.area}, ${v.city}</p>
-                    <div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>
-                    <div class="flex items-center justify-between text-xs text-slate-500 mb-4">
-                        <span>${b.icons} <span class="ml-1">${b.range}</span></span>
-                    </div>
-                    <div class="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 text-center mb-4">
-                        <p class="text-[11px] font-bold text-orange-700">🎁 -${v.free}% • <span class="text-brandPink">VIP -${v.vip}%</span></p>
-                    </div>
-                    <button onclick="openVenue(${v.id})" class="mt-auto w-full border-2 border-slate-200 hover:border-brandPink hover:text-brandPink font-bold py-2.5 rounded-xl text-sm transition">
-                        Voir la fiche
-                    </button>
-                </div>
-            </article>`;
-        }
-
-        function resetFilters() {
-            state.q = ""; state.city = "all"; state.type = "all"; state.budget = "all";
-            document.getElementById('f-search').value = "";
-            document.getElementById('f-city').value = "all";
-            document.getElementById('f-budget').value = "all";
-            render();
-        }
-
-        /* ---------- Modal ---------- */
-        function openVenue(id) {
-            const v = venues.find(x => x.id === id);
-            if (!v) return;
-            const b = budgetLabels[v.budget];
-            const tags = v.tags.map(t => `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full">✓ ${t}</span>`).join('');
-
-            document.getElementById('venue-modal-content').innerHTML = `
-                <div class="relative h-40 flex items-center justify-center text-7xl" style="background: linear-gradient(135deg, ${v.c1}, ${v.c2});">
-                    ${v.emoji}
-                    <button onclick="closeVenue()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 text-slate-600 hover:text-brandPink flex items-center justify-center" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
-                    <span class="absolute top-4 left-4 bg-white/95 text-emerald-700 text-[10px] font-extrabold px-2.5 py-1 rounded-full">✓ CERTIFIÉ SÛR</span>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-start justify-between gap-3 mb-1">
-                        <h3 id="modal-title" class="text-2xl font-extrabold leading-tight">${v.name}</h3>
-                        <span class="shrink-0 text-sm font-bold bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg">⭐ ${v.rating.toFixed(1)}</span>
-                    </div>
-                    <p class="text-sm text-slate-500 mb-4"><i class="fa-solid fa-location-dot text-brandPink mr-1"></i>${v.area}, ${v.city} • ${v.type}</p>
-                    <p class="text-sm text-slate-600 leading-relaxed mb-5">${v.desc}</p>
-
-                    <div class="grid grid-cols-2 gap-3 mb-5 text-sm">
-                        <div class="bg-slate-50 rounded-xl p-3">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Horaires</p>
-                            <p class="font-bold">🕒 ${v.hours}</p>
-                        </div>
-                        <div class="bg-slate-50 rounded-xl p-3">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Budget</p>
-                            <p class="font-bold">${b.icons} <span class="text-xs font-semibold text-slate-500">${b.range}</span></p>
-                        </div>
-                    </div>
-
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Pourquoi il est certifié</p>
-                    <div class="flex flex-wrap gap-2 mb-5">${tags}</div>
-
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        <div class="border border-slate-200 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Gratuit</p>
-                            <p class="text-2xl font-extrabold">-${v.free}%</p>
-                        </div>
-                        <div class="border-2 border-brandPink bg-orange-50 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-bold text-brandPink uppercase">VIP 🔥</p>
-                            <p class="text-2xl font-extrabold text-brand-gradient">-${v.vip}%</p>
-                        </div>
-                    </div>
-
-                    <a href="inscription.html" class="block text-center bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
-                        Réserver via Viens chop 🍹
-                    </a>
-                    <p class="text-[11px] text-center text-slate-400 mt-3">Réservation et code de réduction disponibles dans l'app, une fois inscrit(e).</p>
-                </div>`;
-
-            const modal = document.getElementById('venue-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeVenue() {
-            const modal = document.getElementById('venue-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = '';
-        }
-
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVenue(); });
-
-        /* ---------- Formulaire partenaire (front uniquement) ---------- */
         document.getElementById('partner-form').addEventListener('submit', function (e) {
             e.preventDefault();
-            const err = document.getElementById('p-error');
-            const name = this.name.value.trim();
-            const city = this.city.value.trim();
-            const phone = this.phone.value.replace(/\D/g, '');
 
-            if (!name || !city) { err.textContent = "Merci de renseigner le nom du lieu et la ville."; err.classList.remove('hidden'); return; }
-            if (phone.length !== 10) { err.textContent = "Numéro invalide : il doit contenir 10 chiffres (ex : 07 XX XX XX XX)."; err.classList.remove('hidden'); return; }
+            const error = document.getElementById('p-error');
+            const role = document.getElementById('p-role').value;
+            const name = document.getElementById('p-name').value.trim();
+            const city = document.getElementById('p-city').value.trim();
+            const type = document.getElementById('p-type').value;
+            const phone = document.getElementById('p-phone').value.replace(/\D/g, '');
+            const message = document.getElementById('p-message').value.trim();
 
-            err.classList.add('hidden');
-            // TODO : envoyer les données au backend / WhatsApp / Google Sheet
+            if (!name || !city) {
+                error.textContent = "Merci de renseigner le nom du lieu et la ville ou la commune.";
+                error.classList.remove('hidden');
+                return;
+            }
+
+            if (phone.length !== 10) {
+                error.textContent = "Numéro invalide : il doit contenir 10 chiffres, par exemple 07 XX XX XX XX.";
+                error.classList.remove('hidden');
+                return;
+            }
+
+            error.classList.add('hidden');
+
+            const proposal = { role, name, city, type, phone: '+225' + phone, message };
+            console.log('Proposition de lieu Viens chop :', proposal);
+
+            // TODO : envoyer "proposal" vers le backend, WhatsApp Business ou Google Sheets.
             this.classList.add('hidden');
             document.getElementById('p-success').classList.remove('hidden');
         });
-
-        init();
     </script>
 </body>
 </html>
