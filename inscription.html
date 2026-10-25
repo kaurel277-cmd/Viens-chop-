@@ -197,21 +197,8 @@
                                     <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">👨🏾 Un homme</span>
                                 </label>
                             </div>
-                        </fieldset>
-
-                        <fieldset>
-                            <legend class="block text-xs font-bold text-slate-500 uppercase mb-1">Je veux rencontrer <span class="normal-case font-semibold text-slate-400">(automatique)</span></legend>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="cursor-not-allowed">
-                                    <input type="radio" name="seeking" value="F" class="peer sr-only" disabled>
-                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition opacity-40 peer-checked:opacity-100 peer-checked:border-brandPink peer-checked:bg-orange-50">👩🏾 Des femmes</span>
-                                </label>
-                                <label class="cursor-not-allowed">
-                                    <input type="radio" name="seeking" value="M" class="peer sr-only" disabled>
-                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition opacity-40 peer-checked:opacity-100 peer-checked:border-brandPink peer-checked:bg-orange-50">👨🏾 Des hommes</span>
-                                </label>
-                            </div>
-                            <p id="seeking-hint" class="text-[11px] text-slate-400 mt-2">Choisis d'abord si tu es une femme ou un homme.</p>
+                            <!-- Information automatique (pas un choix) -->
+                            <p id="seeking-hint" class="hidden text-[11px] font-semibold text-slate-500 mt-2"></p>
                         </fieldset>
 
                         <div>
@@ -408,6 +395,18 @@
         };
 
         /* ------------------------------------------------------------
+           RÈGLE AUTOMATIQUE « JE VEUX RENCONTRER »
+           Plus aucun choix pour l'utilisateur : c'est le site qui décide.
+           Valeurs : 'F' = des femmes | 'M' = des hommes | 'A' = hommes et femmes
+           ⚠️ Pour qu'une femme voie seulement des hommes : F: 'M'
+           ------------------------------------------------------------ */
+        const SEEKING_RULE = { M: 'F', F: 'A' };
+        const SEEKING_HINT = {
+            M: "Tu verras des profils de femmes. 💘",
+            F: "Tu verras des profils d'hommes et de femmes. 💘"
+        };
+
+        /* ------------------------------------------------------------
            API — à remplacer par tes vrais appels serveur
            ------------------------------------------------------------ */
         const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -430,7 +429,7 @@
             // TODO : envoyer payload au backend. Le serveur doit AUSSI :
             //        - vérifier l'âge (18+)
             //        - refuser un numéro déjà inscrit (1 compte par numéro)
-            //        - imposer seeking = l'opposé de gender
+            //        - recalculer seeking à partir de gender (même règle que SEEKING_RULE)
             throw new Error('API non branchée');
         }
 
@@ -605,16 +604,12 @@
             return age;
         }
 
-        /* ---------- Genre → « je veux rencontrer » automatique (femme ↔ homme) ---------- */
-        const OPPOSITE = { F: 'M', M: 'F' };
-
+        /* ---------- Genre → affichage de ce que l'utilisateur verra (automatique) ---------- */
         document.querySelectorAll('input[name="gender"]').forEach(radio => {
             radio.addEventListener('change', () => {
-                const target = OPPOSITE[radio.value];
-                document.querySelector('input[name="seeking"][value="' + target + '"]').checked = true;
-                $('seeking-hint').textContent = radio.value === 'M'
-                    ? "Tu verras des profils de femmes."
-                    : "Tu verras des profils d'hommes.";
+                const hint = $('seeking-hint');
+                hint.textContent = SEEKING_HINT[radio.value];
+                hint.classList.remove('hidden');
                 hideError('err-3');
             });
         });
@@ -629,7 +624,7 @@
             const pseudo = $('pseudo').value.trim();
             const birth = $('birth').value;
             const gender = (document.querySelector('input[name="gender"]:checked') || {}).value;
-            const seeking = OPPOSITE[gender];
+            const seeking = SEEKING_RULE[gender];   // calculé automatiquement, jamais choisi par l'utilisateur
             const city = $('city').value;
 
             if (!/^[\p{L}\p{N} ._-]{2,20}$/u.test(pseudo)) { $('pseudo').classList.add('invalid'); return showError('err-3', "Choisis un pseudo de 2 à 20 caractères (lettres, chiffres, espaces, . _ -)."); }
