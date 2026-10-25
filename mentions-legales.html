@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales & CGU — Viens chop</title>
+    <meta name="description" content="Mentions légales, Conditions Générales d'Utilisation et Politique de confidentialité de l'application Viens chop.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { brandOrange: '#FF5E1A', brandPink: '#FF1E56' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
+        .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        .mobile-menu.open { transform: translateX(0); }
+        details > summary { list-style: none; cursor: pointer; outline: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-2xl">🔥</span>
+                <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
+            </a>
+            <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
+                <a href="index.html" class="hover:text-brandPink transition">Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink transition">Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
+                    Rejoindre 🔥
+                </a>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
+            <div class="flex justify-between items-center mb-8">
+                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+                <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+                <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
+                <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+                <hr class="border-slate-200">
+                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <header class="pt-28 pb-16 bg-brand-gradient text-white text-center">
+        <div class="max-w-3xl mx-auto px-4">
+            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Transparence</span>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Mentions Légales & CGU ⚖️</h1>
+            <p class="text-lg text-white/90">En t'inscrivant sur Viens chop, tu acceptes ces conditions. C'est clair, c'est simple.</p>
+        </div>
+    </header>
+
+    <!-- ===== SOMMAIRE RAPIDE ===== -->
+    <section class="py-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <a href="#edito" class="text-center py-3 px-4 bg-white border border-slate-200 rounded-xl hover:border-brandPink transition font-semibold text-sm">L'Éditeur</a>
+            <a href="#usage" class="text-center py-3 px-4 bg-white border border-slate-200 rounded-xl hover:border-brandPink transition font-semibold text-sm">Conditions d'usage</a>
+            <a href="#donnees" class="text-center py-3 px-4 bg-white border border-slate-200 rounded-xl hover:border-brandPink transition font-semibold text-sm">Tes Données</a>
+            <a href="#paiement" class="text-center py-3 px-4 bg-white border border-slate-200 rounded-xl hover:border-brandPink transition font-semibold text-sm">Paiements</a>
+        </div>
+    </section>
+
+    <!-- ===== CONTENU DÉTAILLÉ ===== -->
+    <section class="py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+        <!-- 1. ÉDITEUR -->
+        <article id="edito" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details open>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>1. Qui sommes-nous ? 🏢</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed">
+                    <p class="mb-3">Cette application mobile « Viens chop » est éditée par :</p>
+                    <ul class="list-disc pl-5 space-y-1 mb-3">
+                        <li><strong>Nom de l'entreprise / Entreprise individuelle</strong> : [Ton Nom ou Société]</li>
+                        <li><strong>Siège social</strong> : Abidjan, Côte d'Ivoire</li>
+                        <li><strong>Email de contact</strong> : support@vienschop.ci</li>
+                        <li><strong>Téléphone</strong> : +225 07 XX XX XX XX</li>
+                    </ul>
+                    <p>Dépôt légal : en cours. Hébergeur : [Nom de ton hébergeur].</p>
+                </div>
+            </details>
+        </article>
+
+        <!-- 2. CONDITIONS D'USAGE -->
+        <article id="usage" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>2. Conditions d'utilisation et Règles de base 👮</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed space-y-4">
+                    <p>L'accès à l'application Viens chop est strictement réservé aux utilisateurs majeurs (+18 ans). En te connectant, tu confirms avoir l'âge requis et accepter ces règles.</p>
+
+                    <h4 class="font-bold text-slate-800">Compte unique et identité</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>Un numéro = Un compte</strong> : Il est interdit de créer plusieurs comptes avec un même numéro de téléphone. Tout abus entraînera la suspension immédiate.</li>
+                        <li><strong>Vrai profil</strong> : Tu dois utiliser une note vocale personnelle et une photo réelle de toi. Les faux profils, photos volées ou impersonnations sont bannis.</li>
+                    </ul>
+
+                    <h4 class="font-bold text-slate-800 mt-4">Conduite respectueuse</h4>
+                    <p>Le harcèlement, les propos racistes/homophobes, les menaces ou le partage de contenu pornographique non consenti sont <strong>totalement interdits</strong>. Nous suspendons sans avertissement les profils signalés et vérifiés comme toxiques.</p>
+
+                    <h4 class="font-bold text-slate-800 mt-4">Fonctionnement des rencontres (Algorithme)</h4>
+                    <div class="bg-orange-50 border-l-4 border-brandPink p-4 my-2">
+                        <p class="font-bold text-brandPink">Note importante sur le filtrage</p>
+                        <p>Viens chop applique automatiquement une logique de rencontre basée sur le genre déclaré lors de l'inscription :
+                            <br>• Si tu es <strong>homme</strong>, tu verras exclusivement des profils de <strong>femmes</strong>.
+                            <br>• Si tu es <strong>femme</strong>, tu verras des profils d'<strong>hommes et de femmes</strong>.
+                        </p>
+                        <p>Ce filtre est technique et non modifiable par l'utilisateur afin de garantir une expérience fluide et équilibrée entre les membres.</p>
+                    </div>
+
+                    <h4 class="font-bold text-slate-800 mt-4">Propriété intellectuelle</h4>
+                    <p>Tout le contenu de l'application (design, logo, code, algorithmes) appartient à Viens chop. Tu as la propriété exclusive de ta note vocale et de tes messages.</p>
+                </div>
+            </details>
+        </article>
+
+        <!-- 3. PAIEMENT ET TARIFS -->
+        <article id="paiement" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>3. Offres et Paiements 💸</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed space-y-4">
+                    <p>Viens chop propose deux modes d'utilisation :</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>Mode Coulé (Gratuit)</strong> : Accès illimité et gratuit aux fonctionnalités de base (profil vocal, chat, 10 likes/jour).</li>
+                        <li><strong>Mode Boss (Payant)</strong> : Accès premium à <strong>700 FCFA/mois</strong>. Comprend les likes illimités, le mode incognito et le faux appel d'urgence.</li>
+                    </ul>
+
+                    <h4 class="font-bold text-slate-800">Modalités de paiement</h4>
+                    <p>Les paiements se font exclusivement via <strong>Mobile Money</strong> (Wave, Orange Money, MTN MoMo, Moov). Aucun autre moyen de paiement n'est accepté dans cette version bêta.</p>
+
+                    <h4 class="font-bold text-slate-800">Renouvellement</h4>
+                    <p>Le Mode Boss ne se renouvelle <strong>pas automatiquement</strong>. À la fin du mois, tu repasses en Mode Coulé gratuitement si tu ne paies pas.</p>
+
+                    <h4 class="font-bold text-slate-800">Partenariats Lieux</h4>
+                    <p>Viens chop collabore avec certains lieux (maquis, cafés). L'affichage d'un lieu sur notre carte « Certifié Sûr » ne garantit pas systématiquement une réduction. Toute promotion applicable au restaurant ou bar reste à la discrétion du gérant du lieu, sauf offre exceptionnelle affichée spécifiquement dans l'application.</p>
+                </div>
+            </details>
+        </article>
+
+        <!-- 4. DONNEES PERSONNELLES -->
+        <article id="donnees" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>4. Confidentialité et Tes Données 🔒</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed space-y-4">
+                    <p>Nous collectons uniquement ce qui est nécessaire :</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>Numéro de téléphone</strong> : Requis pour l'authentification (SMS OTP) et unique identifiant. Il n'est jamais visible par d'autres utilisateurs.</li>
+                        <li><strong>Données de profil</strong> : Note vocale, pseudo, date de naissance, localisation approximative (pour matcher à proximité).</li>
+                        <li><strong>Messagerie</strong> : Contenu des échanges privés (non scannés par IA, mais modérés suite à signalement).</li>
+                    </ul>
+
+                    <h4 class="font-bold text-slate-800">Tes droits</h4>
+                    <p>Conformément à la loi ivoirienne sur la protection des données, tu peux à tout moment :</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Accéder à tes données.</li>
+                        <li>Demander la correction de tes informations.</li>
+                        <li>Solliciter la suppression complète de ton compte et de toutes tes données (« droit à l'oubli »).</li>
+                    </ul>
+                    <p>Pour exercer ces droits, contacte-nous via l'application ou par email.</p>
+                </div>
+            </details>
+        </article>
+
+        <!-- 5. SÉCURITÉ ET RÉSILIATION -->
+        <article id="securite" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>5. Résiliation et Sécurité 🛑</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed space-y-4">
+                    <p><strong>Droit de retrait</strong> : Notre équipe de modération peut suspendre ou supprimer tout compte en cas de violation manifeste des présentes CGU (comportement violent, spam, usurpation d'identité), sans obligation de préavis.</p>
+                    
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-xs mt-4">
+                        <strong>Rappel vital</strong> : Les fonctionnalités SOS et Check-In sont des outils d'aide, mais ne remplacent pas les secours officiels (Police 110/111, SAMU 185). En cas de danger immédiat, appelle directement les autorités.
+                    </div>
+                </div>
+            </details>
+        </article>
+
+        <!-- 6. LOI APPLICABLE -->
+        <article class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <details>
+                <summary class="px-6 py-5 bg-slate-50 border-b border-slate-100 font-bold flex justify-between items-center group">
+                    <span>6. Loi applicable et Litiges ⚖️</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-6 text-sm text-slate-600 leading-relaxed">
+                    <p>Les présentes Conditions Générales d'Utilisation sont soumises au droit ivoirien. Tout litige non résolu à l'amiable sera porté devant les tribunaux compétents du ressort de la ville d'Abidjan.</p>
+                    <p class="mt-4 text-xs text-slate-400">Dernière mise à jour : 2025.</p>
+                </div>
+            </details>
+        </article>
+
+    </section>
+
+    <!-- ===== CONTACT RAPIDE ===== -->
+    <section class="py-16 bg-slate-900 text-white text-center">
+        <div class="max-w-2xl mx-auto px-4">
+            <h2 class="text-2xl font-extrabold mb-4">Une question sur ces textes ?</h2>
+            <p class="text-slate-300 mb-6">Notre équipe est disponible pour éclaircir tout point juridique ou technique.</p>
+            <a href="mailto:support@vienschop.ci" class="inline-flex items-center gap-2 bg-brand-gradient text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+                <i class="fa-solid fa-envelope"></i> Nous envoyer un mail
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-slate-950 text-slate-400 py-16 text-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="index.html" class="hover:text-white transition">Accueil</a></li>
+                        <li><a href="comment-ca-marche.html" class="hover:text-white transition">Comment ça marche</a></li>
+                        <li><a href="securite.html" class="hover:text-white transition">Sécurité</a></li>
+                        <li><a href="tarifs.html" class="hover:text-white transition">Tarifs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4">Nous contacter</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-500"></i> WhatsApp Business</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-instagram text-pink-500"></i> @vienschop_ci</li>
+                        <li class="flex items-center gap-2"><i class="fa-brands fa-tiktok text-white"></i> @vienschop</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+                <p>© 2025 Viens chop Côte d'Ivoire. Tous droits réservés.</p>
+                <p>Application réservée aux majeurs (+18 ans).</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
