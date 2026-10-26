@@ -491,26 +491,33 @@ select
 from public.users;
 
 -- ============================================================================
--- 11. DROITS
--- L'API se connecte avec un rôle dédié. Aucun accès anonyme.
+-- 11. DROITS — facultatif
+--
+-- Sur Neon, le compte par défaut (`neondb_owner`) est propriétaire de la base
+-- mais n'a pas le droit de créer des rôles : les rôles se gèrent depuis la
+-- console Neon. Ce bloc est donc tolérant à l'échec : si la création du rôle
+-- n'est pas autorisée, on l'ignore et l'API se connecte simplement avec le
+-- rôle propriétaire.
 -- ============================================================================
 do $$
 begin
     if not exists (select 1 from pg_roles where rolname = 'vienschop_api') then
-        create role vienschop_api nologin;
+        execute 'create role vienschop_api nologin';
     end if;
+
+    execute 'grant usage on schema public, app to vienschop_api';
+    execute 'grant select, insert, update, delete, truncate on all tables in schema public to vienschop_api';
+    execute 'grant usage, select on all sequences in schema public to vienschop_api';
+    execute 'grant execute on all functions in schema app to vienschop_api';
+    execute 'alter default privileges in schema public grant select, insert, update, delete, truncate on tables to vienschop_api';
+    execute 'alter default privileges in schema public grant usage, select on sequences to vienschop_api';
+
+    raise notice 'Rôle vienschop_api créé et configuré.';
+exception
+    when insufficient_privilege then
+        raise notice 'Rôle vienschop_api ignoré (création de rôle non autorisée) — l''API utilisera le rôle propriétaire de la base.';
 end;
 $$;
-
-grant usage on schema public, app to vienschop_api;
-grant select, insert, update, delete, truncate on all tables in schema public to vienschop_api;
-grant usage, select                on all sequences   in schema public to vienschop_api;
-grant execute                      on all functions   in schema app    to vienschop_api;
-
-alter default privileges in schema public
-    grant select, insert, update, delete, truncate on tables to vienschop_api;
-alter default privileges in schema public
-    grant usage, select on sequences to vienschop_api;
 
 -- ============================================================================
 -- 12. COMMENTAIRES

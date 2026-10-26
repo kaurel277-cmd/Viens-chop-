@@ -1,0 +1,39 @@
+# ============================================================================
+# Déploiement de l'API Viens chop sur Render (offre gratuite)
+#
+# 1. Pousser ce fichier sur GitHub (déjà fait).
+# 2. Sur render.com → New → Blueprint → choisir le dépôt Viens-chop-.
+# 3. Render lit ce fichier et demande les variables marquées `sync: false`.
+# 4. Renseigner DATABASE_URL, JWT_SECRET, OTP_PEPPER → Deploy.
+#
+# Documentation : https://render.com/docs/blueprint-spec
+# ============================================================================
+services:
+  - type: web
+    name: viens-chop-api
+    runtime: node
+    plan: free
+    region: frankfurt          # le plus proche d'Abidjan
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false            # à coller depuis Neon (chaîne "-pooler")
+      - key: JWT_SECRET
+        sync: false            # 64 caractères aléatoires
+      - key: OTP_PEPPER
+        sync: false            # un autre secret, différent
+      - key: SMS_PROVIDER
+        value: console         # passer à "termii" ou "twilio" quand le compte est ouvert
+      - key: CORS_ORIGIN
+        sync: false            # URL exacte du site, ex: https://viens-chop.ci
+      - key: OTP_LENGTH
+        value: "6"
+      - key: OTP_TTL_MINUTES
+        value: "5"
+      - key: JWT_TTL
+        value: 15m

@@ -34,6 +34,8 @@ La prochaine étape n'est donc pas une nouvelle page : c'est **brancher un backe
 
 Objectif : un vrai compte, de vrais profils, de vrais matchs.
 
+**Mise en route pas à pas : [`docs/GUIDE-DEMARRAGE.md`](docs/GUIDE-DEMARRAGE.md).**
+
 **Choix d'infrastructure retenu : Neon (PostgreSQL managé) + une API Node.**
 Neon ne fournit que la base : l'authentification, le stockage des photos et le
 temps réel ont donc été construits autour. Détail complet dans
