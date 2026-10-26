@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/icons.css">
     <meta name="description" content="Mentions légales, Conditions Générales d'Utilisation et Politique de confidentialité de l'application Viens chop.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,7 +30,7 @@
         details > summary { list-style: none; cursor: pointer; outline: none; }
         details > summary::-webkit-details-marker { display: none; }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -40,7 +41,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -53,7 +54,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
-                    Rejoindre 🔥
+                    Rejoindre <i class="vc vc-logo"></i>
                 </a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
@@ -66,7 +67,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -77,7 +78,7 @@
             <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -136,7 +137,7 @@
                     <h4 class="font-bold text-slate-800">Compte unique et identité</h4>
                     <ul class="list-disc pl-5 space-y-1">
                         <li><strong>Un numéro = Un compte</strong> : Il est interdit de créer plusieurs comptes avec un même numéro de téléphone. Tout abus entraînera la suspension immédiate.</li>
-                        <li><strong>Vrai profil</strong> : Tu dois utiliser une note vocale personnelle et une photo réelle de toi. Les faux profils, photos volées ou impersonnations sont bannis.</li>
+                        <li><strong>Vrai profil</strong> : Tu dois utiliser une photo réelle de toi. Les faux profils, photos volées ou impersonnations sont bannis.</li>
                     </ul>
 
                     <h4 class="font-bold text-slate-800 mt-4">Conduite respectueuse</h4>
@@ -153,7 +154,7 @@
                     </div>
 
                     <h4 class="font-bold text-slate-800 mt-4">Propriété intellectuelle</h4>
-                    <p>Tout le contenu de l'application (design, logo, code, algorithmes) appartient à Viens chop. Tu as la propriété exclusive de ta note vocale et de tes messages.</p>
+                    <p>Tout le contenu de l'application (design, logo, code, algorithmes) appartient à Viens chop. Tu as la propriété exclusive de tes photos et de tes messages.</p>
                 </div>
             </details>
         </article>
@@ -168,15 +169,15 @@
                 <div class="p-6 text-sm text-slate-600 leading-relaxed space-y-4">
                     <p>Viens chop propose deux modes d'utilisation :</p>
                     <ul class="list-disc pl-5 space-y-1">
-                        <li><strong>Mode Coulé (Gratuit)</strong> : Accès illimité et gratuit aux fonctionnalités de base (profil vocal, chat, 10 likes/jour).</li>
-                        <li><strong>Mode Boss (Payant)</strong> : Accès premium à <strong>700 FCFA/mois</strong>. Comprend les likes illimités, le mode incognito et le faux appel d'urgence.</li>
+                        <li><strong>Mode Coulé (Gratuit)</strong> : Accès illimité et gratuit aux fonctionnalités de base (profil complet, chat, 3 likes/jour).</li>
+                        <li><strong>Mode Debout (Payant)</strong> : Accès premium à <strong>700 FCFA/mois</strong>. Comprend les likes illimités, le mode incognito et le faux appel d'urgence.</li>
                     </ul>
 
                     <h4 class="font-bold text-slate-800">Modalités de paiement</h4>
                     <p>Les paiements se font exclusivement via <strong>Mobile Money</strong> (Wave, Orange Money, MTN MoMo, Moov). Aucun autre moyen de paiement n'est accepté dans cette version bêta.</p>
 
                     <h4 class="font-bold text-slate-800">Renouvellement</h4>
-                    <p>Le Mode Boss ne se renouvelle <strong>pas automatiquement</strong>. À la fin du mois, tu repasses en Mode Coulé gratuitement si tu ne paies pas.</p>
+                    <p>Le Mode Debout ne se renouvelle <strong>pas automatiquement</strong>. À la fin du mois, tu repasses en Mode Coulé gratuitement si tu ne paies pas.</p>
 
                     <h4 class="font-bold text-slate-800">Partenariats Lieux</h4>
                     <p>Viens chop collabore avec certains lieux (maquis, cafés). L'affichage d'un lieu sur notre carte « Certifié Sûr » ne garantit pas systématiquement une réduction. Toute promotion applicable au restaurant ou bar reste à la discrétion du gérant du lieu, sauf offre exceptionnelle affichée spécifiquement dans l'application.</p>
@@ -195,7 +196,7 @@
                     <p>Nous collectons uniquement ce qui est nécessaire :</p>
                     <ul class="list-disc pl-5 space-y-1">
                         <li><strong>Numéro de téléphone</strong> : Requis pour l'authentification (SMS OTP) et unique identifiant. Il n'est jamais visible par d'autres utilisateurs.</li>
-                        <li><strong>Données de profil</strong> : Note vocale, pseudo, date de naissance, localisation approximative (pour matcher à proximité).</li>
+                        <li><strong>Données de profil</strong> : Photo, pseudo, date de naissance, localisation approximative (pour matcher à proximité).</li>
                         <li><strong>Messagerie</strong> : Contenu des échanges privés (non scannés par IA, mais modérés suite à signalement).</li>
                     </ul>
 
@@ -260,8 +261,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>

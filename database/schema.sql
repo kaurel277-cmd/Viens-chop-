@@ -182,7 +182,7 @@ drop trigger if exists likes_create_match on public.likes;
 create trigger likes_create_match after insert on public.likes
     for each row execute function public.maybe_create_match();
 
--- 7d. Quota de 10 likes / jour pour les comptes gratuits (§3.A)
+-- 7d. Quota de 3 likes / jour pour les comptes gratuits (§3.A)
 create or replace function public.enforce_daily_like_quota()
 returns trigger language plpgsql as $$
 declare
@@ -198,8 +198,8 @@ begin
         return new;
     end if;
 
-    if s.likes_today >= 10 then
-        raise exception 'QUOTA_LIKES_ATTEINT : 10 likes par jour en Mode Coulé. Passe en VIP pour des likes illimités.';
+    if s.likes_today >= 3 then
+        raise exception 'QUOTA_LIKES_ATTEINT : 3 likes par jour en Mode Coulé. Passe en Debout pour des likes illimités.';
     end if;
 
     update public.users set likes_today = likes_today + 1 where id = s.id;

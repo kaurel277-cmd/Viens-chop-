@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Viens chop — L'App</title>
-    <meta name="description" content="Aperçu interactif de l'application Viens chop : note vocale, matchs par commune, Mode Flirt, Faux Appel et protections Soutra.">
+    <meta name="description" content="Aperçu interactif de l'application Viens chop : matchs par commune, Mode Flirt, Faux Appel et protections Sécurité.">
     <meta name="theme-color" content="#FF5E1A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/icons.css">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -238,7 +239,7 @@
         .call-btn.decline { background: #ff3b30; color: #fff; }
         .call-btn.accept { background: #34c759; color: #fff; }
 
-        /* ===== VIP MODAL ===== */
+        /* ===== Debout (ex-Boss) MODAL ===== */
         #vip-modal {
             display: none; position: fixed; inset: 0; z-index: 8888;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
@@ -354,20 +355,20 @@
         .stamp.show { animation: stampPop 0.5s ease forwards; }
         @keyframes stampPop { 0% { transform: translate(-50%,-50%) scale(0) rotate(-30deg); } 50% { transform: translate(-50%,-50%) scale(1.2) rotate(10deg); } 100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 0; } }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
 </head>
 <body>
 
     <!-- ==================== ÉCRAN 1: SPLASH ==================== -->
     <div id="splash" class="screen active">
         <div style="text-align:center;" class="anim-fade-in">
-            <div class="logo-glow" style="margin:0 auto 24px;">🔥</div>
+            <div class="logo-glow" style="margin:0 auto 24px;"><i class="vc vc-logo"></i></div>
             <h1 style="font-size:36px; font-weight:800; margin-bottom:8px;">
                 <span class="gradient-text">Viens chop</span>
             </h1>
             <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:48px;">L'amour et le flirt sans pression</p>
             <button class="btn-primary" onclick="goTo('login')" style="max-width:280px; margin:0 auto;" type="button">
-                Commencer 🔥
+                Commencer <i class="vc vc-logo"></i>
             </button>
             <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:16px;">Réservé aux +18 ans</p>
         </div>
@@ -378,14 +379,14 @@
         <div style="max-width:400px; margin:0 auto; width:100%;" class="anim-slide-up">
             <div style="text-align:center; margin-bottom:40px;">
                 <span style="font-size:48px;">📱</span>
-                <h2 style="font-size:24px; font-weight:800; margin-top:16px;">Ton numéro ivoirien</h2>
+                <h2 style="font-size:24px; font-weight:800; margin-top:16px;">Ton numéro de téléphone</h2>
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-top:8px;">On t'envoie un code par SMS pour vérifier que c'est bien toi</p>
             </div>
 
             <!-- Phone Input -->
             <div id="phone-step">
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
-                    <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">🇨🇮 +225</div>
+                    <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">+225</div>
                     <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14" inputmode="numeric" autocomplete="tel" aria-label="Numéro de téléphone">
                 </div>
                 <div style="text-align:right; margin:-8px 0 12px;">
@@ -456,7 +457,7 @@
                                 <option>Plateau</option><option>Port-Bouët</option><option>Songon</option>
                                 <option>Treichville</option><option>Yopougon</option>
                             </optgroup>
-                            <optgroup label="🇨🇮 Villes de Côte d'Ivoire">
+                            <optgroup label="Villes de Côte d'Ivoire">
                                 <option>Abengourou</option><option>Aboisso</option><option>Adiaké</option>
                                 <option>Adzopé</option><option>Agboville</option><option>Agnibilékrou</option>
                                 <option>Akoupé</option><option>Alepe</option><option>Assinie</option>
@@ -505,8 +506,8 @@
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">Choisis tes artistes préférés pour matcher avec les bonnes personnes !</p>
 
                 <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🇨🇮 Rap Ivoire &amp; Afro</span>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🔥 Himra</button>
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🥁 Rap Ivoire &amp; Afro</span>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🏆 Himra</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">💎 Didi B</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">⚡ Sindika</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">🎤 La B</button>
@@ -514,38 +515,70 @@
                     <button class="tag" onclick="toggleArtist(this)" type="button">🎶 Couper-Décaler</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">🥁 Amapiano</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">💃 Afrobeats</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">👑 Josey</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🥁 Tam Sir</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎤 Suspect 95</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">✨ Magic System</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🙏 KS Bloom</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎻 Serge Beynaud</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🦁 DJ Arafat</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💃 Safarel Obiang</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎉 Debordo</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎹 Ariel Sheney</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎧 Mix Premier</button>
                 </div>
                 <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
-                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🌍 Rap FR &amp; International</span>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🖤 Damso</button>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🎸 Tiakola</button>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🦅 Ninho</button>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🎵 Gazo</button>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">💿 Werenoi</button>
-                    <button class="tag" onclick="toggleArtist(this)" type="button">🌙 SDM</button>
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🗼 Rap FR</span>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🚀 Jul</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎼 GIMS</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎯 PLK</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌑 SCH</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💥 Niska</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎺 L2B</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌙 Hamza</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎤 Soolking</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🐺 Booba</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌍 PNL</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💫 Theodora</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💙 Dadju</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🌍 Afrique &amp; Afrobeat</span>
                     <button class="tag" onclick="toggleArtist(this)" type="button">🎧 Rema</button>
                     <button class="tag" onclick="toggleArtist(this)" type="button">✨ Burna Boy</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌴 Asake</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">⭐ Ayra Starr</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌺 Tems</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🦅 Wizkid</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💚 Davido</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌊 Omah Lay</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🗽 US &amp; Global</span>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🦉 Drake</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🏆 Kendrick Lamar</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌃 The Weeknd</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎪 Travis Scott</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🔮 Future</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🗡️ 21 Savage</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🐻 Kanye West</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌻 Tyler, The Creator</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🐰 Bad Bunny</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎀 Ariana Grande</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌊 SZA</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🐱 Doja Cat</button>
                 </div>
 
                 <button class="btn-primary" onclick="profileStep3()" type="button">Continuer →</button>
                 <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep1()" type="button">← Retour</button>
             </div>
 
-            <!-- STEP 3: Note vocale &amp; Selfie -->
+            <!-- STEP 3: Selfie de vérification -->
             <div id="setup-step-3" style="display:none;">
-                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Ta note vocale (10s) 🎙️</h2>
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Vérifie ton profil 📸</h2>
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">
-                    Enregistre ta voix pour te présenter sans pression. C'est ça que ton crush écoutera en premier !
+                    Dernière étape : un selfie rapide et ton profil reçoit le badge « Profil Certifié ».
                 </p>
-
-                <!-- Voice Recorder UI -->
-                <div style="text-align:center; margin-bottom:32px;">
-                    <div id="voice-btn" onclick="toggleRecording()" style="width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:36px; transition:all 0.3s;">
-                        <i class="fa-solid fa-microphone"></i>
-                    </div>
-                    <p id="voice-status" style="color:rgba(255,255,255,0.5); font-size:13px; margin-top:12px;">Appuie pour enregistrer (10s max)</p>
-                    <div id="voice-timer" style="display:none; font-size:28px; font-weight:800; color:#FF6B00; margin-top:8px;">0:00</div>
-                </div>
 
                 <!-- Selfie Verification -->
                 <div style="padding:20px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); text-align:center; margin-bottom:24px;">
@@ -565,7 +598,7 @@
                 </div>
 
                 <button class="btn-primary" onclick="finishProfile()" type="button">
-                    C'est parti ! 🔥
+                    C'est parti ! <i class="vc vc-logo"></i>
                 </button>
                 <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep2Back()" type="button">← Retour</button>
             </div>
@@ -576,12 +609,12 @@
     <div id="discover" class="screen">
         <div class="discover-header">
             <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:22px;">🔥</span>
+                <span style="font-size:22px;"><i class="vc vc-logo"></i></span>
                 <span class="gradient-text" style="font-size:20px; font-weight:800;">Viens chop</span>
             </div>
             <div class="likes-counter glass">
                 <i class="fa-solid fa-heart" style="color:#FF1E56;"></i>
-                <span id="likes-left" class="count">10</span><span style="color:rgba(255,255,255,0.5);">/ 10 Likes</span>
+                <span id="likes-left" class="count">3</span><span style="color:rgba(255,255,255,0.5);">/ 3 Likes</span>
             </div>
         </div>
 
@@ -596,26 +629,13 @@
                     </div>
                 </div>
                 <div class="card-info">
-                    <!-- Voice note bar -->
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.1); border-radius:12px;">
-                        <button type="button" aria-label="Écouter la note vocale" onclick="playVoiceNote()" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); border:none; color:#fff; font-size:14px; cursor:pointer;">
-                            <i class="fa-solid fa-play" id="play-icon"></i>
-                        </button>
-                        <div style="flex:1;">
-                            <div style="height:4px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden;">
-                                <div id="voice-progress" style="width:0%; height:100%; background:linear-gradient(90deg,#FF6B00,#FF1E56); transition:width 0.1s;"></div>
-                            </div>
-                            <span style="font-size:10px; color:rgba(255,255,255,0.5); margin-top:4px; display:block;">🎙️ Note vocale (10s)</span>
-                        </div>
-                    </div>
-
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                         <h3 id="card-name" style="font-size:22px; font-weight:800;">Awa, 22</h3>
                         <span class="badge" style="background:rgba(59,130,246,0.2); color:#60a5fa;"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
                     </div>
                     <p id="card-location" style="font-size:13px; color:rgba(255,255,255,0.6);">📍 Cocody, Angré</p>
                     <div id="card-artists" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-                        <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🔥 Himra</span>
+                        <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🏆 Himra</span>
                         <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🖤 Damso</span>
                         <span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎸 Tiakola</span>
                     </div>
@@ -630,13 +650,13 @@
             <button class="action-btn pass" onclick="swipePass()" title="Passer" type="button" aria-label="Passer ce profil">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <button class="action-btn voice" onclick="playVoiceNote()" title="Écouter la voix" type="button" aria-label="Écouter la note vocale">
-                <i class="fa-solid fa-microphone"></i>
+            <button class="action-btn voice" onclick="showQuiz()" title="Mode Flirt" type="button" aria-label="Lancer le Mode Flirt">
+                <i class="fa-solid fa-gamepad"></i>
             </button>
             <button class="action-btn like" onclick="swipeLike()" title="Liker ❤️" type="button" aria-label="Liker ce profil">
                 <i class="fa-solid fa-heart"></i>
             </button>
-            <button class="action-btn soutra" onclick="triggerFakeCall()" title="Faux Appel Soutra" type="button" aria-label="Lancer un faux appel">
+            <button class="action-btn soutra" onclick="triggerFakeCall()" title="Faux Appel" type="button" aria-label="Lancer un faux appel">
                 <i class="fa-solid fa-phone"></i>
             </button>
         </div>
@@ -695,7 +715,7 @@
         <!-- Quiz Mode Flirt (inline) -->
         <div id="quiz-container" style="display:none; padding:16px;">
             <div class="quiz-card">
-                <span style="font-size:11px; font-weight:700; color:#FF6B00; text-transform:uppercase; letter-spacing:1px;">🔥 Mode Flirt — Quiz</span>
+                <span style="font-size:11px; font-weight:700; color:#FF6B00; text-transform:uppercase; letter-spacing:1px;">🏆 Mode Flirt — Quiz</span>
                 <h3 id="quiz-question" style="font-size:18px; font-weight:700; margin-top:12px;">Chawarma/Burger ou Alloco/Poisson braisé ?</h3>
                 <div id="quiz-options" style="margin-top:16px;">
                     <div class="quiz-option" onclick="answerQuiz(this)">🌯 Chawarma/Burger</div>
@@ -722,11 +742,11 @@
         </div>
         <div style="flex:1; overflow-y:auto; padding:16px;">
             <p id="likes-hint" style="font-size:13px; color:rgba(233,237,239,.6); text-align:center; margin-bottom:16px;">
-                <i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en VIP pour les voir.
+                <i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en Debout pour les voir.
             </p>
             <div id="likes-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:12px;"></div>
-            <button class="btn-primary" style="margin-top:24px;" onclick="showVipModal('Débloque « Qui m\'a aimé » et vois toutes les photos en clair avec le Mode Boss 👑')" type="button">
-                <i class="fa-solid fa-crown"></i> Débloquer avec le VIP — 700 FCFA
+            <button class="btn-primary" style="margin-top:24px;" onclick="showVipModal('Débloque « Qui m\'a aimé » et vois toutes les photos en clair avec le Mode Debout 👑')" type="button">
+                <i class="fa-solid fa-crown"></i> Débloquer avec le Mode Debout — 700 FCFA
             </button>
         </div>
     </div>
@@ -740,16 +760,16 @@
             <button class="call-btn decline" onclick="endFakeCall()" type="button" aria-label="Refuser l'appel"><i class="fa-solid fa-phone-slash"></i></button>
             <button class="call-btn accept" onclick="acceptFakeCall()" type="button" aria-label="Accepter l'appel"><i class="fa-solid fa-phone"></i></button>
         </div>
-        <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:32px;">🤫 Faux Appel Soutra — Personne ne saura</p>
+        <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:32px;">🤫 Faux Appel — Personne ne saura</p>
     </div>
 
-    <!-- ==================== VIP MODAL ==================== -->
+    <!-- ==================== Debout (ex-Boss) MODAL ==================== -->
     <div id="vip-modal">
         <div class="vip-card anim-slide-up">
             <span style="font-size:48px;">👑</span>
-            <h2 style="font-size:22px; font-weight:800; margin-top:12px;" class="gradient-text">Passe en Mode VIP !</h2>
+            <h2 style="font-size:22px; font-weight:800; margin-top:12px;" class="gradient-text">Passe en Mode Debout !</h2>
             <p style="color:rgba(255,255,255,0.6); font-size:14px; margin:12px 0 20px;" id="vip-reason">
-                Tu as utilisé tes 10 Likes du jour. Repasse demain ou débloque les Likes illimités !
+                Tu as utilisé tes 3 Likes du jour. Repasse demain ou débloque les Likes illimités !
             </p>
             <div style="font-size:36px; font-weight:800; margin-bottom:4px;" class="gradient-text">700 FCFA</div>
             <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Par mois • Sans renouvellement piégeux</p>
@@ -769,7 +789,7 @@
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
     <div class="bottom-nav" id="bottom-nav" style="display:none;">
         <div class="nav-item active" role="button" tabindex="0" onclick="switchTab('discover', this)">
-            <i class="fa-solid fa-fire"></i>
+            <i class="fa-solid fa-compass"></i>
             <span>Découvrir</span>
         </div>
         <div class="nav-item" role="button" tabindex="0" onclick="switchTab('discussions', this)" style="position:relative;">
@@ -783,7 +803,7 @@
         </div>
         <div class="nav-item" role="button" tabindex="0" onclick="triggerFakeCall()">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>Soutra</span>
+            <span>Sécurité</span>
         </div>
     </div>
 
@@ -791,18 +811,13 @@
     <script>
         // ===== STATE =====
         let userProfile = {};
-        let likesRemaining = 10;
+        let likesRemaining = 3;
         let isVIP = false;
         let messageCount = 0;
         let photoUnlocked = false;
         let quizSessionsToday = 0;
         const MAX_FREE_QUIZ = 1;
         let currentProfileIndex = 0;
-        let isRecording = false;
-        let recordTimer = null;
-        let recordSeconds = 0;
-        let voicePlaying = false;
-        let voiceInterval = null;
         let fakeCallAudio = null;
 
         // ===== FAKE PROFILES =====
@@ -823,7 +838,7 @@
         const quizzes = [
             { q: "Premier rdv sans pression, tu choisis quoi ?", a: ["🌯 Chawarma / Burger", "🍌 Alloco / Poisson braisé"] },
             { q: "Soirée parfaite, c'est quoi le programme ?", a: ["🎵 Lounge tranquille posé", "🎤 Concert Himra / Didi B"] },
-            { q: "Tu préfères qu'on t'envoie quoi en premier ?", a: ["🎙️ Une note vocale douce", "💬 Une disquette de ouf"] },
+            { q: "Tu préfères qu'on t'envoie quoi en premier ?", a: ["💬 Une disquette de ouf", "🎲 Un quiz pour briser la glace"] },
             { q: "Ton red flag absolu chez un crush ?", a: ["📵 Répond jamais aux messages", "🤥 Utilise des fausses photos"] },
             { q: "Pour un weekend en amoureux c'est où ?", a: ["🏖️ Assinie / Grand-Bassam", "🏨 Hôtel chill à Cocody"] },
             { q: "C'est quoi le plus important pour toi ?", a: ["😂 L'humour avant tout", "💎 L'ambition et les projets"] },
@@ -834,13 +849,13 @@
 
         // ===== DISQUETTES =====
         const disquettes = [
-            "Team Himra ou Team Didi B ? Attention ta réponse peut annuler notre match hein 👀🔥",
+            "Team Himra ou Team Didi B ? Attention ta réponse peut annuler notre match hein 👀🍑",
             "Si on sort ce soir sans pression, tu préfères écouter du Tiakola posé ou t'ambiancer sur du Sindika ?",
             "Sur une échelle de 1 à Damso, tu as le cœur brisé comment ? 😂",
             "Ton profil c'est du lourd comme un classique de La B, on se capte quand ?",
             "Dis-moi la vérité : premier rdv, tu es plutôt Chawarma ou Lounge direct ?",
             "Si j'étais un son de 7 Flocky 45, lequel tu mettrais en boucle pour moi ? 🎵",
-            "Tu es la seule notification que j'ai envie de checker aujourd'hui 📱🔥"
+            "Tu es la seule notification que j'ai envie de checker aujourd'hui 📱🥒"
         ];
 
         // ===== FAKE CALL NAMES =====
@@ -1013,33 +1028,6 @@
         }
 
         // Voice recording simulation
-        function toggleRecording() {
-            const btn = document.getElementById('voice-btn');
-            const status = document.getElementById('voice-status');
-            const timer = document.getElementById('voice-timer');
-
-            if(!isRecording) {
-                isRecording = true;
-                recordSeconds = 0;
-                btn.style.boxShadow = '0 0 0 0 rgba(255,30,86,0.5)';
-                btn.innerHTML = '<i class="fa-solid fa-stop"></i>';
-                btn.style.animation = 'pulse-glow 0.8s ease-in-out infinite';
-                status.textContent = 'Enregistrement en cours...';
-                timer.style.display = 'block';
-                recordTimer = setInterval(() => {
-                    recordSeconds++;
-                    timer.textContent = `0:${recordSeconds.toString().padStart(2,'0')}`;
-                    if(recordSeconds >= 10) toggleRecording();
-                }, 1000);
-            } else {
-                isRecording = false;
-                clearInterval(recordTimer);
-                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                btn.style.animation = 'none';
-                btn.style.background = '#34d399';
-                status.textContent = '✅ Note vocale enregistrée !';
-            }
-        }
 
         function fakeSelfie(el) {
             document.getElementById('selfie-done').style.display = 'block';
@@ -1071,16 +1059,11 @@
             card.className = 'profile-card';
             card.style.display = 'block';
 
-            // Reset voice
-            document.getElementById('voice-progress').style.width = '0%';
-            document.getElementById('play-icon').className = 'fa-solid fa-play';
-            if(voiceInterval) clearInterval(voiceInterval);
-            voicePlaying = false;
         }
 
         function swipeLike() {
             if(likesRemaining <= 0 && !isVIP) {
-                showVipModal("Tu as utilisé tes 10 Likes du jour ! Repasse demain ou débloque les Likes illimités 👑");
+                showVipModal("Tu as utilisé tes 3 Likes du jour ! Repasse demain ou débloque les Likes illimités 👑");
                 return;
             }
 
@@ -1124,22 +1107,6 @@
             setTimeout(() => loadProfile(currentProfileIndex + 1), 500);
         }
 
-        function playVoiceNote() {
-            if(voicePlaying) return;
-            voicePlaying = true;
-            document.getElementById('play-icon').className = 'fa-solid fa-pause';
-            let progress = 0;
-            voiceInterval = setInterval(() => {
-                progress += 1;
-                document.getElementById('voice-progress').style.width = (progress * 10) + '%';
-                if(progress >= 10) {
-                    clearInterval(voiceInterval);
-                    voicePlaying = false;
-                    document.getElementById('play-icon').className = 'fa-solid fa-play';
-                    document.getElementById('voice-progress').style.width = '0%';
-                }
-            }, 1000);
-        }
 
         // ===== CHAT =====
         function openChat(profile) {
@@ -1184,7 +1151,7 @@
             // Auto reply
             setTimeout(() => {
                 const replies = [
-                    "Haha trop bien ça 😂🔥",
+                    "Haha trop bien ça 😂🍑",
                     "J'aime ta vibe ! Tu écoutes quoi là maintenant ? 🎵",
                     "Hmm intéressant... dis-moi plus 👀",
                     "Tu es de quel coin exactement ? Moi je suis à Cocody là",
@@ -1217,7 +1184,7 @@
                 // Le flou du chat disparaît vraiment, au lieu de rester flouté après l'annonce.
                 const av = document.getElementById('chat-avatar');
                 if (av) av.style.filter = 'none';
-                addMessage("🔓 Photo débloquée ! La photo de ton crush est maintenant visible 🔥", 'system');
+                addMessage("🔓 Photo débloquée ! La photo de ton crush est maintenant visible 🍑", 'system');
             }
         }
 
@@ -1228,7 +1195,7 @@
                 el.classList.add('active');
             }
             if(quizSessionsToday >= MAX_FREE_QUIZ && !isVIP) {
-                showVipModal("Tu as utilisé ta session Mode Flirt du jour ! Passe en VIP pour des sessions illimitées 🎮👑");
+                showVipModal("Tu as utilisé ta session Mode Flirt du jour ! Passe en Debout pour des sessions illimitées 🎮👑");
                 return;
             }
 
@@ -1257,7 +1224,7 @@
             // Auto reply
             setTimeout(() => {
                 const reactions = [
-                    "On a choisi la même chose !! 🔥🔥 Le match est validé haha",
+                    "On a choisi la même chose !! 🍑🥒 Le match est validé haha",
                     "Hmm intéressant ton choix... pas la même team mais j'aime ta personnalité 😏",
                     "Exactement ce que j'aurais choisi ! On est connectés 🤝",
                     "Bonne réponse ! Tu gagnes +10 points de compatibilité 💯"
@@ -1286,7 +1253,7 @@
         // ===== FAKE CALL =====
         function triggerFakeCall() {
             if(!isVIP) {
-                showVipModal("Le Faux Appel d'urgence est réservé aux membres VIP. Protège-toi sans pression pour seulement 700F ! 📞👑");
+                showVipModal("Le Faux Appel d'urgence est réservé aux membres Debout. Protège-toi sans pression pour seulement 700F ! 📞👑");
                 return;
             }
             const name = callerNames[Math.floor(Math.random() * callerNames.length)];
@@ -1312,7 +1279,7 @@
             setTimeout(() => { callInProgress = false; endFakeCall(); }, 3000);
         }
 
-        // ===== VIP MODAL =====
+        // ===== Debout (ex-Boss) MODAL =====
         function showVipModal(reason) {
             document.getElementById('vip-reason').textContent = reason;
             document.getElementById('vip-modal').classList.add('active');
@@ -1333,7 +1300,7 @@
             // Show success
             const successMsg = document.createElement('div');
             successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:slideDown 0.3s ease;';
-            successMsg.textContent = `✅ Paiement ${method} confirmé ! Tu es maintenant VIP 👑`;
+            successMsg.textContent = `✅ Paiement ${method} confirmé ! Tu es maintenant Debout 👑`;
             document.body.appendChild(successMsg);
             setTimeout(() => successMsg.remove(), 4000);
         }
@@ -1373,7 +1340,7 @@
 
         /* ---------------------------------------------------------------
            2. QUOTA FAUX APPEL — CDC §4 :
-              gratuit = 1 essai / semaine   |   VIP = illimité 24/7
+              gratuit = 1 essai / semaine   |   Debout = illimité 24/7
            --------------------------------------------------------------- */
         const FAKE_CALL_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 jours
 
@@ -1393,7 +1360,7 @@
             return Math.max(1, Math.ceil(ms / 60000)) + ' minutes';
         }
 
-        /* On enveloppe la fonction d'origine : le contrôle VIP unique est remplacé
+        /* On enveloppe la fonction d'origine : le contrôle Debout unique est remplacé
            par la règle « 1 essai par semaine » du cahier des charges. */
         const _triggerFakeCallOriginal = triggerFakeCall;
         triggerFakeCall = function () {
@@ -1402,7 +1369,7 @@
                 showVipModal(
                     "Tu as utilisé ton essai gratuit de Faux Appel cette semaine. " +
                     "Prochain essai dans " + humanDuration(avail.remainingMs) + ". " +
-                    "Passe en VIP pour un accès illimité 24/7 👑"
+                    "Passe en Debout pour un accès illimité 24/7 👑"
                 );
                 return;
             }
@@ -1420,7 +1387,7 @@
             if (!el) return;
             const avail = fakeCallAvailability();
             if (isVIP) {
-                el.innerHTML = '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Faux Appel <strong>illimité</strong> (VIP)';
+                el.innerHTML = '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Faux Appel <strong>illimité</strong> (Debout)';
             } else if (avail.allowed) {
                 el.innerHTML = '<i class="fa-solid fa-phone"></i> Faux Appel : <strong>1 essai gratuit</strong> disponible cette semaine';
             } else {
@@ -1438,7 +1405,7 @@
             { id: 'c1', name: 'Awa', emoji: '👩🏾', color: 'linear-gradient(135deg,#7c3aed,#db2777)',
               online: true, unread: 2, lastAt: NOW - 4 * 60000,
               messages: [
-                  { t: 'Salut ! J\'ai écouté ta note vocale, elle est trop cool 😍', dir: 'in', at: NOW - 9 * 60000 },
+                  { t: 'Salut ! Ton profil est trop cool, on a les mêmes sons 😍', dir: 'in', at: NOW - 9 * 60000 },
                   { t: 'Merci beaucoup ! Team Himra ou Team Didi B ?', dir: 'out', at: NOW - 6 * 60000, read: true },
                   { t: 'Himra évidemment 😂 et toi ?', dir: 'in', at: NOW - 4 * 60000 }
               ] },
@@ -1456,7 +1423,7 @@
             { id: 'c4', name: 'Franck', emoji: '👨🏾', color: 'linear-gradient(135deg,#1b3a4b,#0f3443)',
               online: false, unread: 0, lastAt: NOW - 3 * 86400000,
               messages: [
-                  { t: 'T\'as vu le nouveau son de Tiakola ? 🔥', dir: 'out', at: NOW - 3 * 86400000, read: true },
+                  { t: 'T\'as vu le nouveau son de Tiakola ? 🥒', dir: 'out', at: NOW - 3 * 86400000, read: true },
                   { t: 'Pas encore, je l\'écoute ce soir !', dir: 'in', at: NOW - 3 * 86400000 }
               ] }
         ];
@@ -1555,7 +1522,7 @@
 
         /* ---------------------------------------------------------------
            4. « QUI M'A AIMÉ » — CDC §4 :
-              gratuit = photos floutées   |   VIP = totalement visible
+              gratuit = photos floutées   |   Debout = totalement visible
            --------------------------------------------------------------- */
         const likedMeSamples = [
             { name: 'Awa', age: 22, city: 'Cocody', emoji: '👩🏾', color: 'linear-gradient(135deg,#7c3aed,#db2777)' },
@@ -1581,14 +1548,14 @@
                 '</div>'
             ).join('');
             hint.innerHTML = isVIP
-                ? '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Mode Boss : <strong>' + likedMeSamples.length + ' personnes</strong> t\'ont liké'
-                : '<i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en VIP pour tout voir.';
+                ? '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Mode Debout : <strong>' + likedMeSamples.length + ' personnes</strong> t\'ont liké'
+                : '<i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en Debout pour tout voir.';
             goTo('likes');
         }
 
         /* ---------------------------------------------------------------
            5. CERTIFICATION IA — CDC §2
-              Comparaison note vocale + selfie, badge en moins de 5 s.
+              Comparaison photo de profil + selfie, badge en moins de 5 s.
            --------------------------------------------------------------- */
         function startVerification() {
             const box = document.getElementById('verify-progress');
@@ -1598,7 +1565,7 @@
             box.style.display = 'block';
             let pct = 0;
             const steps = [
-                'Analyse de la note vocale…',
+                'Analyse de ta photo de profil…',
                 'Comparaison avec le selfie…',
                 'Détection de visage…',
                 'Attribution du badge…'

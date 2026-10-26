@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
-    <meta name="description" content="Toutes les réponses à tes questions sur Viens chop : inscription, profil vocal, Mode Coulé et Mode Boss, paiement Mobile Money, sécurité et lieux certifiés.">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <meta name="description" content="Toutes les réponses à tes questions sur Viens chop : inscription, profil complet, Mode Coulé et Mode Debout, paiement Mobile Money, sécurité et lieux certifiés.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -33,7 +34,7 @@
         .faq-answer { animation: faqIn .2s ease; }
         @keyframes faqIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -44,7 +45,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -57,7 +58,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
-                    Rejoindre 🔥
+                    Rejoindre <i class="vc vc-logo"></i>
                 </a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
@@ -70,7 +71,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -81,7 +82,7 @@
             <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -90,7 +91,7 @@
         <div class="max-w-3xl mx-auto px-4">
             <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Centre d'aide</span>
             <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Une question ? On a la réponse 💬</h1>
-            <p class="text-lg text-white/90 mb-8">Inscription, profil vocal, Mode Boss, paiement, sécurité, rancarts : tout est expliqué simplement.</p>
+            <p class="text-lg text-white/90 mb-8">Inscription, profil complet, Mode Debout, paiement, sécurité, rancarts : tout est expliqué simplement.</p>
 
             <div class="relative max-w-xl mx-auto">
                 <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -179,7 +180,7 @@
             <a href="tarifs.html" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-brandPink transition">
                 <p class="text-2xl mb-2">💸</p>
                 <h3 class="font-extrabold text-sm mb-1">Tarifs</h3>
-                <p class="text-xs text-slate-500">Mode Coulé vs Mode Boss.</p>
+                <p class="text-xs text-slate-500">Mode Coulé vs Mode Debout.</p>
             </a>
             <a href="securite.html" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-brandPink transition">
                 <p class="text-2xl mb-2">🛡️</p>
@@ -192,8 +193,8 @@
     <!-- ===== CTA ===== -->
     <section class="py-20 bg-brand-gradient text-white text-center">
         <div class="max-w-2xl mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Prêt(e) à chopper ? 🔥</h2>
-            <p class="text-white/90 mb-8">Inscris-toi avec ton numéro en 2 minutes. Les 500 premiers inscrits reçoivent 1 mois VIP offert.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Prêt(e) à te lancer ? <i class="vc vc-logo"></i></h2>
+            <p class="text-white/90 mb-8">Inscris-toi avec ton numéro en 2 minutes. Les 500 premiers inscrits reçoivent 1 mois Debout offert.</p>
             <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
                 Je m'inscris gratuitement 🚀
             </a>
@@ -205,8 +206,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
@@ -305,9 +306,9 @@
         const faqs = [
             /* ---------- DÉMARRER ---------- */
             { cat: "start", q: `C'est quoi Viens chop ?`,
-              a: `<strong>Viens chop</strong> est une application de rencontre pensée pour la jeunesse ivoirienne. Ici, on commence par la <strong>voix</strong> (une note vocale de 10 secondes), les photos sont floutées au départ, et la sécurité est intégrée : SOS, Check-In et lieux certifiés pour les rancarts. ${a("comment-ca-marche.html", "Voir le parcours complet")}.` },
+              a: `<strong>Viens chop</strong> est une application de rencontre pensée pour toi. Ici, on commence par le <strong>profil</strong>, les photos sont floutées au départ, et la sécurité est intégrée : SOS, Check-In et lieux certifiés pour les rancarts. ${a("comment-ca-marche.html", "Voir le parcours complet")}.` },
             { cat: "start", q: `Comment je m'inscris ?`,
-              a: `Tu entres juste ton <strong>numéro ivoirien</strong>, tu reçois un code par SMS, et c'est réglé en 2 minutes environ. Pas d'email, pas de mot de passe compliqué, pas de carte bancaire. ${a("inscription.html", "Je m'inscris maintenant")}.` },
+              a: `Tu entres juste ton <strong>numéro de téléphone</strong>, tu reçois un code par SMS, et c'est réglé en 2 minutes environ. Pas d'email, pas de mot de passe compliqué, pas de carte bancaire. ${a("inscription.html", "Je m'inscris maintenant")}.` },
             { cat: "start", q: `Faut-il avoir un âge minimum ?`,
               a: `Oui : Viens chop est <strong>réservée aux +18 ans</strong>. La vérification d'âge est stricte et les mineurs sont bloqués.` },
             { cat: "start", q: `Mon numéro de téléphone est-il visible par les autres ?`,
@@ -315,7 +316,7 @@
             { cat: "start", q: `Puis-je créer plusieurs comptes ?`,
               a: `Non, c'est <strong>un seul compte par numéro</strong>. C'est une des façons de limiter les faux profils en double.` },
             { cat: "start", q: `L'application est-elle déjà disponible ?`,
-              a: `Viens chop est en phase <strong>bêta</strong> : tu peux t'inscrire dès maintenant pour faire partie des premiers membres. Les 500 premiers inscrits reçoivent 1 mois de Mode Boss offert. Pour l'instant, l'inscription se fait avec un numéro ivoirien (+225).` },
+              a: `Viens chop est en phase <strong>bêta</strong> : tu peux t'inscrire dès maintenant pour faire partie des premiers membres. Les 500 premiers inscrits reçoivent 1 mois de Mode Debout offert. Pour l'instant, l'inscription se fait avec un numéro de téléphone (+225).` },
             { cat: "start", q: `Je ne reçois pas mon code SMS, que faire ?`,
               a: `Vérifie que ton numéro est bien saisi (10 chiffres) et que tu as du réseau. Patiente une minute, puis redemande un code. Si ça ne marche toujours pas, ${a("#contact", "écris-nous")} et on t'aide.` },
 
@@ -327,39 +328,39 @@
             { cat: "profil", q: `Comment fonctionne le match ?`,
               a: `Tu écoutes les notes vocales des profils autour de toi et tu likes ceux dont la vibe te plaît. Si c'est réciproque, c'est un <strong>match</strong> : vous pouvez discuter.` },
             { cat: "profil", q: `Combien de likes puis-je envoyer ?`,
-              a: `<strong>10 likes par jour</strong> en Mode Coulé (gratuit) et <strong>likes & swipes illimités</strong> en Mode Boss. ${a("tarifs.html", "Voir les tarifs")}.` },
+              a: `<strong>3 likes par jour</strong> en Mode Coulé (gratuit) et <strong>likes & swipes illimités</strong> en Mode Debout. ${a("tarifs.html", "Voir les tarifs")}.` },
             { cat: "profil", q: `À quoi servent mes artistes préférés et ma commune ?`,
               a: `Tes artistes (Himra, Didi B, Sindika, Damso, Tiakola...) permettent de matcher avec des gens qui ont les mêmes goûts que toi. Ta commune ou ta ville aide à trouver des personnes vraiment près de toi.` },
             { cat: "profil", q: `Comment obtenir le badge « Profil Vérifié » ?`,
               a: `En faisant ton <strong>selfie de vérification</strong> (3 secondes) quand tu crées ton profil. Le badge rassure les autres membres et montre que tu es bien la personne de tes photos.` },
             { cat: "profil", q: `C'est quoi le Mode Flirt ?`,
-              a: `Ce sont des <strong>quiz pour briser la glace</strong> avec ton match. En Mode Coulé, tu as 1 session par jour ; en Mode Boss, c'est illimité. En panne d'inspi, le générateur de disquettes est aussi là pour t'aider.` },
+              a: `Ce sont des <strong>quiz pour briser la glace</strong> avec ton match. En Mode Coulé, tu as 1 session par jour ; en Mode Debout, c'est illimité. En panne d'inspi, le générateur de disquettes est aussi là pour t'aider.` },
 
             /* ---------- TARIFS ---------- */
-            { cat: "tarifs", q: `Quelle est la différence entre Mode Coulé et Mode Boss ?`,
-              a: `<strong>Mode Coulé 🥰 (gratuit)</strong> : 10 likes par jour, notes vocales illimitées, 1 session Mode Flirt par jour, SOS & Check-In.<br><strong>Mode Boss 👑 (700 FCFA/mois)</strong> : likes & swipes illimités, Mode Flirt illimité, voir qui t'a liké, Faux Appel d'urgence et Mode Incognito. ${a("tarifs.html", "Comparer en détail")}.` },
-            { cat: "tarifs", q: `Combien coûte le Mode Boss ?`,
+            { cat: "tarifs", q: `Quelle est la différence entre Mode Coulé et Mode Debout ?`,
+              a: `<strong>Mode Coulé 🥰 (gratuit)</strong> : 3 likes par jour, messages illimités, 1 session Mode Flirt par jour, SOS & Check-In.<br><strong>Mode Debout 👑 (700 FCFA/mois)</strong> : likes & swipes illimités, Mode Flirt illimité, voir qui t'a liké, Faux Appel d'urgence et Mode Incognito. ${a("tarifs.html", "Comparer en détail")}.` },
+            { cat: "tarifs", q: `Combien coûte le Mode Debout ?`,
               a: `<strong>700 FCFA par mois</strong>, soit à peine 23 FCFA par jour. Un seul prix, pas d'options cachées.` },
-            { cat: "tarifs", q: `Comment marche le mois VIP offert ?`,
-              a: `Les <strong>500 premiers inscrits</strong> reçoivent 1 mois de Mode Boss offert. À la fin du mois, tu repasses en Mode Coulé, sauf si tu choisis de payer 700 FCFA pour continuer.` },
-            { cat: "tarifs", q: `Comment je paie le Mode Boss ?`,
-              a: `Par <strong>Mobile Money</strong> : Wave, Orange Money, MTN MoMo ou Moov. Pas besoin de carte bancaire. Le Mode Boss s'active dès que le paiement est confirmé.` },
-            { cat: "tarifs", q: `Le Mode Boss se renouvelle-t-il tout seul ?`,
-              a: `Non, il n'y a <strong>pas de prélèvement surprise</strong>. Quand le mois se termine, tu reviens en Mode Coulé et tu réactives le Boss quand tu veux.` },
+            { cat: "tarifs", q: `Comment marche le mois Debout offert ?`,
+              a: `Les <strong>500 premiers inscrits</strong> reçoivent 1 mois de Mode Debout offert. À la fin du mois, tu repasses en Mode Coulé, sauf si tu choisis de payer 700 FCFA pour continuer.` },
+            { cat: "tarifs", q: `Comment je paie le Mode Debout ?`,
+              a: `Par <strong>Mobile Money</strong> : Wave, Orange Money, MTN MoMo ou Moov. Pas besoin de carte bancaire. Le Mode Debout s'active dès que le paiement est confirmé.` },
+            { cat: "tarifs", q: `Le Mode Debout se renouvelle-t-il tout seul ?`,
+              a: `Non, il n'y a <strong>pas de prélèvement surprise</strong>. Quand le mois se termine, tu reviens en Mode Coulé et tu réactives le Debout quand tu veux.` },
             { cat: "tarifs", q: `Est-ce que je perds mes matchs si je repasse en gratuit ?`,
               a: `Non. Ton profil, tes matchs et tes conversations restent. Tu retrouves simplement les limites du Mode Coulé.` },
 
             /* ---------- SÉCURITÉ ---------- */
             { cat: "secu", q: `Quelles protections sont gratuites ?`,
-              a: `Le <strong>SOS</strong> et le <strong>Check-In</strong> sont inclus dans les deux modes, tout comme l'accès aux lieux certifiés. Le <strong>Faux Appel d'urgence</strong> et le <strong>Mode Incognito</strong> sont réservés au Mode Boss.` },
+              a: `Le <strong>SOS</strong> et le <strong>Check-In</strong> sont inclus dans les deux modes, tout comme l'accès aux lieux certifiés. Le <strong>Faux Appel d'urgence</strong> et le <strong>Mode Incognito</strong> sont réservés au Mode Debout.` },
             { cat: "secu", q: `Comment fonctionne le bouton SOS ?`,
               a: `Pendant un rancart, le bouton SOS te permet de demander de l'aide rapidement si la situation tourne mal. Tous les détails sont sur la ${a("securite.html", "page Sécurité")}.` },
             { cat: "secu", q: `C'est quoi le Check-In automatique ?`,
               a: `Pendant ton rancart, l'appli fait un point automatique (par exemple à 21h) pour vérifier que tout va bien. C'est un filet de sécurité de plus, sans que tu aies à y penser.` },
             { cat: "secu", q: `Comment marche le Faux Appel d'urgence ?`,
-              a: `Le rancart tourne mal ou tu n'es pas à l'aise ? Ton téléphone sonne comme pour un vrai appel : tu as une <strong>excuse parfaite pour partir</strong> en douceur. Cette option est incluse dans le Mode Boss.` },
+              a: `Le rancart tourne mal ou tu n'es pas à l'aise ? Ton téléphone sonne comme pour un vrai appel : tu as une <strong>excuse parfaite pour partir</strong> en douceur. Cette option est incluse dans le Mode Debout.` },
             { cat: "secu", q: `À quoi sert le Mode Incognito ?`,
-              a: `Il te permet de parcourir les profils discrètement et de garder la main sur qui te découvre. Il est inclus dans le Mode Boss.` },
+              a: `Il te permet de parcourir les profils discrètement et de garder la main sur qui te découvre. Il est inclus dans le Mode Debout.` },
             { cat: "secu", q: `Quelqu'un me met mal à l'aise : comment le signaler ou le bloquer ?`,
               a: `Tu peux <strong>bloquer et signaler</strong> un profil depuis la conversation. Tu n'as pas à justifier ton malaise : si quelque chose te gêne, tu peux arrêter l'échange à tout moment. Tu peux aussi ${a("#contact", "nous écrire")} directement.` },
             { cat: "secu", q: `Je suis en danger, que faire ?`,

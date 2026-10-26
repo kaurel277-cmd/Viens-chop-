@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viens chop — L'amour et le flirt sans pression en Côte d'Ivoire 🔥</title>
+    <title>Viens chop — L'amour et le flirt sans pression en Côte d'Ivoire</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
-    <meta name="description" content="La première application de rencontre pensée pour la jeunesse ivoirienne. Découvre la voix d'abord, débloque les photos après 5 messages, et rencontre ton crush dans un lieu certifié sûr.">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <meta name="description" content="La première application de rencontre pensée pour toi. Découvre les affinités d'abord, débloque les photos après 5 messages, et rencontre ton crush dans un lieu certifié sûr.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -37,7 +38,7 @@
         .playing .wave-bar:nth-child(2n) { animation-delay: .15s; }
         .playing .wave-bar:nth-child(3n) { animation-delay: .3s; }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -48,7 +49,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -61,7 +62,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
-                    Rejoindre 🔥
+                    Rejoindre <i class="vc vc-logo"></i>
                 </a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
@@ -74,7 +75,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -85,7 +86,7 @@
             <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -97,17 +98,16 @@
             <div class="text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 rounded-full px-4 py-1.5 text-xs font-bold mb-6">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    🎁 500 premiers inscrits : <strong>1 mois VIP offert</strong>
+                    🎁 500 premiers inscrits : <strong>1 mois de Mode Debout offert</strong>
                 </div>
 
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5">
-                    Écoute la voix.<br>
-                    Sens la vibe.<br>
-                    <span class="underline decoration-white/40">Viens chop.</span> 🔥
-                </h1>
+                    Ton profil.<br>
+                    Puis la photo.<br>
+                    <span class="underline decoration-white/40">Viens chop.</span> <i class="vc vc-logo"></i></h1>
 
                 <p class="text-lg text-white/90 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
-                    La première appli de rencontre pensée pour la jeunesse ivoirienne. Ici, les photos sont floutées au départ : tu craques d'abord sur <strong>une note vocale de 10 secondes</strong> et vos sons en commun.
+                    La première appli de rencontre pensée pour toi. Ici, les photos sont floutées au départ : tu craques d'abord sur <strong>vos sons en commun</strong> et votre humour.
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
@@ -129,7 +129,7 @@
                         <p class="text-[11px] text-white/80">pour voir la photo</p>
                     </div>
                     <div class="bg-white/10 rounded-xl p-3 border border-white/15">
-                        <p class="font-extrabold text-sm">🛡️ Soutra</p>
+                        <p class="font-extrabold text-sm">🛡️ Sécurité</p>
                         <p class="text-[11px] text-white/80">SOS &amp; lieux sûrs</p>
                     </div>
                 </div>
@@ -141,58 +141,31 @@
                     <div class="bg-white text-slate-800 rounded-[2rem] p-5">
                         <!-- Barre top app -->
                         <div class="flex items-center justify-between mb-4">
-                            <span class="font-extrabold text-sm text-brand-gradient">🔥 Viens chop</span>
+                            <span class="font-extrabold text-sm text-brand-gradient">🏆 Viens chop</span>
                             <span class="bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-2.5 py-1 rounded-full">✓ PROFIL VÉRIFIÉ</span>
                         </div>
 
-                        <!-- Avatar flouté + infos -->
-                        <div class="relative rounded-2xl p-5 text-white overflow-hidden mb-4" id="demo-card-bg" style="background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);">
+                        <!-- Profil démo -->
+                        <div class="rounded-2xl p-5 text-white overflow-hidden mb-4" id="demo-card-bg" style="background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);">
                             <div class="flex items-center gap-4">
-                                <div class="relative">
+                                <div class="relative shrink-0">
                                     <div id="demo-avatar" class="w-16 h-16 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-3xl blur-[3px] select-none">👩🏾</div>
                                     <span class="absolute -bottom-1 -right-1 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🔒</span>
                                 </div>
-                                <div>
-                                    <h2 id="demo-name" class="font-extrabold text-xl">Awa, 22 ans</h2>
-                                    <p id="demo-city" class="text-xs text-white/85"><i class="fa-solid fa-location-dot mr-1"></i>Cocody, Riviera 2</p>
+                                <div class="min-w-0">
+                                    <h2 id="demo-name" class="font-extrabold text-xl leading-tight">Awa, 22 ans</h2>
+                                    <p id="demo-city" class="text-xs text-white/85 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>Cocody, Riviera 2</p>
                                     <p class="text-[11px] text-white/75 mt-1">🔓 Photo visible après 5 messages</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Lecteur Note Vocale -->
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold text-slate-500">🎙️ Sa note vocale (10s)</span>
-                                <span id="demo-timer" class="text-xs font-extrabold text-brandPink">0:10</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleVoiceDemo()" id="demo-play-btn" class="w-11 h-11 shrink-0 rounded-full bg-brand-gradient text-white flex items-center justify-center shadow-md hover:opacity-90 transition" aria-label="Écouter la note vocale" type="button">
-                                    <i id="demo-play-icon" class="fa-solid fa-play text-sm ml-0.5"></i>
-                                </button>
-                                <div id="demo-wave" class="flex-1 flex items-center justify-between gap-1 h-8 px-1">
-                                    <span class="wave-bar w-1 h-6 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-8 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-5 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-7 bg-brandPink rounded-full"></span>
-                                    <span class="wave-bar w-1 h-4 bg-brandPink rounded-full"></span>
-                                    <span class="wave-bar w-1 h-8 bg-brandPink rounded-full"></span>
-                                    <span class="wave-bar w-1 h-6 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-7 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-5 bg-brandPink rounded-full"></span>
-                                    <span class="wave-bar w-1 h-8 bg-brandPink rounded-full"></span>
-                                    <span class="wave-bar w-1 h-4 bg-brandOrange rounded-full"></span>
-                                    <span class="wave-bar w-1 h-6 bg-brandPink rounded-full"></span>
-                                </div>
-                            </div>
-                            <p id="demo-quote" class="text-xs text-slate-600 italic mt-3">« Salut ! Moi c'est Awa. Si tu connais tous les sons de Himra par cœur et que t'aimes l'allocodrome de Cocody, on va bien s'entendre 😂 »</p>
+                            <p id="demo-quote" class="text-xs text-white/90 italic mt-4">« Salut ! Moi c'est Awa. Si tu connais tous les sons de Himra par cœur et que t'aimes l'allocodrome de Cocody, on va bien s'entendre 😂 »</p>
                         </div>
 
                         <!-- Sons du moment -->
                         <div class="mb-5">
                             <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">🎵 Ses sons du moment</p>
                             <div id="demo-tags" class="flex flex-wrap gap-1.5">
-                                <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">🔥 Himra</span>
+                                <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">🏆 Himra</span>
                                 <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">💎 Didi B</span>
                                 <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">🎸 Tiakola</span>
                             </div>
@@ -225,9 +198,9 @@
         <div class="grid md:grid-cols-3 gap-6">
             <div class="bg-white rounded-3xl p-7 border border-slate-100 shadow-sm hover:shadow-lg transition">
                 <div class="w-14 h-14 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🎙️</div>
-                <h3 class="text-xl font-extrabold mb-2">La voix avant la photo</h3>
+                <h3 class="text-xl font-extrabold mb-2">Le profil avant la photo</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
-                    Une voix, un rire, une façon de parler : ça dit tout. Ici, tu écoutes 10 secondes de note vocale et les photos se débloquent après <strong>5 messages échangés</strong>.
+                    Tes artistes, ta commune, ton style d'humour : ça dit tout. Ici, tu découvres la personne avant son visage et les photos se débloquent après <strong>5 messages échangés</strong>.
                 </p>
             </div>
 
@@ -241,9 +214,9 @@
 
             <div class="bg-white rounded-3xl p-7 border border-slate-100 shadow-sm hover:shadow-lg transition">
                 <div class="w-14 h-14 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🛡️</div>
-                <h3 class="text-xl font-extrabold mb-2">La Soutra intégrée</h3>
+                <h3 class="text-xl font-extrabold mb-2">La Sécurité intégrée</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
-                    Selfie de vérification, numéro privé, bouton SOS, Check-In automatique et répertoire de maquis &amp; cafés certifiés sûrs pour ton premier rancart.
+                    Selfie de vérification, numéro privé, bouton SOS, Check-In automatique et répertoire de maquis &amp; cafés certifiés sûrs pour ton premier rancart. <em>Soutra</em>, en nouchi, veut dire « venir en aide » : c'est exactement ce que fait ce mode.
                 </p>
             </div>
         </div>
@@ -273,7 +246,7 @@
                 </div>
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 min-h-[110px] flex items-center justify-center text-center mb-5">
                     <p id="disquette-text" class="text-base font-semibold leading-relaxed">
-                        « Ta voix là, c'est mieux qu'un son de Tiakola sous la pluie. On fait connaissance ? 🔥 »
+                        « Ton profil là, c'est mieux qu'un son de Tiakola sous la pluie. On fait connaissance ? »
                     </p>
                 </div>
                 <div class="flex gap-3">
@@ -304,13 +277,13 @@
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">2</div>
-                <h3 class="font-extrabold text-lg mb-2">Profil vocal 🎙️</h3>
-                <p class="text-sm text-slate-600">Enregistre ta note vocale de 10s, choisis tes artistes et valide ton selfie en 3 secondes.</p>
+                <h3 class="font-extrabold text-lg mb-2">Ton profil 🎨</h3>
+                <p class="text-sm text-slate-600">Choisis tes artistes, ta commune et valide ton selfie en 3 secondes.</p>
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">3</div>
                 <h3 class="font-extrabold text-lg mb-2">Match &amp; Débloque 🔓</h3>
-                <p class="text-sm text-slate-600">Écoute, like et discute. Au bout de 5 messages échangés, vos photos se dévoilent.</p>
+                <p class="text-sm text-slate-600">Like et discute. Au bout de 5 messages échangés, vos photos se dévoilent.</p>
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">4</div>
@@ -346,7 +319,7 @@
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
                         <p class="font-extrabold text-sm mb-1">📞 Faux Appel d'urgence</p>
-                        <p class="text-xs text-slate-400">Une excuse crédible pour quitter un rancart gênant (Mode Boss).</p>
+                        <p class="text-xs text-slate-400">Une excuse crédible pour quitter un rancart gênant (Mode Debout).</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
                         <p class="font-extrabold text-sm mb-1">🍹 Maquis &amp; Cafés certifiés</p>
@@ -406,7 +379,7 @@
         <div class="text-center mb-12">
             <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Tarifs accessibles</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-3">Deux modes. Zéro prise de tête. 💸</h2>
-            <p class="text-slate-500">Commence gratuitement en Mode Coulé, ou passe en Mode Boss pour le prix d'un plat d'alloco.</p>
+            <p class="text-slate-500">Commence gratuitement en Mode Coulé, ou passe en Mode Debout pour le prix d'un plat d'alloco.</p>
         </div>
 
         <div class="grid md:grid-cols-2 gap-8 items-stretch">
@@ -421,8 +394,8 @@
                     <p class="text-xs text-slate-400 mt-2">Gratuit, pour toujours</p>
                 </div>
                 <ul class="space-y-4 text-sm text-slate-700 flex-1 mb-8">
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> 10 Likes / jour</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> Notes vocales illimitées</li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> 3 Likes / jour</li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> Messages illimités</li>
                     <li class="flex items-start gap-3"><span class="w-5 text-center">⏳</span> Mode Flirt : 1 session / jour</li>
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> SOS &amp; Check-In inclus</li>
                     <li class="flex items-start gap-3 text-slate-400"><span class="w-5 text-center">🔒</span> Faux Appel &amp; Incognito non inclus</li>
@@ -432,13 +405,13 @@
                 </a>
             </div>
 
-            <!-- MODE BOSS -->
+            <!-- MODE DEBOUT -->
             <div class="relative bg-white rounded-3xl border-2 border-brandOrange card-boss p-8 flex flex-col">
                 <div class="absolute -top-3 right-6 bg-brand-gradient text-white text-[11px] font-extrabold uppercase tracking-wider px-4 py-1.5 rounded-full shadow">
-                    Le plus populaire 🔥
+                    Le plus populaire <i class="vc vc-peach"></i>
                 </div>
                 <div>
-                    <span class="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full">Mode Boss 👑</span>
+                    <span class="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full">Mode Debout 👑</span>
                 </div>
                 <div class="mt-6 mb-6">
                     <span class="text-5xl font-extrabold text-brand-gradient">700 FCFA</span>
@@ -459,7 +432,7 @@
                     <span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-800 text-[11px] font-bold px-3 py-1.5 rounded-lg"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Moov</span>
                 </div>
                 <a href="inscription.html" class="block text-center bg-brand-gradient text-white font-extrabold py-4 rounded-xl shadow-md hover:opacity-90 transition">
-                    Tester le VIP Gratuitement 🎁
+                    Tester le Debout Gratuitement 🎁
                 </a>
             </div>
         </div>
@@ -512,10 +485,10 @@
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
                 <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
-                    Comment profiter du mois VIP offert ?
+                    Comment profiter du mois Debout offert ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Les 500 premiers inscrits reçoivent automatiquement 1 mois de Mode Boss 👑 gratuit dès la création de leur compte, sans rien payer.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Les 500 premiers inscrits reçoivent automatiquement 1 mois de Mode Debout 👑 gratuit dès la création de leur compte, sans rien payer.</p>
             </details>
         </div>
         <p class="text-center text-sm text-slate-500 mt-8">
@@ -526,8 +499,8 @@
     <!-- ===== CTA FINAL ===== -->
     <section class="py-20 bg-brand-gradient text-white text-center">
         <div class="max-w-2xl mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Ta prochaine rencontre commence par une voix 🎙️🔥</h2>
-            <p class="text-white/90 mb-8">Inscris-toi en 2 minutes avec ton numéro. Les 500 premiers inscrits repartent avec 1 mois de Mode Boss offert.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Ta prochaine rencontre commence ici 🎙️</h2>
+            <p class="text-white/90 mb-8">Inscris-toi en 2 minutes avec ton numéro. Les 500 premiers inscrits repartent avec 1 mois de Mode Debout offert.</p>
             <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
                 Je m'inscris gratuitement 🚀
             </a>
@@ -539,8 +512,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
@@ -623,14 +596,14 @@
                 avatar: "👩🏾",
                 bg: "linear-gradient(135deg, #7c3aed 0%, #db2777 100%)",
                 quote: "« Salut ! Moi c'est Awa. Si tu connais tous les sons de Himra par cœur et que t'aimes l'allocodrome de Cocody, on va bien s'entendre 😂 »",
-                tags: ["🔥 Himra", "💎 Didi B", "🎸 Tiakola"]
+                tags: ["🏆 Himra", "💎 Didi B", "🎸 Tiakola"]
             },
             {
                 name: "Franck, 24 ans",
                 city: "Marcory, Zone 4",
                 avatar: "👨🏾",
                 bg: "linear-gradient(135deg, #ea580c 0%, #e11d48 100%)",
-                quote: "« Ici Franck ! Amateur de bon garba le midi et de chill en terrasse le soir. Envoie un like si t'as une bonne vibe 🔥 »",
+                quote: "« Ici Franck ! Amateur de bon garba le midi et de chill en terrasse le soir. Envoie un like si t'as une bonne vibe 🍑 »",
                 tags: ["💎 Didi B", "🖤 Damso", "🦅 Ninho"]
             },
             {
@@ -639,42 +612,11 @@
                 avatar: "👩🏾‍🦱",
                 bg: "linear-gradient(135deg, #0284c7 0%, #7c3aed 100%)",
                 quote: "« Coucou ! Je cherche quelqu'un de drôle, simple et respectueux pour rigoler et voir où ça mène 😊 »",
-                tags: ["🎸 Tiakola", "🔥 Himra", "🎤 Aya"]
+                tags: ["🎸 Tiakola", "🏆 Himra", "🎤 Aya"]
             }
         ];
 
         let currentProfile = 0;
-        let voiceInterval = null;
-        let secondsLeft = 10;
-
-        function stopVoiceDemo() {
-            clearInterval(voiceInterval);
-            voiceInterval = null;
-            secondsLeft = 10;
-            document.getElementById('demo-wave').classList.remove('playing');
-            document.getElementById('demo-play-icon').className = 'fa-solid fa-play text-sm ml-0.5';
-            document.getElementById('demo-timer').textContent = '0:10';
-        }
-
-        function toggleVoiceDemo() {
-            const wave = document.getElementById('demo-wave');
-            const icon = document.getElementById('demo-play-icon');
-            const timer = document.getElementById('demo-timer');
-
-            if (voiceInterval) {
-                stopVoiceDemo();
-                return;
-            }
-
-            wave.classList.add('playing');
-            icon.className = 'fa-solid fa-pause text-sm';
-            voiceInterval = setInterval(() => {
-                secondsLeft--;
-                timer.textContent = '0:0' + Math.max(secondsLeft, 0);
-                if (secondsLeft <= 0) stopVoiceDemo();
-            }, 1000);
-        }
-
         function nextDemoProfile() {
             stopVoiceDemo();
             currentProfile = (currentProfile + 1) % demoProfiles.length;
@@ -691,9 +633,9 @@
 
         /* ---------- Générateur de disquettes ---------- */
         const disquettes = [
-            "« Ta voix là, c'est mieux qu'un son de Tiakola sous la pluie. On fait connaissance ? 🔥 »",
+            "« Ton profil là, c'est mieux qu'un son de Tiakola sous la pluie. On fait connaissance ? »",
             "« Question sérieuse pour commencer : Team Alloco bien cuit ou Team Garba attiéké chaud ? 👀 »",
-            "« J'ai écouté ta note vocale 3 fois déjà… il reste que 5 messages avant de débloquer nos photos, on s'y met ? 😏 »",
+            "« J'ai regardé ton profil 3 fois déjà… il reste que 5 messages avant de débloquer nos photos, on s'y met ? 😏 »",
             "« Si t'aimes Himra autant que moi, c'est que le destin a déjà validé le match 💯 »",
             "« Promis je suis plus intéressant(e) qu'un simple 'Salut ça va'. Raconte-moi ton meilleur plan chill à Abidjan ! 🍹 »"
         ];

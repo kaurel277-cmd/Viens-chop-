@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
-    <meta name="description" content="Inscris-toi, enregistre ta voix, matche dans ta commune et gère tes rancarts sans pression. Voici comment Viens chop fonctionne.">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <meta name="description" content="Inscris-toi, complète ton profil, matche dans ta commune et gère tes rancarts sans pression. Voici comment Viens chop fonctionne.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -28,7 +29,7 @@
         body.menu-open { overflow: hidden; }
         .step-line { background: linear-gradient(180deg, #FF6B00, #FF1E56); }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -39,7 +40,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -51,7 +52,7 @@
                 <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
             </div>
             <div class="flex items-center gap-3">
-                <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">Rejoindre 🔥</a>
+                <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">Rejoindre <i class="vc vc-logo"></i></a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
                 </button>
@@ -61,7 +62,7 @@
 <div id="menu-overlay" class="menu-overlay md:hidden" aria-hidden="true"></div>
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -72,7 +73,7 @@
             <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -96,7 +97,7 @@
             <span class="text-xs font-bold uppercase tracking-wider text-brandOrange">Inscription</span>
             <h2 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-4">Ton numéro +225, c’est tout</h2>
             <p class="text-slate-600 leading-relaxed mb-6">
-                Pas d’email, pas de mot de passe à 12 caractères, pas de Facebook. Tu entres ton numéro ivoirien, tu reçois un petit code par SMS, et c’est validé. Un numéro = un compte. Fini les doublons et les faux profils.
+                Pas d’email, pas de mot de passe à 12 caractères, pas de Facebook. Tu entres ton numéro de téléphone, tu reçois un petit code par SMS, et c’est validé. Un numéro = un compte. Fini les doublons et les faux profils.
             </p>
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
@@ -116,12 +117,12 @@
         <article class="relative pl-8 sm:pl-16 pb-16 border-l-4 border-pink-200">
             <div class="absolute -left-7 sm:-left-8 top-0 w-14 h-14 rounded-2xl bg-brand-gradient text-white flex items-center justify-center text-2xl font-extrabold shadow-lg">2</div>
             <span class="text-xs font-bold uppercase tracking-wider text-brandPink">Ton profil</span>
-            <h2 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-4">La voix d’abord, la photo après</h2>
+            <h2 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-4">Le profil d’abord, la photo après</h2>
             <p class="text-slate-600 leading-relaxed mb-6">
-                Tu indiques ton prénom (ou ton blase), ta commune ou ta ville, tes artistes du moment — Himra, Didi B, Sindika, La B, Damso, Tiakola, Ninho… — et tu enregistres <strong>10 secondes de voix</strong>. C’est ça que les autres écoutent en premier.
+                Tu indiques ton prénom (ou ton blase), ta commune ou ta ville, tes artistes du moment — Himra, Didi B, Josey, Damso, Tiakola, Ninho, Drake… — et tu valides ton selfie. C’est ça que les autres voient en premier.
             </p>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm mb-6">
-                <h3 class="font-bold text-lg mb-3 flex items-center gap-2">🎙️ Pourquoi une note vocale ?</h3>
+                <h3 class="font-bold text-lg mb-3 flex items-center gap-2">🎨 Pourquoi un profil complet ?</h3>
                 <ul class="space-y-3 text-sm text-slate-600">
                     <li class="flex gap-3"><span class="text-brandOrange font-bold">→</span> On entend le flow, l’humour, l’énergie. Une photo seule, ça ne dit rien.</li>
                     <li class="flex gap-3"><span class="text-brandOrange font-bold">→</span> Les photos restent <strong>floutées</strong> jusqu’à ce que vous ayez vraiment discuté (5 messages).</li>
@@ -143,7 +144,7 @@
             <span class="text-xs font-bold uppercase tracking-wider text-brandOrange">Découverte</span>
             <h2 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-4">Écoute, like, matche près de chez toi</h2>
             <p class="text-slate-600 leading-relaxed mb-6">
-                Tu swipes des profils de ta commune ou de ta ville : Cocody, Yopougon, Marcory, Bouaké, Yakro, Daloa, Korhogo, San-Pédro… Tu écoutes la voix, tu vois les vibes musicales, tu likes ou tu passes. Sans pression.
+                Tu swipes des profils de ta commune ou de ta ville : Cocody, Yopougon, Marcory, Bouaké, Yakro, Daloa, Korhogo, San-Pédro… Tu vois les vibes musicales et la commune, tu likes ou tu passes. Sans pression.
             </p>
             <div class="grid sm:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 text-center shadow-sm">
@@ -158,14 +159,14 @@
                 </div>
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 text-center shadow-sm">
                     <div class="text-3xl mb-2">❤️</div>
-                    <h3 class="font-bold text-sm mb-1">10 likes / jour</h3>
-                    <p class="text-xs text-slate-500">En gratuit (mode « coulé »). Illimité en VIP à 700F.</p>
+                    <h3 class="font-bold text-sm mb-1">3 likes / jour</h3>
+                    <p class="text-xs text-slate-500">En gratuit (mode « coulé »). Illimité en Debout à 700F.</p>
                 </div>
             </div>
             <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5">
                 <h3 class="font-bold mb-2">🎮 Mode Flirt (Jeux &amp; Quiz)</h3>
                 <p class="text-sm text-slate-600">
-                    Timide ? Lance un quiz à deux : <em>« Chawarma ou Alloco ? »</em>, <em>« Lounge ou concert ? »</em>, <em>« Damso ou Ninho ? »</em>. En mode gratuit : <strong>1 session par jour</strong>. En VIP : illimité.
+                    Timide ? Lance un quiz à deux : <em>« Chawarma ou Alloco ? »</em>, <em>« Lounge ou concert ? »</em>, <em>« Damso ou Ninho ? »</em>. En mode gratuit : <strong>1 session par jour</strong>. En Debout : illimité.
                 </p>
             </div>
         </article>
@@ -181,7 +182,7 @@
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="font-bold mb-2">💬 Discussion d’abord</h3>
-                    <p class="text-sm text-slate-500">Disquettes, notes vocales, quiz. On apprend à se connaître avant le look.</p>
+                    <p class="text-sm text-slate-500">Disquettes, quiz, messages. On apprend à se connaître avant le look.</p>
                 </div>
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="font-bold mb-2">🍹 Lieu certifié</h3>
@@ -192,7 +193,7 @@
                     <p class="text-sm text-slate-500">Partage ta position à un proche. Gratuit pour tout le monde.</p>
                 </div>
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                    <h3 class="font-bold mb-2">📞 Faux appel (VIP)</h3>
+                    <h3 class="font-bold mb-2">📞 Faux appel (Debout)</h3>
                     <p class="text-sm text-slate-500">Rancart chelou ? Un bouton déclenche un appel ultra-réaliste pour partir poliment.</p>
                 </div>
             </div>
@@ -216,7 +217,7 @@
                         <tr>
                             <td class="py-4 px-5 font-medium">Premier contact</td>
                             <td class="py-4 px-5 text-slate-400">Photo + bio</td>
-                            <td class="py-4 px-5 font-semibold text-slate-800">Voix 10s + photo floutée</td>
+                            <td class="py-4 px-5 font-semibold text-slate-800">Profil + photo floutée</td>
                         </tr>
                         <tr>
                             <td class="py-4 px-5 font-medium">Où matcher</td>
@@ -244,26 +245,26 @@
         </div>
     </section>
 
-    <!-- GRATUIT VS VIP RAPPEL -->
+    <!-- GRATUIT VS Debout RAPPEL -->
     <section class="py-16 max-w-4xl mx-auto px-4 text-center">
         <h2 class="text-2xl sm:text-3xl font-extrabold mb-3">Tu peux tout tester gratuitement</h2>
         <p class="text-slate-600 mb-8 max-w-xl mx-auto">
-            Mode « coulé » : likes limités, 1 quiz / jour, SOS inclus. Mode VIP à 700 FCFA : tout débloqué, sans renouvellement piégeux.
+            Mode « coulé » : likes limités, 1 quiz / jour, SOS inclus. Mode Debout à 700 FCFA : tout débloqué, sans renouvellement piégeux.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="inscription.html" class="bg-brand-gradient text-white font-extrabold px-8 py-4 rounded-xl shadow-lg hover:opacity-95 transition">
-                Rejoindre gratuitement 🔥
+                Rejoindre gratuitement <i class="vc vc-logo"></i>
             </a>
             <a href="tarifs.html" class="bg-white border border-slate-200 text-slate-800 font-bold px-8 py-4 rounded-xl hover:bg-slate-50 transition">
-                Voir Gratuit vs VIP
+                Voir Gratuit vs Debout
             </a>
         </div>
     </section>
 
     <!-- CTA -->
     <section class="py-16 bg-brand-gradient text-white text-center px-4">
-        <h2 class="text-3xl font-extrabold mb-3">Prêt(e) à lancer ta première note vocale ?</h2>
-        <p class="text-white/90 mb-8">Les 500 premiers : 1 mois VIP offert. Inscris-toi sans pression.</p>
+        <h2 class="text-3xl font-extrabold mb-3">Prêt(e) à lancer ta première rencontre ?</h2>
+        <p class="text-white/90 mb-8">Les 500 premiers : 1 mois Debout offert. Inscris-toi sans pression.</p>
         <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition">
             Obtenir mon accès 🚀
         </a>
@@ -274,8 +275,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L’amour et le flirt sans pression. Pensé pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L’amour et le flirt sans pression. Pensé pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>

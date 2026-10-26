@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/icons.css">
     <meta name="description" content="Le répertoire des maquis et cafés certifiés Viens chop est en cours de constitution. Découvre nos critères de sécurité et propose un lieu.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,7 +30,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -40,7 +41,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -53,7 +54,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
-                    Rejoindre 🔥
+                    Rejoindre <i class="vc vc-logo"></i>
                 </a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
@@ -66,7 +67,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -77,7 +78,7 @@
             <a href="maquis.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -253,7 +254,7 @@
 
             <p class="text-center mt-10">
                 <a href="securite.html" class="inline-flex items-center gap-2 text-white font-bold hover:underline">
-                    Découvrir les protections Soutra <i class="fa-solid fa-arrow-right"></i>
+                    Découvrir les protections Sécurité <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </p>
         </div>
@@ -342,7 +343,7 @@
     <!-- ===== CTA ===== -->
     <section class="py-20 bg-brand-gradient text-white text-center">
         <div class="max-w-2xl mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Sois parmi les premiers membres 🔥</h2>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Sois parmi les premiers membres <i class="vc vc-logo"></i></h2>
             <p class="text-white/90 mb-8">Inscris-toi dès maintenant pour être prévenu du lancement et profiter de l’offre des 500 premiers inscrits.</p>
             <a href="inscription.html" class="inline-block bg-white text-brandPink font-extrabold px-10 py-4 rounded-xl shadow-lg hover:bg-slate-100 transition text-lg">
                 Je m'inscris gratuitement 🚀
@@ -355,8 +356,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>

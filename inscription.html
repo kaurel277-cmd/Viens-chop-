@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
-    <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro ivoirien. Un code SMS, une note vocale de 10 secondes, et tu peux commencer à matcher.">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro de téléphone. Un code SMS, et tu peux commencer à matcher.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -38,7 +39,7 @@
         .shake { animation: shake .35s ease; }
         @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,assets/img/logo.svg">
     <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
           imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
           imagesizes="100vw">
@@ -49,7 +50,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
             <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl">🔥</span>
+                <span class="text-2xl"><i class="vc vc-logo"></i></span>
                 <span class="font-extrabold text-2xl tracking-tight text-brand-gradient">Viens chop</span>
             </a>
             <div class="hidden md:flex space-x-6 font-medium text-sm text-slate-600">
@@ -62,7 +63,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
-                    Rejoindre 🔥
+                    Rejoindre <i class="vc vc-logo"></i>
                 </a>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
@@ -75,7 +76,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
-            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <span class="font-extrabold text-xl text-brand-gradient">🏆 Menu</span>
             <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
@@ -86,7 +87,7 @@
             <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
             <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
             <hr class="border-slate-200">
-            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement <i class="vc vc-logo"></i></a>
         </div>
     </div>
 
@@ -97,12 +98,12 @@
             <!-- Colonne texte -->
             <div class="text-center lg:text-left">
                 <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Inscription bêta</span>
-                <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Rejoins Viens chop 🔥</h1>
+                <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Rejoins Viens chop <i class="vc vc-logo"></i></h1>
                 <p class="text-lg text-white/90 mb-8">Un numéro, un code SMS, et c'est parti. Pas d'email, pas de mot de passe, pas de carte bancaire.</p>
 
                 <div class="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl p-5 text-left mb-8">
                     <p class="font-extrabold text-lg mb-1">🎁 Les 500 premiers inscrits</p>
-                    <p class="text-sm text-white/90">reçoivent <strong>1 mois de Mode Boss 👑 offert</strong>.</p>
+                    <p class="text-sm text-white/90">reçoivent <strong>1 mois de Mode Debout 👑 offert</strong>.</p>
                     <div id="vip-progress" class="hidden mt-4">
                         <div class="flex justify-between text-xs font-bold mb-1.5">
                             <span id="vip-taken-label"></span>
@@ -134,12 +135,12 @@
 
                 <!-- ÉTAPE 1 : NUMÉRO -->
                 <form id="step-1" class="step-panel panel-in" novalidate>
-                    <h2 class="text-2xl font-extrabold mb-1">Ton numéro ivoirien 📱</h2>
+                    <h2 class="text-2xl font-extrabold mb-1">Ton numéro de téléphone 📱</h2>
                     <p class="text-sm text-slate-500 mb-5">On t'envoie un code par SMS pour vérifier que c'est bien toi.</p>
 
                     <label for="phone" class="block text-xs font-bold text-slate-500 uppercase mb-1">Numéro de téléphone</label>
                     <div class="flex gap-2">
-                        <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm">🇨🇮 +225</span>
+                        <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm">+225</span>
                         <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" aria-describedby="err-1" placeholder="07 XX XX XX XX" class="field flex-1">
                     </div>
                     <div class="text-right mt-1">
@@ -238,7 +239,7 @@
                     <p id="err-3" role="alert" class="hidden text-xs font-semibold text-red-500 mt-3"></p>
 
                     <button id="btn-register" type="submit" class="mt-5 w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
-                        Créer mon compte 🔥
+                        Créer mon compte <i class="vc vc-logo"></i>
                     </button>
                 </form>
 
@@ -246,25 +247,22 @@
                 <div id="step-done" class="step-panel panel-in hidden text-center">
                     <p class="text-6xl mb-4">🎉</p>
                     <h2 class="text-2xl font-extrabold mb-2">Bienvenue, <span id="done-name" class="text-brand-gradient"></span> !</h2>
-                    <p class="text-sm text-slate-600 mb-5">Ton compte est créé. Si tu fais partie des <strong>500 premiers inscrits</strong>, ton mois de Mode Boss 👑 s'active automatiquement.</p>
+                    <p class="text-sm text-slate-600 mb-5">Ton compte est <strong>activé tout de suite</strong>. Si tu fais partie des <strong>500 premiers inscrits</strong>, ton mois de Mode Debout 👑 s'ajoute automatiquement.</p>
 
                     <div class="bg-slate-50 rounded-2xl p-5 text-left mb-5">
                         <p class="text-xs font-bold text-slate-400 uppercase mb-3">Ce qui t'attend dans l'appli</p>
                         <ol class="space-y-3 text-sm text-slate-700">
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">1</span> Enregistre ta <strong>note vocale de 10 secondes</strong> 🎙️</li>
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">2</span> Choisis tes <strong>artistes préférés</strong> 🎵</li>
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">3</span> Fais ton <strong>selfie de vérification</strong> pour le badge ✅</li>
+                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">1</span><span>Complète ton <strong>profil</strong> en 30 secondes 🎨</span></li>
+                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">2</span><span>Choisis tes <strong>artistes préférés</strong> 🎵</span></li>
+                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">3</span><span>Fais ton <strong>selfie de vérification</strong> pour le badge ✅</span></li>
                         </ol>
                     </div>
 
-                    <a id="app-link" href="app.html" style="display:none" class="bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition mb-3">
-                        Ouvrir l'application 🚀
+                    <!-- Confirmation AUTOMATIQUE : l'accès est ouvert tout de suite, aucun lien à attendre -->
+                    <a id="app-link" href="app.html" class="block bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
+                        Entrer dans l'application 🚀
                     </a>
-                    <p id="app-soon" class="text-xs text-slate-500 mb-3">On te prévient par SMS dès que ton accès est ouvert.</p>
-
-                    <a id="share-link" href="https://wa.me/" target="_blank" rel="noopener" class="block border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition text-sm">
-                        <i class="fa-brands fa-whatsapp mr-1"></i> Invite tes potes sur WhatsApp
-                    </a>
+                    <p class="text-xs text-slate-500 mt-3">✅ Compte activé automatiquement. Aucune validation à attendre.</p>
                 </div>
             </div>
         </div>
@@ -274,14 +272,14 @@
     <section class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Après ton inscription</span>
-            <h2 class="text-3xl font-extrabold mt-2 mb-3">Ton profil, c'est ta voix 🎙️</h2>
+            <h2 class="text-3xl font-extrabold mt-2 mb-3">Ton profil, c'est ta vibe 🎨</h2>
             <p class="text-slate-500 max-w-2xl mx-auto">Ici, on ne juge pas que sur le physique. Voilà ce qui t'attend juste après.</p>
         </div>
         <div class="grid sm:grid-cols-3 gap-5">
             <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-center">
-                <div class="w-14 h-14 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-2xl mb-4">🎙️</div>
-                <h3 class="font-extrabold mb-1">Ta note vocale</h3>
-                <p class="text-sm text-slate-600">10 secondes pour te présenter avec ton style. C'est elle que ton crush écoute en premier.</p>
+                <div class="w-14 h-14 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-2xl mb-4">🎨</div>
+                <h3 class="font-extrabold mb-1">Ton profil</h3>
+                <p class="text-sm text-slate-600">Tes artistes, ta commune, ton style. C'est ce que ton crush découvre en premier.</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-center">
                 <div class="w-14 h-14 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-2xl mb-4">✅</div>
@@ -311,7 +309,7 @@
                         C'est vraiment gratuit ?
                         <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                     </summary>
-                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui. L'inscription est gratuite et le Mode Coulé 🥰 reste à 0 FCFA. Le Mode Boss 👑 (700 FCFA/mois) est optionnel. <a href="tarifs.html" class="text-brandPink font-bold hover:underline">Voir les tarifs</a>.</p>
+                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui. L'inscription est gratuite et le Mode Coulé 🥰 reste à 0 FCFA. Le Mode Debout 👑 (700 FCFA/mois) est optionnel. <a href="tarifs.html" class="text-brandPink font-bold hover:underline">Voir les tarifs</a>.</p>
                 </details>
                 <details class="bg-slate-50 rounded-2xl border border-slate-200 p-5 group">
                     <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
@@ -346,8 +344,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="font-extrabold text-white text-xl">🔥 Viens chop</span>
-                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour la jeunesse ivoirienne.</p>
+                    <span class="font-extrabold text-white text-xl">🏆 Viens chop</span>
+                    <p class="text-xs mt-3 text-slate-500 leading-relaxed">L'amour et le flirt sans pression. La première application de rencontre pensée pour toi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Navigation</h4>
@@ -427,7 +425,7 @@
            DEMO_MODE  : true = aucun SMS réel, le code DEMO_CODE est accepté.
                         À passer à false une fois l'API branchée !
            VIP_TAKEN  : nombre d'inscrits déjà comptés (null = jauge masquée)
-           APP_LINK   : lien de l'appli (vide = message « on te prévient par SMS »)
+           APP_LINK   : lien optionnel vers l'appli (vide = on garde le bouton interne app.html)
            ------------------------------------------------------------ */
         const CONFIG = {
             DEMO_MODE: true,
@@ -436,7 +434,7 @@
             RESEND_SECONDS: 30,
             VIP_TOTAL: 500,
             VIP_TAKEN: null,
-            APP_LINK: ""
+            APP_LINK: "app.html"
         };
 
         /* ------------------------------------------------------------
@@ -478,7 +476,7 @@
                 return g;
             };
             sel.appendChild(mk('📍 Grand Abidjan', COMMUNES.abidjan));
-            sel.appendChild(mk("🇨🇮 Villes de Côte d'Ivoire", COMMUNES.villes));
+            sel.appendChild(mk("Villes de Côte d'Ivoire", COMMUNES.villes));
         }
 
         /* ------------------------------------------------------------
@@ -769,14 +767,8 @@
             $('stepper').classList.add('hidden');
             $('done-name').textContent = state.pseudo;
 
-            if (CONFIG.APP_LINK) {
-                $('app-link').href = CONFIG.APP_LINK;
-                $('app-link').style.display = 'block';   // « hidden » + « block » se neutralisaient : le bouton ne s'affichait jamais
-                $('app-soon').classList.add('hidden');
-            }
-            const site = new URL('index.html', location.href).href;
-            const msg = "Rejoins-moi sur Viens chop 🔥 La première appli de rencontre pensée pour la jeunesse ivoirienne : on commence par la voix ! " + site;
-            $('share-link').href = "https://wa.me/?text=" + encodeURIComponent(msg);
+            // Confirmation automatique : le bouton d'entrée est toujours actif, rien à attendre.
+            $('app-link').href = CONFIG.APP_LINK || 'app.html';
 
             $('step-done').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
