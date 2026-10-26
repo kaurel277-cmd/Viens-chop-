@@ -3,18 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Aperçu interactif de l'application Viens chop : note vocale, matchs par commune, Mode Flirt, Faux Appel et protections Soutra.">
     <title>Viens chop — L'App</title>
+    <meta name="description" content="Aperçu interactif de l'application Viens chop : note vocale, matchs par commune, Mode Flirt, Faux Appel et protections Soutra.">
     <meta name="theme-color" content="#FF5E1A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap"></noscript>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Outfit', sans-serif;
-            background: #0f0f0f;
+            /* CDC §1 : fond Dark Slate WhatsApp */
+            background: #0B141A;
             color: #fff;
             min-height: 100vh;
             min-height: 100dvh;
@@ -160,13 +170,17 @@
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
         .chat-messages {
-            flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+            flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+            background-color: #0B141A;
+            background-image: linear-gradient(rgba(11,20,26,.86), rgba(11,20,26,.86)), url("assets/img/bg-chat.webp");
+            background-size: cover; background-position: center;
+            -webkit-overflow-scrolling: touch;
         }
         .msg {
             max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5;
         }
-        .msg.sent { background: linear-gradient(135deg, #FF6B00, #FF1E56); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.received { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.sent { background: #005C4B; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.received { background: #202C33; align-self: flex-start; border-bottom-left-radius: 4px; }
         .msg.system {
             align-self: center; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
             font-size: 12px; text-align: center; border-radius: 12px; max-width: 90%;
@@ -245,12 +259,68 @@
         .payment-btn:hover { background: rgba(255,255,255,0.12); }
 
         /* ===== BOTTOM NAV ===== */
+        /* ===== ÉCRAN DISCUSSIONS (CDC §3.B — UI WhatsApp) ===== */
+        .conv-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+        .conv-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+            cursor: pointer; transition: background .15s; border: none; background: none;
+            width: 100%; text-align: left; color: inherit; font-family: inherit;
+        }
+        .conv-item:hover, .conv-item:focus-visible { background: #202C33; outline: none; }
+        .conv-avatar {
+            width: 50px; height: 50px; font-size: 26px; line-height: 1; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+            background: linear-gradient(135deg, #2d1b4e, #1b3a4b); position: relative;
+        }
+        .conv-online {
+            position: absolute; right: 0; bottom: 0; width: 13px; height: 13px;
+            border-radius: 50%; background: #25D366; border: 2px solid #111B21;
+        }
+        .conv-body { flex: 1; min-width: 0; border-bottom: 1px solid rgba(255,255,255,.05); padding: 6px 0; }
+        .conv-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .conv-name { font-size: 16px; font-weight: 600; color: #E9EDEF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conv-time { font-size: 12px; color: rgba(233,237,239,.6); flex-shrink: 0; }
+        .conv-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 2px; }
+        .conv-preview { font-size: 13px; color: rgba(233,237,239,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conv-badge {
+            background: #25D366; color: #111B21; font-size: 11px; font-weight: 800;
+            min-width: 20px; height: 20px; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; padding: 0 6px; flex-shrink: 0;
+        }
+        .tick { color: #53BDEB; font-size: 12px; margin-right: 4px; }
+        .tick.read { color: #53BDEB; }
+        .tick.sent-only { color: rgba(233,237,239,.5); }
+        .wa-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; background: #111B21; position: sticky; top: 0; z-index: 20;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+        }
+        .wa-header h2 { font-size: 20px; font-weight: 800; color: #E9EDEF; }
+        .wa-actions { display: flex; gap: 6px; }
+        .wa-icon-btn {
+            background: none; border: none; color: #AEBAC1; font-size: 18px; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: background .15s;
+        }
+        .wa-icon-btn:hover { background: #202C33; color: #E9EDEF; }
+        .conv-empty { text-align: center; padding: 48px 24px; color: rgba(233,237,239,.5); font-size: 14px; }
+        /* Bulle vocale façon WhatsApp avec forme d'onde */
+        .wa-voice {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            background: #202C33; border-radius: 12px; max-width: 260px;
+        }
+        .wa-voice.sent { background: #005C4B; }
+        .waveform { display: flex; align-items: center; gap: 2px; height: 22px; flex: 1; }
+        .waveform span { width: 2px; border-radius: 1px; background: rgba(255,255,255,.45); }
+        .waveform span.on { background: #53BDEB; }
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(15,15,15,0.95); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            background: #111B21;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex; justify-content: space-around; padding: 6px 0 max(6px, env(safe-area-inset-bottom));
             z-index: 100;
+            /* la barre ne doit jamais masquer le bas du contenu */
+            padding-bottom: max(6px, env(safe-area-inset-bottom));
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -318,6 +388,9 @@
                     <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">🇨🇮 +225</div>
                     <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14" inputmode="numeric" autocomplete="tel" aria-label="Numéro de téléphone">
                 </div>
+                <div style="text-align:right; margin:-8px 0 12px;">
+                    <span id="phone-operator" style="display:none; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;"></span>
+                </div>
                 <button class="btn-primary" onclick="sendOTP()" type="button">
                     Recevoir mon code SMS
                 </button>
@@ -366,24 +439,11 @@
                         <input type="text" id="setup-name" class="input-field" placeholder="Ex: Franck / Maïmouna" aria-label="Ton prénom ou surnom" autocomplete="nickname" style="margin-top:6px;">
                     </div>
                     <div>
-                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ton âge</label>
-                        <input type="number" id="setup-age" class="input-field" placeholder="Ex: 22" min="18" max="99" aria-label="Ton âge" inputmode="numeric" style="margin-top:6px;">
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ta date de naissance</label>
+                        <input type="date" id="setup-birth" class="input-field" aria-label="Ta date de naissance" required style="margin-top:6px;">
+                        <p id="setup-age-info" style="font-size:12px; margin-top:6px; color:rgba(255,255,255,.5); display:none;"></p>
                     </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je suis</label>
-                        <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectGender(this,'Homme')" type="button">🙋‍♂️ Un Homme</button>
-                            <button class="tag" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
-                        <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
-                        </div>
-                    </div>
+
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ta commune / ville</label>
                         <select id="setup-city" class="input-field" aria-label="Ta commune ou ville" style="margin-top:6px;">
@@ -419,6 +479,21 @@
                                 <option>Vavoua</option><option>Yamoussoukro</option><option>Zuénoula</option>
                             </optgroup>
                         </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je suis</label>
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" onclick="selectGender(this,'Homme')" type="button">🙋‍♂️ Un Homme</button>
+                            <button class="tag" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
+                        </div>
                     </div>
                 </div>
                 <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()" type="button">Continuer →</button>
@@ -477,9 +552,15 @@
                     <span style="font-size:32px;">📸</span>
                     <h3 style="font-size:16px; font-weight:700; margin-top:8px;">Vérifie ton profil (Selfie rapide)</h3>
                     <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Un selfie vidéo de 3 secondes pour prouver que tu es réel(le). Zéro brouteur autorisé !</p>
-                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie(this)" type="button">
+                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie(this); startVerification();" type="button">
                         <i class="fa-solid fa-camera"></i> Prendre le selfie
                     </button>
+                    <div id="verify-progress" style="display:none; margin-top:14px;">
+                        <div style="height:6px; background:rgba(255,255,255,.12); border-radius:6px; overflow:hidden;">
+                            <div id="verify-bar" style="width:0%; height:100%; background:linear-gradient(90deg,#FF6B00,#FF1E56); transition:width .15s linear;"></div>
+                        </div>
+                        <p id="verify-label" style="font-size:12px; color:rgba(255,255,255,.6); margin-top:8px;">Analyse de la note vocale…</p>
+                    </div>
                     <p id="selfie-done" style="display:none; color:#34d399; font-weight:700; font-size:13px; margin-top:10px;">✅ Selfie vérifié ! Badge Profil Certifié ajouté</p>
                 </div>
 
@@ -559,18 +640,38 @@
                 <i class="fa-solid fa-phone"></i>
             </button>
         </div>
+        <p id="fakecall-quota" style="text-align:center; font-size:11px; color:rgba(233,237,239,.55); padding:0 20px 12px;"></p>
     </div>
 
     <!-- ==================== ÉCRAN 5: CHAT &amp; MODE FLIRT ==================== -->
+    <!-- ==================== ÉCRAN 4.5: DISCUSSIONS (CDC §3.B) ==================== -->
+    <div id="discussions" class="screen">
+        <div class="wa-header">
+            <h2>Discussions</h2>
+            <div class="wa-actions">
+                <button class="wa-icon-btn" onclick="openLikes()" aria-label="Voir qui m'a aimé" title="Qui m'a aimé" type="button">
+                    <i class="fa-solid fa-heart" style="color:#FF6B00;"></i>
+                </button>
+                <button class="wa-icon-btn" onclick="goTo('discover')" aria-label="Nouveau match" title="Découvrir des profils" type="button">
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="conv-list" id="conv-list"></div>
+    </div>
+
     <div id="chat" class="screen">
         <div class="chat-header">
             <button onclick="goTo('discover')" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;" type="button" aria-label="Retour aux profils">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <div id="chat-avatar" style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px); transition:filter .4s ease;">👤</div>
+            <div id="chat-avatar" style="width:44px; height:44px; font-size:24px; line-height:1; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px); transition:filter .4s ease;">👤</div>
             <div style="flex:1;">
                 <h3 style="font-size:15px; font-weight:700;" id="chat-name">Awa</h3>
-                <p style="font-size:11px; color:rgba(255,255,255,0.4);">📍 Cocody • Photo après <span id="msg-countdown">5</span> messages</p>
+                <p style="font-size:11px; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <span id="chat-status"><span style="color:#25D366;">● En ligne</span></span>
+                    • photo après <span id="msg-countdown">5</span> msg
+                </p>
             </div>
             <div style="display:flex; gap:12px;">
                 <button onclick="showQuiz()" style="background:none; border:none; color:#FF6B00; font-size:20px; cursor:pointer;" title="Mode Flirt" type="button" aria-label="Lancer le Mode Flirt">
@@ -607,6 +708,26 @@
         <div class="chat-input-bar">
             <input type="text" id="chat-input" placeholder="Écris ton message..." aria-label="Écrire un message" onkeypress="if(event.key==='Enter')sendMessage()">
             <button onclick="sendMessage()" type="button" aria-label="Envoyer le message"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- ==================== QUI M'A AIMÉ (CDC §4) ==================== -->
+    <div id="likes" class="screen">
+        <div class="wa-header">
+            <button class="wa-icon-btn" onclick="goTo('discussions')" aria-label="Retour aux discussions" type="button">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h2 style="flex:1; text-align:center;">Qui m'a aimé</h2>
+            <span style="width:40px;"></span>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:16px;">
+            <p id="likes-hint" style="font-size:13px; color:rgba(233,237,239,.6); text-align:center; margin-bottom:16px;">
+                <i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en VIP pour les voir.
+            </p>
+            <div id="likes-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:12px;"></div>
+            <button class="btn-primary" style="margin-top:24px;" onclick="showVipModal('Débloque « Qui m\'a aimé » et vois toutes les photos en clair avec le Mode Boss 👑')" type="button">
+                <i class="fa-solid fa-crown"></i> Débloquer avec le VIP — 700 FCFA
+            </button>
         </div>
     </div>
 
@@ -651,9 +772,9 @@
             <i class="fa-solid fa-fire"></i>
             <span>Découvrir</span>
         </div>
-        <div class="nav-item" role="button" tabindex="0" onclick="switchTab('chat', this)" style="position:relative;">
+        <div class="nav-item" role="button" tabindex="0" onclick="switchTab('discussions', this)" style="position:relative;">
             <i class="fa-solid fa-comment"></i>
-            <span>Messages</span>
+            <span>Discussions</span>
             <div class="notif-dot" id="chat-notif" style="display:none;"></div>
         </div>
         <div class="nav-item" role="button" tabindex="0" onclick="showQuiz(this)">
@@ -730,7 +851,7 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             
-            const navScreens = ['discover', 'chat'];
+            const navScreens = ['discover', 'chat', 'discussions'];
             document.getElementById('bottom-nav').style.display = navScreens.includes(screenId) ? 'flex' : 'none';
         }
 
@@ -802,17 +923,62 @@
             el.classList.toggle('selected');
         }
 
+        /* ---------- CDС §2 : majorité calculée automatiquement ---------- */
+        function ageFromBirth(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-').map(Number);
+            if (parts.length !== 3) return null;
+            const [y, m, d] = parts;
+            const check = new Date(y, m - 1, d);
+            if (isNaN(check) || check.getFullYear() !== y || check.getMonth() !== m - 1 || check.getDate() !== d) return null;
+            const t = new Date();
+            let age = t.getFullYear() - y;
+            if (t.getMonth() + 1 < m || (t.getMonth() + 1 === m && t.getDate() < d)) age--;
+            return age;
+        }
+
+        (function setBirthLimits() {
+            const el = document.getElementById('setup-birth');
+            if (!el) return;
+            const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            const t = new Date();
+            el.max = fmt(new Date(t.getFullYear() - 18, t.getMonth(), t.getDate()));
+            el.min = fmt(new Date(t.getFullYear() - 99, 0, 1));
+            el.addEventListener('change', () => {
+                const info = document.getElementById('setup-age-info');
+                const age = ageFromBirth(el.value);
+                if (age === null) { info.style.display = 'none'; return; }
+                info.style.display = 'block';
+                if (age < 18) {
+                    info.style.color = '#f87171';
+                    info.textContent = '⛔ ' + age + ' ans : Viens chop est réservé aux +18 ans.';
+                } else {
+                    info.style.color = '#34d399';
+                    info.textContent = '✅ ' + age + ' ans — âge validé automatiquement.';
+                }
+            });
+        })();
+
         function profileStep2() {
             const name = document.getElementById('setup-name').value.trim();
-            const age = parseInt(document.getElementById('setup-age').value);
+            const birth = document.getElementById('setup-birth').value;
             const city = document.getElementById('setup-city').value;
             if(!name) { alert("Entre ton prénom ou surnom !"); return; }
-            if(!age || age < 18) { alert("Tu dois avoir au moins 18 ans !"); return; }
+            if(!birth) { alert("Indique ta date de naissance !"); return; }
+
+            // Calcul automatique de la majorité — CDC §2
+            const age = ageFromBirth(birth);
+            if (age === null) { alert("Cette date de naissance n'est pas valide."); return; }
+            if (age < 18) {
+                alert("Désolé, Viens chop est réservé aux +18 ans.\nReviens le jour de tes 18 ans 😉");
+                return;
+            }
+            if (age > 99) { alert("Cette date de naissance n'est pas valide."); return; }
             if(!city) { alert("Choisis ta commune ou ta ville !"); return; }
             if(!selectedGender) { alert("Indique si tu es un homme ou une femme !"); return; }
             if(!selectedSeeking) { alert("Indique qui tu recherches !"); return; }
 
-            userProfile = { name, age, city, gender: selectedGender, seeking: selectedSeeking };
+            userProfile = { name, age, birth, city, gender: selectedGender, seeking: selectedSeeking };
             document.getElementById('setup-step-1').style.display = 'none';
             document.getElementById('setup-step-2').style.display = 'block';
             document.getElementById('setup-step-2').classList.add('anim-slide-up');
@@ -1174,6 +1340,336 @@
 
         // ===== INIT : Auto go to splash =====
         goTo('splash');
+    </script>
+
+    <script>
+        /* ==========================================================================
+           VIENS CHOP — module « cahier des charges v2.0 »
+           Discussions, quota hebdomadaire du Faux Appel, « Qui m'a aimé »,
+           certification IA. Ajouté sans modifier le code d'origine.
+           ========================================================================== */
+
+        /* ---------------------------------------------------------------
+           1. ÉTAT PERSISTANT (localStorage — survit au rechargement)
+           --------------------------------------------------------------- */
+        const STORE_KEY = 'vienschop_state_v1';
+
+        const AppState = {
+            data: { fakeCallLastUsed: 0, conversations: [], likedMe: [], certified: false },
+
+            load() {
+                try {
+                    const raw = localStorage.getItem(STORE_KEY);
+                    if (raw) Object.assign(this.data, JSON.parse(raw));
+                } catch (e) { /* navigation privée : on continue en mémoire */ }
+                return this.data;
+            },
+            save() {
+                try { localStorage.setItem(STORE_KEY, JSON.stringify(this.data)); } catch (e) {}
+            },
+            reset() { this.data = { fakeCallLastUsed: 0, conversations: [], likedMe: [], certified: false }; this.save(); }
+        };
+        AppState.load();
+
+        /* ---------------------------------------------------------------
+           2. QUOTA FAUX APPEL — CDC §4 :
+              gratuit = 1 essai / semaine   |   VIP = illimité 24/7
+           --------------------------------------------------------------- */
+        const FAKE_CALL_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 jours
+
+        function fakeCallAvailability() {
+            if (isVIP) return { allowed: true, reason: 'vip' };
+            const last = AppState.data.fakeCallLastUsed || 0;
+            const elapsed = Date.now() - last;
+            if (elapsed >= FAKE_CALL_COOLDOWN_MS) return { allowed: true, reason: 'free' };
+            return { allowed: false, remainingMs: FAKE_CALL_COOLDOWN_MS - elapsed };
+        }
+
+        function humanDuration(ms) {
+            const d = Math.ceil(ms / 86400000);
+            if (d > 1) return d + ' jours';
+            const h = Math.ceil(ms / 3600000);
+            if (h > 1) return h + ' heures';
+            return Math.max(1, Math.ceil(ms / 60000)) + ' minutes';
+        }
+
+        /* On enveloppe la fonction d'origine : le contrôle VIP unique est remplacé
+           par la règle « 1 essai par semaine » du cahier des charges. */
+        const _triggerFakeCallOriginal = triggerFakeCall;
+        triggerFakeCall = function () {
+            const avail = fakeCallAvailability();
+            if (!avail.allowed) {
+                showVipModal(
+                    "Tu as utilisé ton essai gratuit de Faux Appel cette semaine. " +
+                    "Prochain essai dans " + humanDuration(avail.remainingMs) + ". " +
+                    "Passe en VIP pour un accès illimité 24/7 👑"
+                );
+                return;
+            }
+            if (!isVIP) {
+                AppState.data.fakeCallLastUsed = Date.now();
+                AppState.save();
+            }
+            _triggerFakeCallOriginal();
+            renderFakeCallQuota();
+        };
+
+        /* Bandeau d'information du quota, affiché sous les actions de Découverte */
+        function renderFakeCallQuota() {
+            const el = document.getElementById('fakecall-quota');
+            if (!el) return;
+            const avail = fakeCallAvailability();
+            if (isVIP) {
+                el.innerHTML = '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Faux Appel <strong>illimité</strong> (VIP)';
+            } else if (avail.allowed) {
+                el.innerHTML = '<i class="fa-solid fa-phone"></i> Faux Appel : <strong>1 essai gratuit</strong> disponible cette semaine';
+            } else {
+                el.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Prochain essai gratuit dans <strong>' + humanDuration(avail.remainingMs) + '</strong>';
+            }
+        }
+
+        /* ---------------------------------------------------------------
+           3. DISCUSSIONS — CDC §3.B
+              Liste de conversations : statut « en ligne », coche de lecture,
+              aperçu du dernier message, compteur de non-lus.
+           --------------------------------------------------------------- */
+        const NOW = Date.now();
+        const seedConversations = [
+            { id: 'c1', name: 'Awa', emoji: '👩🏾', color: 'linear-gradient(135deg,#7c3aed,#db2777)',
+              online: true, unread: 2, lastAt: NOW - 4 * 60000,
+              messages: [
+                  { t: 'Salut ! J\'ai écouté ta note vocale, elle est trop cool 😍', dir: 'in', at: NOW - 9 * 60000 },
+                  { t: 'Merci beaucoup ! Team Himra ou Team Didi B ?', dir: 'out', at: NOW - 6 * 60000, read: true },
+                  { t: 'Himra évidemment 😂 et toi ?', dir: 'in', at: NOW - 4 * 60000 }
+              ] },
+            { id: 'c2', name: 'Prisca', emoji: '👩🏽‍🦱', color: 'linear-gradient(135deg,#ea580c,#e11d48)',
+              online: true, unread: 0, lastAt: NOW - 47 * 60000,
+              messages: [
+                  { t: 'On se voit dans un maquis certifié ce week-end ?', dir: 'in', at: NOW - 52 * 60000 },
+                  { t: 'Carrément ! Je te propose le vendredi soir 🍹', dir: 'out', at: NOW - 47 * 60000, read: true }
+              ] },
+            { id: 'c3', name: 'Kadi', emoji: '👩🏾', color: 'linear-gradient(135deg,#0284c7,#7c3aed)',
+              online: false, unread: 0, lastAt: NOW - 26 * 3600000,
+              messages: [
+                  { t: 'Bonne nuit, à demain 😴', dir: 'in', at: NOW - 26 * 3600000 }
+              ] },
+            { id: 'c4', name: 'Franck', emoji: '👨🏾', color: 'linear-gradient(135deg,#1b3a4b,#0f3443)',
+              online: false, unread: 0, lastAt: NOW - 3 * 86400000,
+              messages: [
+                  { t: 'T\'as vu le nouveau son de Tiakola ? 🔥', dir: 'out', at: NOW - 3 * 86400000, read: true },
+                  { t: 'Pas encore, je l\'écoute ce soir !', dir: 'in', at: NOW - 3 * 86400000 }
+              ] }
+        ];
+
+        function initConversations() {
+            if (!AppState.data.conversations || AppState.data.conversations.length === 0) {
+                AppState.data.conversations = seedConversations;
+                AppState.save();
+            }
+        }
+        initConversations();
+
+        function timeLabel(ts) {
+            const d = new Date(ts), now = new Date();
+            const sameDay = d.toDateString() === now.toDateString();
+            if (sameDay) return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            const diffDays = Math.floor((now - d) / 86400000);
+            if (diffDays === 1) return 'Hier';
+            if (diffDays < 7) return ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'][d.getDay()];
+            return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+        }
+
+        function renderConversations() {
+            const list = document.getElementById('conv-list');
+            if (!list) return;
+            initConversations();
+            const convs = [...AppState.data.conversations].sort((a, b) => b.lastAt - a.lastAt);
+
+            if (convs.length === 0) {
+                list.innerHTML = '<div class="conv-empty"><i class="fa-solid fa-comments" style="font-size:40px; opacity:.3; display:block; margin-bottom:16px;"></i>' +
+                    'Aucune discussion pour l\'instant.<br>Va dans <strong>Découvrir</strong> et like des profils pour matcher !</div>';
+                return;
+            }
+
+            list.innerHTML = convs.map(c => {
+                const last = c.messages[c.messages.length - 1] || { t: '', dir: 'in' };
+                const tick = last.dir === 'out'
+                    ? '<span class="tick ' + (last.read ? 'read' : 'sent-only') + '">' + (last.read ? '✓✓' : '✓') + '</span>'
+                    : '';
+                return '<button class="conv-item" onclick="openConversation(\'' + c.id + '\')" aria-label="Ouvrir la discussion avec ' + c.name + '" type="button">' +
+                    '<div class="conv-avatar" style="background:' + c.color + '">' + c.emoji +
+                        (c.online ? '<span class="conv-online" title="En ligne"></span>' : '') +
+                    '</div>' +
+                    '<div class="conv-body">' +
+                        '<div class="conv-top"><span class="conv-name">' + c.name + '</span>' +
+                            '<span class="conv-time">' + timeLabel(c.lastAt) + '</span></div>' +
+                        '<div class="conv-bottom"><span class="conv-preview">' + tick + escapeHTML(last.t) + '</span>' +
+                            (c.unread > 0 ? '<span class="conv-badge">' + c.unread + '</span>' : '') +
+                        '</div>' +
+                    '</div></button>';
+            }).join('');
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
+        let activeConversationId = null;
+
+        function openConversation(id) {
+            const conv = AppState.data.conversations.find(c => c.id === id);
+            if (!conv) return;
+            activeConversationId = id;
+            conv.unread = 0;
+            AppState.save();
+
+            document.getElementById('chat-name').textContent = conv.name;
+            document.getElementById('chat-status').innerHTML = conv.online
+                ? '<span style="color:#25D366;">● En ligne</span> • 📍 ' + (conv.city || 'Abidjan')
+                : 'Vu(e) récemment';
+
+            messageCount = conv.messages.filter(m => m.dir === 'out').length * 2;
+            photoUnlocked = messageCount >= 5;
+
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = conv.messages.map(m => messageHTML(m)).join('');
+            container.scrollTop = container.scrollHeight;
+
+            const av = document.getElementById('chat-avatar');
+            if (av) {
+                av.textContent = conv.emoji;
+                av.style.background = conv.color;
+                av.style.filter = photoUnlocked ? 'none' : 'blur(3px)';
+            }
+            updatePhotoCountdown();
+            goTo('chat');
+        }
+
+        function messageHTML(m) {
+            if (m.dir === 'sys') return '<div class="msg system">' + escapeHTML(m.t) + '</div>';
+            const time = timeLabel(m.at);
+            const tick = m.dir === 'out' ? ' <span class="tick ' + (m.read ? 'read' : 'sent-only') + '">' + (m.read ? '✓✓' : '✓') + '</span>' : '';
+            return '<div class="msg ' + (m.dir === 'out' ? 'sent' : 'received') + '">' + escapeHTML(m.t) +
+                   '<span style="display:block; font-size:10px; opacity:.55; text-align:right; margin-top:4px;">' + time + tick + '</span></div>';
+        }
+
+        /* ---------------------------------------------------------------
+           4. « QUI M'A AIMÉ » — CDC §4 :
+              gratuit = photos floutées   |   VIP = totalement visible
+           --------------------------------------------------------------- */
+        const likedMeSamples = [
+            { name: 'Awa', age: 22, city: 'Cocody', emoji: '👩🏾', color: 'linear-gradient(135deg,#7c3aed,#db2777)' },
+            { name: 'Prisca', age: 20, city: 'Yopougon', emoji: '👩🏽‍🦱', color: 'linear-gradient(135deg,#ea580c,#e11d48)' },
+            { name: 'Kadi', age: 21, city: 'Yopougon', emoji: '👩🏾', color: 'linear-gradient(135deg,#0284c7,#7c3aed)' },
+            { name: 'Fatou', age: 23, city: 'Marcory', emoji: '👩🏿', color: 'linear-gradient(135deg,#1a1a2e,#4a1942)' },
+            { name: 'Linda', age: 20, city: 'Daloa', emoji: '👩🏾‍🦰', color: 'linear-gradient(135deg,#2d1b4e,#16213e)' },
+            { name: 'Grâce', age: 23, city: 'San-Pédro', emoji: '👩🏿‍🦱', color: 'linear-gradient(135deg,#0f3443,#1a0a2e)' }
+        ];
+
+        function openLikes() {
+            const grid = document.getElementById('likes-grid');
+            const hint = document.getElementById('likes-hint');
+            grid.innerHTML = likedMeSamples.map(p =>
+                '<div style="border-radius:16px; overflow:hidden; background:' + p.color + '; aspect-ratio:3/4; display:flex; flex-direction:column; justify-content:flex-end; padding:10px; position:relative;">' +
+                    '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:44px; ' +
+                        (isVIP ? '' : 'filter:blur(9px);') + '">' + p.emoji + '</div>' +
+                    (isVIP ? '' : '<div style="position:absolute; top:8px; right:8px; font-size:12px;">🔒</div>') +
+                    '<div style="position:relative; background:rgba(0,0,0,.55); border-radius:8px; padding:4px 6px; font-size:11px; font-weight:700;">' +
+                        (isVIP ? escapeHTML(p.name) + ', ' + p.age + '<br><span style="font-weight:400; opacity:.75;">📍 ' + escapeHTML(p.city) + '</span>'
+                              : '•••••<br><span style="font-weight:400; opacity:.75;">Qui ça peut être ?</span>') +
+                    '</div>' +
+                '</div>'
+            ).join('');
+            hint.innerHTML = isVIP
+                ? '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Mode Boss : <strong>' + likedMeSamples.length + ' personnes</strong> t\'ont liké'
+                : '<i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en VIP pour tout voir.';
+            goTo('likes');
+        }
+
+        /* ---------------------------------------------------------------
+           5. CERTIFICATION IA — CDC §2
+              Comparaison note vocale + selfie, badge en moins de 5 s.
+           --------------------------------------------------------------- */
+        function startVerification() {
+            const box = document.getElementById('verify-progress');
+            const bar = document.getElementById('verify-bar');
+            const label = document.getElementById('verify-label');
+            if (!box) return null;
+            box.style.display = 'block';
+            let pct = 0;
+            const steps = [
+                'Analyse de la note vocale…',
+                'Comparaison avec le selfie…',
+                'Détection de visage…',
+                'Attribution du badge…'
+            ];
+            const timer = setInterval(() => {
+                pct = Math.min(100, pct + 4);
+                if (bar) bar.style.width = pct + '%';
+                if (label) label.textContent = steps[Math.min(steps.length - 1, Math.floor(pct / 25))];
+                if (pct >= 100) {
+                    clearInterval(timer);
+                    if (label) label.textContent = '✅ Profil Certifié — badge activé';
+                    AppState.data.certified = true;
+                    AppState.save();
+                }
+            }, 150); // ~3,75 s : sous les 5 s imposées par le cahier des charges
+            return timer;
+        }
+
+        /* ---------------------------------------------------------------
+           6. DÉTECTION OPÉRATEUR +225 — CDC §2 (07 / 05 / 01)
+           --------------------------------------------------------------- */
+        const OPERATORS = {
+            '07': { name: 'Orange CI', color: '#FF7900' },
+            '05': { name: 'MTN CI', color: '#FFCC00' },
+            '01': { name: 'Moov Africa', color: '#009CDE' },
+            '25': { name: 'Orange CI', color: '#FF7900' },
+            '27': { name: 'MTN CI', color: '#FFCC00' },
+            '21': { name: 'Moov Africa', color: '#009CDE' }
+        };
+
+        function detectOperator(raw) {
+            const digits = raw.replace(/\D/g, '');
+            const prefix = digits.slice(0, 2);
+            return OPERATORS[prefix] || null;
+        }
+
+        function updateOperatorBadge(inputId, badgeId) {
+            const input = document.getElementById(inputId);
+            const badge = document.getElementById(badgeId);
+            if (!input || !badge) return;
+            const op = detectOperator(input.value);
+            if (op) {
+                badge.textContent = op.name;
+                badge.style.display = 'inline-block';
+                badge.style.background = op.color + '22';
+                badge.style.color = op.color;
+                badge.style.border = '1px solid ' + op.color + '55';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        /* ---------------------------------------------------------------
+           7. INITIALISATION
+           --------------------------------------------------------------- */
+        (function initCdc() {
+            renderConversations();
+            renderFakeCallQuota();
+
+            const phone = document.getElementById('phone-input');
+            if (phone) {
+                phone.addEventListener('input', () => updateOperatorBadge('phone-input', 'phone-operator'));
+            }
+            // Les discussions doivent refléter l'état réel à chaque visite de l'onglet
+            const _goTo = goTo;
+            goTo = function (screenId) {
+                if (screenId === 'discussions') renderConversations();
+                if (screenId === 'discover') renderFakeCallQuota();
+                return _goTo(screenId);
+            };
+        })();
     </script>
 </body>
 </html>

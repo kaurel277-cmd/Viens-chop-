@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription — Viens chop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="assets/css/common.css">
     <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro ivoirien. Un code SMS, une note vocale de 10 secondes, et tu peux commencer à matcher.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                    colors: { brandOrange: '#FF5E1A', brandPink: '#FF1E56' }
-                }
-            }
-        }
-    </script>
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap"></noscript>
     <style>
         .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -39,6 +39,9 @@
         @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
     </style>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
+          imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
+          imagesizes="100vw">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -88,7 +91,7 @@
     </div>
 
     <!-- ===== HERO + FORMULAIRE ===== -->
-    <header class="pt-28 pb-16 bg-brand-gradient text-white">
+    <header class="pt-28 pb-16 hero-bg text-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             <!-- Colonne texte -->
@@ -138,6 +141,9 @@
                     <div class="flex gap-2">
                         <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm">🇨🇮 +225</span>
                         <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" aria-describedby="err-1" placeholder="07 XX XX XX XX" class="field flex-1">
+                    </div>
+                    <div class="text-right mt-1">
+                        <span id="operator-badge" style="display:none; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;"></span>
                     </div>
                     <p id="err-1" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
 
@@ -446,6 +452,36 @@
         };
 
         /* ------------------------------------------------------------
+           COMMUNES — liste utilisée à l'étape 3 (CDC §5)
+           ------------------------------------------------------------ */
+        const COMMUNES = {
+            abidjan: ['Abobo', 'Adjamé', 'Anyama', 'Attécoubé', 'Bingerville', 'Cocody', 'Koumassi',
+                      'Marcory', 'Plateau', 'Port-Bouët', 'Songon', 'Treichville', 'Yopougon'],
+            villes: ['Abengourou', 'Aboisso', 'Adiaké', 'Adzopé', 'Agboville', 'Agnibilékrou', 'Akoupé', 'Alepe', 'Assinie', 'Bangolo', 'Béoumi', 'Biankouma', 'Bondoukou', 'Bongouanou', 'Bonoua', 'Bouaflé', 'Bouaké', 'Bouna', 'Boundiali', 'Dabakala', 'Dabou', 'Daloa', 'Danané', 'Daoukro', 'Dimbokro', 'Divo', 'Duékoué', 'Ferkessédougou', 'Fresco', 'Gagnoa', 'Grand-Bassam', 'Grand-Béréby', 'Grand-Lahou', 'Guiglo', 'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota', 'Man', 'Mankono', 'M\'Bahiakro', 'Odienné', 'Oumé', 'Sakassou', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra', 'Soubré', 'Tabou', 'Tanda', 'Tiassalé', 'Tingréla', 'Touba', 'Toulepleu', 'Toumodi', 'Vavoua', 'Yamoussoukro', 'Zuénoula']
+        };
+
+        function fillCities() {
+            const sel = $('city');
+            if (!sel || sel.dataset.filled === '1') return;
+            // la liste de COMMUNES fait foi : on repart du seul placeholder
+            while (sel.options.length > 1) sel.remove(1);
+            sel.querySelectorAll('optgroup').forEach(g => { if (g.children.length === 0) g.remove(); });
+            sel.dataset.filled = '1';
+            const mk = (label, list) => {
+                const g = document.createElement('optgroup');
+                g.label = label;
+                list.forEach(c => {
+                    const o = document.createElement('option');
+                    o.textContent = c;
+                    g.appendChild(o);
+                });
+                return g;
+            };
+            sel.appendChild(mk('📍 Grand Abidjan', COMMUNES.abidjan));
+            sel.appendChild(mk("🇨🇮 Villes de Côte d'Ivoire", COMMUNES.villes));
+        }
+
+        /* ------------------------------------------------------------
            API — à remplacer par tes vrais appels serveur
            ------------------------------------------------------------ */
         const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -507,10 +543,34 @@
         }
         function formatPhone(d) { return d.replace(/(\d{2})(?=\d)/g, '$1 '); }
 
+        /* CDC §2 — détection automatique de l'opérateur (07 / 05 / 01) */
+        const OPERATORS = {
+            '07': { name: 'Orange CI', color: '#FF7900' },
+            '05': { name: 'MTN CI',    color: '#FFCC00' },
+            '01': { name: 'Moov Africa', color: '#009CDE' }
+        };
+
+        function updateOperator(raw) {
+            const badge = $('operator-badge');
+            if (!badge) return;
+            const prefix = raw.replace(/\D/g, '').slice(0, 2);
+            const op = OPERATORS[prefix];
+            if (op) {
+                badge.textContent = op.name;
+                badge.style.background = op.color + '22';
+                badge.style.color = op.color;
+                badge.style.border = '1px solid ' + op.color + '55';
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
         $('phone').addEventListener('input', e => {
             e.target.value = formatPhone(cleanPhone(e.target.value));
             e.target.classList.remove('invalid');
             hideError('err-1');
+            updateOperator(e.target.value);
         });
 
         $('step-1').addEventListener('submit', async e => {
@@ -734,6 +794,7 @@
             $('vip-bar').style.width = (taken / CONFIG.VIP_TOTAL * 100) + '%';
             $('vip-progress').classList.remove('hidden');
         }
+        fillCities();
         goStep(1, false);
     </script>
 </body>

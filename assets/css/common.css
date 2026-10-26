@@ -1,0 +1,120 @@
+/* ==========================================================================
+   Viens chop — feuille commune
+   Chargée sur toutes les pages : fonds, fluidité, accessibilité.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Réglages globaux (fluidité / rendu)
+   -------------------------------------------------------------------------- */
+html {
+    /* La barre de navigation est fixe (64 px) : sans ceci, un lien #ancre
+       place le titre SOUS la navbar et on ne voit pas la section. */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Supprime le rectangle bleu au tap sur mobile (perçu comme un "bug") */
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+}
+
+/* Les animations ne doivent jamais déclencher de recalcul de mise en page */
+.fade-up { animation: fadeUp .5s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes fadeUp {
+    from { opacity: 0; transform: translate3d(0, 18px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   2. Image d'arrière-plan — bandeaux héro
+   Le dégradé de marque est conservé par-dessus l'image (marque inchangée),
+   l'image apporte la texture.
+   -------------------------------------------------------------------------- */
+.hero-bg {
+    /* 3 couches : dégradé de marque → voile sombre (contraste des textes) → photo */
+    background-image:
+        linear-gradient(135deg, rgba(255, 107, 0, .74) 0%, rgba(255, 30, 86, .78) 100%),
+        linear-gradient(rgba(0, 0, 0, .26), rgba(0, 0, 0, .26)),
+        url("../img/bg-hero-sm.jpg");
+    background-size: cover, cover, cover;
+    background-position: center, center, center;
+    background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+@media (min-width: 768px) {
+    .hero-bg {
+        background-image:
+            linear-gradient(135deg, rgba(255, 107, 0, .74) 0%, rgba(255, 30, 86, .78) 100%),
+            linear-gradient(rgba(0, 0, 0, .26), rgba(0, 0, 0, .26)),
+            url("../img/bg-hero.jpg");
+    }
+}
+
+/* Bandeau d'appel à l'action en bas de page */
+.cta-bg {
+    background-image:
+        linear-gradient(135deg, rgba(255, 107, 0, .93) 0%, rgba(255, 30, 86, .93) 100%),
+        url("../img/bg-hero-sm.jpg");
+    background-size: cover;
+    background-position: center;
+}
+@media (min-width: 768px) {
+    .cta-bg {
+        background-image:
+            linear-gradient(135deg, rgba(255, 107, 0, .93) 0%, rgba(255, 30, 86, .93) 100%),
+            url("../img/bg-hero.jpg");
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. Thème WhatsApp (cahier des charges §1) — utilisé par app.html
+   -------------------------------------------------------------------------- */
+:root {
+    --wa-bg: #0B141A;
+    --wa-panel: #111B21;
+    --wa-panel-2: #202C33;
+    --wa-sent: #005C4B;
+    --wa-recv: #202C33;
+    --wa-green: #25D366;
+    --wa-tick: #53BDEB;
+    --brand-orange: #FF6B00;
+    --brand-pink: #FF1E56;
+}
+
+/* Fond de discussion façon WhatsApp */
+.wa-wallpaper {
+    background-color: var(--wa-bg);
+    background-image:
+        linear-gradient(rgba(11, 20, 26, .82), rgba(11, 20, 26, .82)),
+        url("../img/bg-chat.webp");
+    background-size: cover;
+    background-position: center;
+    background-attachment: local;
+}
+
+/* --------------------------------------------------------------------------
+   4. Accessibilité — mouvement réduit
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto !important; }
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   5. Impression
+   -------------------------------------------------------------------------- */
+@media print {
+    nav, footer, .mobile-menu, .menu-overlay, button { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .hero-bg, .cta-bg { background: none !important; color: #000 !important; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 10px; }
+}

@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comment ça marche — Viens chop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="assets/css/common.css">
     <meta name="description" content="Inscris-toi, enregistre ta voix, matche dans ta commune et gère tes rancarts sans pression. Voici comment Viens chop fonctionne.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                    colors: { brandOrange: '#FF5E1A', brandPink: '#FF1E56' }
-                }
-            }
-        }
-    </script>
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap"></noscript>
     <style>
         .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -29,6 +29,9 @@
         .step-line { background: linear-gradient(180deg, #FF6B00, #FF1E56); }
     </style>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+    <link rel="preload" as="image" href="assets/img/bg-hero.jpg"
+          imagesrcset="assets/img/bg-hero-sm.jpg 900w, assets/img/bg-hero.jpg 1600w"
+          imagesizes="100vw">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -74,7 +77,7 @@
     </div>
 
     <!-- HERO -->
-    <header class="pt-28 pb-16 bg-brand-gradient text-white">
+    <header class="pt-28 pb-16 hero-bg text-white">
         <div class="max-w-3xl mx-auto px-4 text-center">
             <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-5">Simple • Rapide • Sans pression</span>
             <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-5">Comment ça marche ?</h1>
