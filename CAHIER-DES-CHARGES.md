@@ -76,7 +76,7 @@ L'âge saisi à la main (`<input type="number">`, contournable) est remplacé pa
 
 ## 8. Base de données Supabase / PostgreSQL (CDC §5) — *nouveau*
 
-`database/schema.sql` (prêt à exécuter dans Supabase → SQL Editor) :
+`database/neon-schema.sql` (prêt à exécuter dans Neon → SQL Editor) :
 
 - `users` avec `age` et `is_adult` **colonnes générées** exactement comme au CDC ;
 - `likes`, `matches`, `messages` (texte / vocal / quiz / système), `quiz_sessions`, `payments` ;
@@ -120,7 +120,7 @@ Fichiers de build conservés dans `build/` (`tailwind.config.js`, `input.css`, `
 | # | Point | Où |
 |---|---|---|
 | 1 | Passer `DEMO_MODE: false` et brancher l'API SMS / OTP | `inscription.html` |
-| 2 | Exécuter `database/schema.sql` puis connecter l'app à Supabase | Supabase |
+| 2 | Exécuter `database/neon-schema.sql`, lancer `server/` et brancher l'app | Neon + Node |
 | 3 | Renseigner les numéros WhatsApp Business | `faq.html`, `maquis.html` |
 | 4 | Compléter les mentions légales (`[Ton Nom ou Société]`, hébergeur, téléphone) | `mentions-legales.html` |
 | 5 | La certification IA est **simulée** (progression + badge) : à relier au vrai service de vérification | `app.html` |
@@ -134,7 +134,9 @@ Fichiers de build conservés dans `build/` (`tailwind.config.js`, `input.css`, `
 assets/img/bg-hero.jpg, bg-hero-sm.jpg, bg-chat.jpg, bg-chat.webp
 assets/css/tailwind.css        (compilé, 31 Ko)
 assets/css/common.css          (fond, thème WhatsApp, fluidité, impression)
-database/schema.sql            (schéma Supabase complet)
+database/neon-schema.sql       (schéma Neon complet)
+database/test-schema.sql       (tests des règles métier)
+server/                        (API Node : auth, feed, likes, chat)
 build/tailwind.config.js, input.css, build.sh
 ```
 

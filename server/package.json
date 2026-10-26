@@ -1,0 +1,27 @@
+{
+  "name": "viens-chop-api",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "API Viens chop — Neon (PostgreSQL) + Node",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "NODE_ENV=test node --test --test-concurrency=1 test/",
+    "db:schema": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f ../database/neon-schema.sql",
+    "db:test": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f ../database/test-schema.sql"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

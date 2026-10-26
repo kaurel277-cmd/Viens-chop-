@@ -1,6 +1,6 @@
 # Viens chop — Feuille de route
 
-> État au 26 octobre 2026 · commit `1f5a9cb`
+> État au 26 octobre 2026
 > Ce document répond à : **« quelle est la prochaine étape ? »**
 
 ---
@@ -13,7 +13,9 @@
   0 débordement, 42 tests de régression au vert).
 - Charte, ton et parcours utilisateur fixés : profil → photo floutée → 5 messages
   → déblocage, likes 3/jour, Mode Coulé / Mode Debout.
-- `database/schema.sql` prêt : 6 tables, 8 triggers, politiques RLS écrites.
+- `database/neon-schema.sql` : 11 tables, 9 triggers, testé sur PostgreSQL 17.
+- `server/` : API Node complète (auth SMS, feed, likes, chat, sécurité),
+  17 suites de tests d'intégration au vert contre un vrai PostgreSQL.
 - Site rapide sans aucune dépendance externe (CSS compilé en local, polices
   système, images optimisées à 160 Ko).
 
@@ -28,19 +30,25 @@ La prochaine étape n'est donc pas une nouvelle page : c'est **brancher un backe
 
 ---
 
-## Étape 1 — Backend temps réel · *bloquant, 1 à 2 semaines*
+## Étape 1 — Backend temps réel · *bloquant* · **base et API livrées**
 
 Objectif : un vrai compte, de vrais profils, de vrais matchs.
 
-| Quoi | Comment | Effort |
+**Choix d'infrastructure retenu : Neon (PostgreSQL managé) + une API Node.**
+Neon ne fournit que la base : l'authentification, le stockage des photos et le
+temps réel ont donc été construits autour. Détail complet dans
+[`docs/BACKEND.md`](docs/BACKEND.md).
+
+| Quoi | État | Où |
 |---|---|---|
-| Base de données | Créer un projet Supabase, exécuter `database/schema.sql` | 1 h |
-| Inscription réelle | Brancher `sendOtp` / `verifyOtp` / `registerUser` (`inscription.html` l. 484-504) | 1 j |
-| Envoi des SMS | Supabase Auth + Twilio, **ou** un agrégateur local (Termii, Infobip, Orange CI) | 1 j + coût SMS |
-| Photos | Bucket Supabase Storage + politiques d'accès | 1 j |
-| Swipe & match | Brancher le front sur `likes` / `matches` (le trigger de match existe déjà) | 2 j |
-| Chat | Supabase Realtime sur `messages` | 2-3 j |
-| Notifications | Push web (PWA) ou SMS pour les matchs | 2 j |
+| Base de données | ✅ **livré** — schéma v3 testé sur PostgreSQL 17 | `database/neon-schema.sql` |
+| Règles métier (âge, quotas, match, déblocage) | ✅ **livré** — 14 vérifications SQL | `database/test-schema.sql` |
+| API Node (auth, feed, likes, chat, sécurité) | ✅ **livré** — 17 suites, 31 vérifications | `server/` |
+| Envoi des SMS | ⚙️ prêt, fournisseur à choisir (Termii / Twilio) | `server/src/sms.js` |
+| Brancher le site sur l'API | ⏳ **prochaine tâche** | `inscription.html` l. 484-504 |
+| Stockage des photos | ⏳ à faire (Cloudflare R2 conseillé) | voir BACKEND.md §6.1 |
+| Chat temps réel | ⏳ polling d'abord, SSE ensuite | voir BACKEND.md §6.2 |
+| Notifications | ⏳ push web ou SMS | — |
 
 ⚠️ Les règles sensibles doivent vivre **côté serveur**, pas dans le JavaScript :
 quota de likes, majorité 18+, déblocage après 5 messages, « qui m'a liké » flouté.
@@ -119,10 +127,10 @@ Une app de rencontre sans modération se fait fermer, ou se vide.
 
 | Chantier | Ce que je livre | Ce qu'il te faut |
 |---|---|---|
-| **A. Brancher Supabase** | Code JS d'auth, swipe, chat + requêtes SQL prêtes | Créer le projet Supabase (gratuit) et me donner l'URL + la clé publique |
+| **A. Brancher le site sur l'API** | Remplacement de `DEMO_MODE` par de vrais appels dans `inscription.html` et `app.html` | Créer le projet Neon (gratuit) et coller `DATABASE_URL` dans `server/.env` |
 | **B. Rendre le site installable (PWA)** | `manifest.json`, service worker, icônes, écran d'accueil | Rien |
 | **C. Partage WhatsApp propre** | Open Graph + image de partage + `sitemap.xml` + `robots.txt` | Rien |
 | **D. Comptes de démo** | Jeu de profils réalistes pour tester le parcours | Rien |
 
-**Recommandation : A.** Tout le reste en dépend, et sans backend le projet reste
-une démonstration — même très propre.
+**Recommandation : A** — mais la base et l'API sont désormais écrites et
+testées : il ne reste qu'à relier l'interface.
