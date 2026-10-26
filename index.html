@@ -7,7 +7,7 @@
     <meta name="description" content="La première application de rencontre pensée pour la jeunesse ivoirienne. Découvre la voix d'abord, débloque les photos après 5 messages, et rencontre ton crush dans un lieu certifié sûr.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -23,6 +23,9 @@
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
         .mobile-menu.open { transform: translateX(0); }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 60; }
+        .menu-overlay.open { opacity: 1; pointer-events: auto; }
+        body.menu-open { overflow: hidden; }
         .card-boss { box-shadow: 0 20px 50px -12px rgba(255, 94, 26, 0.35); }
         .phone-glow { box-shadow: 0 30px 70px -15px rgba(255, 30, 86, 0.45); }
         @keyframes pulseBar {
@@ -34,6 +37,7 @@
         .playing .wave-bar:nth-child(2n) { animation-delay: .15s; }
         .playing .wave-bar:nth-child(3n) { animation-delay: .3s; }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
@@ -49,37 +53,38 @@
                 <a href="comment-ca-marche.html" class="hover:text-brandPink transition">Comment ça marche</a>
                 <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
                 <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis &amp; Cafés</a>
                 <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
                     Rejoindre 🔥
                 </a>
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu">
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
-            <div class="flex justify-between items-center mb-8">
-                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
-                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
-                <a href="index.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
-                <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
-                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
-                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
-                <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
-                <hr class="border-slate-200">
-                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
-            </div>
+</nav>
+<div id="menu-overlay" class="menu-overlay md:hidden" aria-hidden="true"></div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
-    </nav>
+        <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+            <a href="index.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+            <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+            <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+            <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+            <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
+            <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+            <hr class="border-slate-200">
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+        </div>
+    </div>
 
     <!-- ===== HERO ===== -->
     <header class="pt-28 pb-20 bg-brand-gradient text-white relative overflow-hidden">
@@ -122,7 +127,7 @@
                     </div>
                     <div class="bg-white/10 rounded-xl p-3 border border-white/15">
                         <p class="font-extrabold text-sm">🛡️ Soutra</p>
-                        <p class="text-[11px] text-white/80">SOS & lieux sûrs</p>
+                        <p class="text-[11px] text-white/80">SOS &amp; lieux sûrs</p>
                     </div>
                 </div>
             </div>
@@ -159,7 +164,7 @@
                                 <span id="demo-timer" class="text-xs font-extrabold text-brandPink">0:10</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <button onclick="toggleVoiceDemo()" id="demo-play-btn" class="w-11 h-11 shrink-0 rounded-full bg-brand-gradient text-white flex items-center justify-center shadow-md hover:opacity-90 transition" aria-label="Écouter la note vocale">
+                                <button onclick="toggleVoiceDemo()" id="demo-play-btn" class="w-11 h-11 shrink-0 rounded-full bg-brand-gradient text-white flex items-center justify-center shadow-md hover:opacity-90 transition" aria-label="Écouter la note vocale" type="button">
                                     <i id="demo-play-icon" class="fa-solid fa-play text-sm ml-0.5"></i>
                                 </button>
                                 <div id="demo-wave" class="flex-1 flex items-center justify-between gap-1 h-8 px-1">
@@ -192,7 +197,7 @@
 
                         <!-- Boutons action -->
                         <div class="grid grid-cols-2 gap-3">
-                            <button onclick="nextDemoProfile()" class="py-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 font-bold text-sm text-slate-600 transition">
+                            <button onclick="nextDemoProfile()" class="py-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 font-bold text-sm text-slate-600 transition" type="button">
                                 ⏭️ Suivant
                             </button>
                             <a href="inscription.html" class="py-3 rounded-xl bg-brand-gradient text-white font-extrabold text-sm text-center shadow-md hover:opacity-90 transition">
@@ -225,7 +230,7 @@
 
             <div class="bg-white rounded-3xl p-7 border border-slate-100 shadow-sm hover:shadow-lg transition">
                 <div class="w-14 h-14 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🎵</div>
-                <h3 class="text-xl font-extrabold mb-2">Match par les sons & la commune</h3>
+                <h3 class="text-xl font-extrabold mb-2">Match par les sons &amp; la commune</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
                     Team Himra ou Didi B ? Cocody, Yopougon ou Marcory ? Tu vois tout de suite si vous avez les mêmes goûts et si vous êtes proches.
                 </p>
@@ -235,7 +240,7 @@
                 <div class="w-14 h-14 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🛡️</div>
                 <h3 class="text-xl font-extrabold mb-2">La Soutra intégrée</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
-                    Selfie de vérification, numéro privé, bouton SOS, Check-In automatique et répertoire de maquis & cafés certifiés sûrs pour ton premier rancart.
+                    Selfie de vérification, numéro privé, bouton SOS, Check-In automatique et répertoire de maquis &amp; cafés certifiés sûrs pour ton premier rancart.
                 </p>
             </div>
         </div>
@@ -245,7 +250,7 @@
     <section class="py-20 bg-white">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
             <div>
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Mode Flirt & Disquettes</span>
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Mode Flirt &amp; Disquettes</span>
                 <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-4">Plus jamais en panne d'inspi pour aborder 😎</h2>
                 <p class="text-slate-600 leading-relaxed mb-6">
                     Fini les « Salut ça va ? » qui restent en vu. Dans le chat, tu as accès aux <strong>quiz Mode Flirt</strong> et au <strong>générateur de disquettes</strong> pour briser la glace sans forcer.
@@ -269,7 +274,7 @@
                     </p>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="nextDisquette()" class="flex-1 bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition text-sm">
+                    <button onclick="nextDisquette()" class="flex-1 bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition text-sm" type="button">
                         🔄 Une autre disquette
                     </button>
                     <a href="inscription.html" class="px-5 py-3.5 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-sm transition">
@@ -283,7 +288,7 @@
     <!-- ===== COMMENT ÇA MARCHE (4 ÉTAPES) ===== -->
     <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14">
-            <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Simple & rapide</span>
+            <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Simple &amp; rapide</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-3">Ton parcours en 4 temps ⚡</h2>
             <p class="text-slate-500">De ton inscription SMS à ton premier verre dans un coin chill.</p>
         </div>
@@ -301,7 +306,7 @@
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">3</div>
-                <h3 class="font-extrabold text-lg mb-2">Match & Débloque 🔓</h3>
+                <h3 class="font-extrabold text-lg mb-2">Match &amp; Débloque 🔓</h3>
                 <p class="text-sm text-slate-600">Écoute, like et discute. Au bout de 5 messages échangés, vos photos se dévoilent.</p>
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
@@ -318,11 +323,11 @@
         </p>
     </section>
 
-    <!-- ===== SÉCURITÉ & MAQUIS CERTIFIÉS ===== -->
+    <!-- ===== SÉCURITÉ &amp; MAQUIS CERTIFIÉS ===== -->
     <section class="py-20 bg-slate-900 text-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <span class="bg-white/10 text-orange-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Sécurité & Lieux sûrs</span>
+                <span class="bg-white/10 text-orange-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Sécurité &amp; Lieux sûrs</span>
                 <h2 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4">Chopper oui, mais en toute sécurité 🛡️</h2>
                 <p class="text-slate-300 leading-relaxed mb-6">
                     Sur Viens chop, on ne rigole pas avec ta tranquillité. De la vérification des profils jusqu'au retour de ton rancart, tout est pensé pour te protéger.
@@ -333,7 +338,7 @@
                         <p class="text-xs text-slate-400">Un compte par numéro + selfie de vérification obligatoire.</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                        <p class="font-extrabold text-sm mb-1">🆘 SOS & Check-In</p>
+                        <p class="font-extrabold text-sm mb-1">🆘 SOS &amp; Check-In</p>
                         <p class="text-xs text-slate-400">Inclus gratuitement pour veiller sur toi pendant tes sorties.</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
@@ -341,7 +346,7 @@
                         <p class="text-xs text-slate-400">Une excuse crédible pour quitter un rancart gênant (Mode Boss).</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                        <p class="font-extrabold text-sm mb-1">🍹 Maquis & Cafés certifiés</p>
+                        <p class="font-extrabold text-sm mb-1">🍹 Maquis &amp; Cafés certifiés</p>
                         <p class="text-xs text-slate-400">Des lieux publics, bien éclairés et fréquentés dans ta ville.</p>
                     </div>
                 </div>
@@ -350,7 +355,7 @@
                         Découvrir les protections
                     </a>
                     <a href="maquis.html" class="bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-xl transition">
-                        Voir les Maquis & Cafés 📍
+                        Voir les Maquis &amp; Cafés 📍
                     </a>
                 </div>
             </div>
@@ -416,8 +421,8 @@
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> 10 Likes / jour</li>
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> Notes vocales illimitées</li>
                     <li class="flex items-start gap-3"><span class="w-5 text-center">⏳</span> Mode Flirt : 1 session / jour</li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> SOS & Check-In inclus</li>
-                    <li class="flex items-start gap-3 text-slate-400"><span class="w-5 text-center">🔒</span> Faux Appel & Incognito non inclus</li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold w-5 text-center">✓</span> SOS &amp; Check-In inclus</li>
+                    <li class="flex items-start gap-3 text-slate-400"><span class="w-5 text-center">🔒</span> Faux Appel &amp; Incognito non inclus</li>
                 </ul>
                 <a href="inscription.html" class="block text-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-4 rounded-xl transition">
                     Commencer gratuitement
@@ -438,7 +443,7 @@
                     <p class="text-xs text-slate-400 mt-2">Soit à peine ~23 FCFA par jour</p>
                 </div>
                 <ul class="space-y-4 text-sm text-slate-700 flex-1 mb-6">
-                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Likes & Swipes Illimités</li>
+                    <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Likes &amp; Swipes Illimités</li>
                     <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Mode Flirt Illimité</li>
                     <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Voir qui t'a liké</li>
                     <li class="flex items-start gap-3"><span class="text-brandOrange w-5 text-center">★</span> Faux Appel d'urgence</li>
@@ -546,10 +551,10 @@
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
                     <ul class="space-y-2 text-xs">
-                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis &amp; Cafés Sûrs</a></li>
                         <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
                         <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
-                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales &amp; CGU</a></li>
                     </ul>
                 </div>
                 <div>
@@ -562,16 +567,50 @@
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-                <p>© 2025 Viens chop Côte d'Ivoire. Tous droits réservés.</p>
+                <p>© <span id="year">2026</span> Viens chop Côte d'Ivoire. Tous droits réservés.</p>
                 <p>Application réservée aux majeurs (+18 ans).</p>
             </div>
         </div>
     </footer>
 
     <script>
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('open');
+        function toggleMobileMenu(force) {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            const open = typeof force === 'boolean' ? force : !menu.classList.contains('open');
+            menu.classList.toggle('open', open);
+            if (overlay) overlay.classList.toggle('open', open);
+            document.body.classList.toggle('menu-open', open);
+            document.querySelectorAll('[aria-controls="mobile-menu"]').forEach(b => b.setAttribute('aria-expanded', String(open)));
+            if (open) {
+                const first = menu.querySelector('a');
+                if (first) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+            }
         }
+
+        (function setYear() {
+            const y = document.getElementById('year');
+            if (y) y.textContent = new Date().getFullYear();
+        })();
+
+        (function initMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            if (overlay) overlay.addEventListener('click', () => toggleMobileMenu(false));
+            menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMobileMenu(false)));
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && menu.classList.contains('open')) {
+                    toggleMobileMenu(false);
+                    const b = document.querySelector('[aria-controls="mobile-menu"]');
+                    if (b) b.focus();
+                }
+            });
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768 && menu.classList.contains('open')) toggleMobileMenu(false);
+            });
+        })();
 
         /* ---------- Mockup Téléphone : Profils démo ---------- */
         const demoProfiles = [

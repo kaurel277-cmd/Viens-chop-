@@ -2,13 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aperçu interactif de l'application Viens chop : note vocale, matchs par commune, Mode Flirt, Faux Appel et protections Soutra.">
     <title>Viens chop — L'App</title>
     <meta name="theme-color" content="#FF5E1A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -283,6 +284,7 @@
         .stamp.show { animation: stampPop 0.5s ease forwards; }
         @keyframes stampPop { 0% { transform: translate(-50%,-50%) scale(0) rotate(-30deg); } 50% { transform: translate(-50%,-50%) scale(1.2) rotate(10deg); } 100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 0; } }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 
@@ -294,7 +296,7 @@
                 <span class="gradient-text">Viens chop</span>
             </h1>
             <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:48px;">L'amour et le flirt sans pression</p>
-            <button class="btn-primary" onclick="goTo('login')" style="max-width:280px; margin:0 auto;">
+            <button class="btn-primary" onclick="goTo('login')" style="max-width:280px; margin:0 auto;" type="button">
                 Commencer 🔥
             </button>
             <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:16px;">Réservé aux +18 ans</p>
@@ -314,9 +316,9 @@
             <div id="phone-step">
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
                     <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">🇨🇮 +225</div>
-                    <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14">
+                    <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14" inputmode="numeric" autocomplete="tel" aria-label="Numéro de téléphone">
                 </div>
-                <button class="btn-primary" onclick="sendOTP()">
+                <button class="btn-primary" onclick="sendOTP()" type="button">
                     Recevoir mon code SMS
                 </button>
             </div>
@@ -327,16 +329,16 @@
                     Code envoyé au <span id="phone-display" style="color:#FF6B00; font-weight:700;"></span>
                 </p>
                 <div class="otp-inputs" style="margin-bottom:24px;">
-                    <input type="text" maxlength="1" oninput="otpNext(this,1)">
-                    <input type="text" maxlength="1" oninput="otpNext(this,2)">
-                    <input type="text" maxlength="1" oninput="otpNext(this,3)">
-                    <input type="text" maxlength="1" oninput="otpNext(this,4)">
+                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" aria-label="Chiffre 1 du code" oninput="otpNext(this,1)">
+                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 2 du code" oninput="otpNext(this,2)">
+                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 3 du code" oninput="otpNext(this,3)">
+                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 4 du code" oninput="otpNext(this,4)">
                 </div>
-                <button class="btn-primary" onclick="verifyOTP()">
+                <button class="btn-primary" onclick="verifyOTP()" type="button">
                     Vérifier ✓
                 </button>
                 <p style="text-align:center; margin-top:16px;">
-                    <button style="background:none; border:none; color:#FF6B00; font-weight:600; font-size:13px; cursor:pointer;" onclick="sendOTP()">Renvoyer le code</button>
+                    <button style="background:none; border:none; color:#FF6B00; font-weight:600; font-size:13px; cursor:pointer;" onclick="sendOTP()" type="button">Renvoyer le code</button>
                 </p>
             </div>
         </div>
@@ -361,30 +363,30 @@
                 <div style="display:flex; flex-direction:column; gap:14px;">
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ton prénom ou surnom</label>
-                        <input type="text" id="setup-name" class="input-field" placeholder="Ex: Franck / Maïmouna" style="margin-top:6px;">
+                        <input type="text" id="setup-name" class="input-field" placeholder="Ex: Franck / Maïmouna" aria-label="Ton prénom ou surnom" autocomplete="nickname" style="margin-top:6px;">
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ton âge</label>
-                        <input type="number" id="setup-age" class="input-field" placeholder="Ex: 22" min="18" max="99" style="margin-top:6px;">
+                        <input type="number" id="setup-age" class="input-field" placeholder="Ex: 22" min="18" max="99" aria-label="Ton âge" inputmode="numeric" style="margin-top:6px;">
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je suis</label>
                         <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectGender(this,'Homme')">🙋‍♂️ Un Homme</button>
-                            <button class="tag" onclick="selectGender(this,'Femme')">🙋‍♀️ Une Femme</button>
+                            <button class="tag" onclick="selectGender(this,'Homme')" type="button">🙋‍♂️ Un Homme</button>
+                            <button class="tag" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
                         </div>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
                         <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectSeeking(this,'Homme')">🙋‍♂️ Homme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Femme')">🙋‍♀️ Femme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Tous')">🌍 Tous</button>
+                            <button class="tag" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
+                            <button class="tag" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
                         </div>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Ta commune / ville</label>
-                        <select id="setup-city" class="input-field" style="margin-top:6px;">
+                        <select id="setup-city" class="input-field" aria-label="Ta commune ou ville" style="margin-top:6px;">
                             <option value="" disabled selected>Choisis ta ville...</option>
                             <optgroup label="📍 Grand Abidjan">
                                 <option>Abobo</option><option>Adjamé</option><option>Anyama</option>
@@ -419,7 +421,7 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()">Continuer →</button>
+                <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()" type="button">Continuer →</button>
             </div>
 
             <!-- STEP 2: Vibes musicales -->
@@ -428,33 +430,33 @@
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">Choisis tes artistes préférés pour matcher avec les bonnes personnes !</p>
 
                 <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🇨🇮 Rap Ivoire & Afro</span>
-                    <button class="tag" onclick="toggleArtist(this)">🔥 Himra</button>
-                    <button class="tag" onclick="toggleArtist(this)">💎 Didi B</button>
-                    <button class="tag" onclick="toggleArtist(this)">⚡ Sindika</button>
-                    <button class="tag" onclick="toggleArtist(this)">🎤 La B</button>
-                    <button class="tag" onclick="toggleArtist(this)">🌊 7 Flocky 45</button>
-                    <button class="tag" onclick="toggleArtist(this)">🎶 Couper-Décaler</button>
-                    <button class="tag" onclick="toggleArtist(this)">🥁 Amapiano</button>
-                    <button class="tag" onclick="toggleArtist(this)">💃 Afrobeats</button>
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🇨🇮 Rap Ivoire &amp; Afro</span>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🔥 Himra</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💎 Didi B</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">⚡ Sindika</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎤 La B</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌊 7 Flocky 45</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎶 Couper-Décaler</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🥁 Amapiano</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💃 Afrobeats</button>
                 </div>
                 <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
-                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🌍 Rap FR & International</span>
-                    <button class="tag" onclick="toggleArtist(this)">🖤 Damso</button>
-                    <button class="tag" onclick="toggleArtist(this)">🎸 Tiakola</button>
-                    <button class="tag" onclick="toggleArtist(this)">🦅 Ninho</button>
-                    <button class="tag" onclick="toggleArtist(this)">🎵 Gazo</button>
-                    <button class="tag" onclick="toggleArtist(this)">💿 Werenoi</button>
-                    <button class="tag" onclick="toggleArtist(this)">🌙 SDM</button>
-                    <button class="tag" onclick="toggleArtist(this)">🎧 Rema</button>
-                    <button class="tag" onclick="toggleArtist(this)">✨ Burna Boy</button>
+                    <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4); width:100%; text-transform:uppercase; letter-spacing:1px;">🌍 Rap FR &amp; International</span>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🖤 Damso</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎸 Tiakola</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🦅 Ninho</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎵 Gazo</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">💿 Werenoi</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🌙 SDM</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">🎧 Rema</button>
+                    <button class="tag" onclick="toggleArtist(this)" type="button">✨ Burna Boy</button>
                 </div>
 
-                <button class="btn-primary" onclick="profileStep3()">Continuer →</button>
-                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep1()">← Retour</button>
+                <button class="btn-primary" onclick="profileStep3()" type="button">Continuer →</button>
+                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep1()" type="button">← Retour</button>
             </div>
 
-            <!-- STEP 3: Note vocale & Selfie -->
+            <!-- STEP 3: Note vocale &amp; Selfie -->
             <div id="setup-step-3" style="display:none;">
                 <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Ta note vocale (10s) 🎙️</h2>
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">
@@ -475,16 +477,16 @@
                     <span style="font-size:32px;">📸</span>
                     <h3 style="font-size:16px; font-weight:700; margin-top:8px;">Vérifie ton profil (Selfie rapide)</h3>
                     <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Un selfie vidéo de 3 secondes pour prouver que tu es réel(le). Zéro brouteur autorisé !</p>
-                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie()">
+                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie(this)" type="button">
                         <i class="fa-solid fa-camera"></i> Prendre le selfie
                     </button>
                     <p id="selfie-done" style="display:none; color:#34d399; font-weight:700; font-size:13px; margin-top:10px;">✅ Selfie vérifié ! Badge Profil Certifié ajouté</p>
                 </div>
 
-                <button class="btn-primary" onclick="finishProfile()">
+                <button class="btn-primary" onclick="finishProfile()" type="button">
                     C'est parti ! 🔥
                 </button>
-                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep2Back()">← Retour</button>
+                <button class="btn-secondary" style="margin-top:10px;" onclick="profileStep2Back()" type="button">← Retour</button>
             </div>
         </div>
     </div>
@@ -515,7 +517,7 @@
                 <div class="card-info">
                     <!-- Voice note bar -->
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.1); border-radius:12px;">
-                        <button onclick="playVoiceNote()" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); border:none; color:#fff; font-size:14px; cursor:pointer;">
+                        <button type="button" aria-label="Écouter la note vocale" onclick="playVoiceNote()" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#FF6B00,#FF1E56); border:none; color:#fff; font-size:14px; cursor:pointer;">
                             <i class="fa-solid fa-play" id="play-icon"></i>
                         </button>
                         <div style="flex:1;">
@@ -544,37 +546,37 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="action-btn pass" onclick="swipePass()" title="Passer">
+            <button class="action-btn pass" onclick="swipePass()" title="Passer" type="button" aria-label="Passer ce profil">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <button class="action-btn voice" onclick="playVoiceNote()" title="Écouter la voix">
+            <button class="action-btn voice" onclick="playVoiceNote()" title="Écouter la voix" type="button" aria-label="Écouter la note vocale">
                 <i class="fa-solid fa-microphone"></i>
             </button>
-            <button class="action-btn like" onclick="swipeLike()" title="Liker ❤️">
+            <button class="action-btn like" onclick="swipeLike()" title="Liker ❤️" type="button" aria-label="Liker ce profil">
                 <i class="fa-solid fa-heart"></i>
             </button>
-            <button class="action-btn soutra" onclick="triggerFakeCall()" title="Faux Appel Soutra">
+            <button class="action-btn soutra" onclick="triggerFakeCall()" title="Faux Appel Soutra" type="button" aria-label="Lancer un faux appel">
                 <i class="fa-solid fa-phone"></i>
             </button>
         </div>
     </div>
 
-    <!-- ==================== ÉCRAN 5: CHAT & MODE FLIRT ==================== -->
+    <!-- ==================== ÉCRAN 5: CHAT &amp; MODE FLIRT ==================== -->
     <div id="chat" class="screen">
         <div class="chat-header">
-            <button onclick="goTo('discover')" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">
+            <button onclick="goTo('discover')" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;" type="button" aria-label="Retour aux profils">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px);">👤</div>
+            <div id="chat-avatar" style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px); transition:filter .4s ease;">👤</div>
             <div style="flex:1;">
                 <h3 style="font-size:15px; font-weight:700;" id="chat-name">Awa</h3>
                 <p style="font-size:11px; color:rgba(255,255,255,0.4);">📍 Cocody • Photo après <span id="msg-countdown">5</span> messages</p>
             </div>
             <div style="display:flex; gap:12px;">
-                <button onclick="showQuiz()" style="background:none; border:none; color:#FF6B00; font-size:20px; cursor:pointer;" title="Mode Flirt">
+                <button onclick="showQuiz()" style="background:none; border:none; color:#FF6B00; font-size:20px; cursor:pointer;" title="Mode Flirt" type="button" aria-label="Lancer le Mode Flirt">
                     <i class="fa-solid fa-gamepad"></i>
                 </button>
-                <button onclick="triggerFakeCall()" style="background:none; border:none; color:#fbbf24; font-size:20px; cursor:pointer;" title="Faux Appel">
+                <button onclick="triggerFakeCall()" style="background:none; border:none; color:#fbbf24; font-size:20px; cursor:pointer;" title="Faux Appel" type="button" aria-label="Lancer un faux appel">
                     <i class="fa-solid fa-phone-volume"></i>
                 </button>
             </div>
@@ -603,8 +605,8 @@
         </div>
 
         <div class="chat-input-bar">
-            <input type="text" id="chat-input" placeholder="Écris ton message..." onkeypress="if(event.key==='Enter')sendMessage()">
-            <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            <input type="text" id="chat-input" placeholder="Écris ton message..." aria-label="Écrire un message" onkeypress="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()" type="button" aria-label="Envoyer le message"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -614,8 +616,8 @@
         <h2 style="font-size:22px; font-weight:700;" id="caller-name">Maman 📱</h2>
         <p style="color:rgba(255,255,255,0.5); font-size:14px;">Appel entrant...</p>
         <div class="call-actions">
-            <button class="call-btn decline" onclick="endFakeCall()"><i class="fa-solid fa-phone-slash"></i></button>
-            <button class="call-btn accept" onclick="acceptFakeCall()"><i class="fa-solid fa-phone"></i></button>
+            <button class="call-btn decline" onclick="endFakeCall()" type="button" aria-label="Refuser l'appel"><i class="fa-solid fa-phone-slash"></i></button>
+            <button class="call-btn accept" onclick="acceptFakeCall()" type="button" aria-label="Accepter l'appel"><i class="fa-solid fa-phone"></i></button>
         </div>
         <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:32px;">🤫 Faux Appel Soutra — Personne ne saura</p>
     </div>
@@ -632,12 +634,12 @@
             <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Par mois • Sans renouvellement piégeux</p>
 
             <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
-                <button class="payment-btn" onclick="fakePayment('Wave')">🐧 Payer avec Wave</button>
-                <button class="payment-btn" onclick="fakePayment('Orange Money')">🟠 Payer avec Orange Money</button>
-                <button class="payment-btn" onclick="fakePayment('MTN MoMo')">🟡 Payer avec MTN MoMo</button>
-                <button class="payment-btn" onclick="fakePayment('Moov Money')">🔵 Payer avec Moov Money</button>
+                <button class="payment-btn" onclick="fakePayment('Wave')" type="button">🐧 Payer avec Wave</button>
+                <button class="payment-btn" onclick="fakePayment('Orange Money')" type="button">🟠 Payer avec Orange Money</button>
+                <button class="payment-btn" onclick="fakePayment('MTN MoMo')" type="button">🟡 Payer avec MTN MoMo</button>
+                <button class="payment-btn" onclick="fakePayment('Moov Money')" type="button">🔵 Payer avec Moov Money</button>
             </div>
-            <button onclick="closeVipModal()" style="background:none; border:none; color:rgba(255,255,255,0.4); font-size:13px; cursor:pointer; font-family:'Outfit';">
+            <button onclick="closeVipModal()" style="background:none; border:none; color:rgba(255,255,255,0.4); font-size:13px; cursor:pointer; font-family:'Outfit';" type="button">
                 Non merci, je reste en mode « coulé » 😅
             </button>
         </div>
@@ -645,20 +647,20 @@
 
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
     <div class="bottom-nav" id="bottom-nav" style="display:none;">
-        <div class="nav-item active" onclick="switchTab('discover')">
+        <div class="nav-item active" role="button" tabindex="0" onclick="switchTab('discover', this)">
             <i class="fa-solid fa-fire"></i>
             <span>Découvrir</span>
         </div>
-        <div class="nav-item" onclick="switchTab('chat')" style="position:relative;">
+        <div class="nav-item" role="button" tabindex="0" onclick="switchTab('chat', this)" style="position:relative;">
             <i class="fa-solid fa-comment"></i>
             <span>Messages</span>
             <div class="notif-dot" id="chat-notif" style="display:none;"></div>
         </div>
-        <div class="nav-item" onclick="showQuiz()">
+        <div class="nav-item" role="button" tabindex="0" onclick="showQuiz(this)">
             <i class="fa-solid fa-gamepad"></i>
             <span>Mode Flirt</span>
         </div>
-        <div class="nav-item" onclick="triggerFakeCall()">
+        <div class="nav-item" role="button" tabindex="0" onclick="triggerFakeCall()">
             <i class="fa-solid fa-shield-halved"></i>
             <span>Soutra</span>
         </div>
@@ -732,9 +734,10 @@
             document.getElementById('bottom-nav').style.display = navScreens.includes(screenId) ? 'flex' : 'none';
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, el) {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            const target = el || (window.event && window.event.currentTarget);
+            if (target && target.classList) target.classList.add('active');
             goTo(tab);
             if(tab === 'chat') document.getElementById('chat-notif').style.display = 'none';
         }
@@ -752,10 +755,25 @@
         }
 
         function otpNext(el, nextIdx) {
-            if(el.value.length === 1 && nextIdx < 4) {
-                el.nextElementSibling?.focus();
+            const inputs = [...document.querySelectorAll('.otp-inputs input')];
+            const idx = inputs.indexOf(el);
+            // n'accepte qu'un chiffre par case, même en cas de collage
+            const digits = (el.value || '').replace(/\D/g, '');
+            el.value = digits.slice(0, 1);
+            if (digits.length > 1) {
+                digits.split('').slice(0, inputs.length - idx).forEach((c, k) => { inputs[idx + k].value = c; });
+                inputs[Math.min(idx + digits.length, inputs.length - 1)].focus();
+                return;
             }
+            if (el.value && idx < inputs.length - 1) inputs[idx + 1].focus();
         }
+
+        // Retour arrière : remonte à la case précédente quand la case est vide
+        document.querySelectorAll('.otp-inputs input').forEach((inp, i, arr) => {
+            inp.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !inp.value && i > 0) { arr[i - 1].focus(); arr[i - 1].value = ''; }
+            });
+        });
 
         function verifyOTP() {
             const inputs = document.querySelectorAll('.otp-inputs input');
@@ -857,10 +875,12 @@
             }
         }
 
-        function fakeSelfie() {
+        function fakeSelfie(el) {
             document.getElementById('selfie-done').style.display = 'block';
-            event.target.textContent = '✅ Selfie validé';
-            event.target.disabled = true;
+            const btn = el || (window.event && window.event.currentTarget);
+            if (!btn) return;
+            btn.textContent = '✅ Selfie validé';
+            btn.disabled = true;
         }
 
         function finishProfile() {
@@ -917,7 +937,11 @@
 
             setTimeout(() => {
                 if(isMatch) {
-                    openChat(profiles[currentProfileIndex]);
+                    // On ouvre le chat ET on prépare la carte suivante :
+                    // sinon, au retour sur « Découvrir », la carte restait swipée hors écran (écran vide).
+                    const matched = profiles[currentProfileIndex];
+                    loadProfile(currentProfileIndex + 1);
+                    openChat(matched);
                 } else {
                     loadProfile(currentProfileIndex + 1);
                 }
@@ -954,6 +978,8 @@
         // ===== CHAT =====
         function openChat(profile) {
             document.getElementById('chat-name').textContent = profile.name;
+            const av = document.getElementById('chat-avatar');
+            if (av) av.style.filter = 'blur(3px)';
             messageCount = 0;
             photoUnlocked = false;
             document.getElementById('msg-countdown').textContent = '5';
@@ -1022,12 +1048,19 @@
             
             if(remaining <= 0 && !photoUnlocked) {
                 photoUnlocked = true;
+                // Le flou du chat disparaît vraiment, au lieu de rester flouté après l'annonce.
+                const av = document.getElementById('chat-avatar');
+                if (av) av.style.filter = 'none';
                 addMessage("🔓 Photo débloquée ! La photo de ton crush est maintenant visible 🔥", 'system');
             }
         }
 
         // ===== MODE FLIRT QUIZ =====
-        function showQuiz() {
+        function showQuiz(el) {
+            if(el && el.classList && el.classList.contains('nav-item')) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
             if(quizSessionsToday >= MAX_FREE_QUIZ && !isVIP) {
                 showVipModal("Tu as utilisé ta session Mode Flirt du jour ! Passe en VIP pour des sessions illimitées 🎮👑");
                 return;
@@ -1103,9 +1136,14 @@
             if(navigator.vibrate) navigator.vibrate(0);
         }
 
+        let callInProgress = false;
         function acceptFakeCall() {
-            document.getElementById('caller-name').textContent += " — En cours...";
-            setTimeout(() => endFakeCall(), 3000);
+            if (callInProgress) return;
+            callInProgress = true;
+            const nameEl = document.getElementById('caller-name');
+            const baseName = nameEl.textContent.replace(/ — En cours\.\.\.$/, '');
+            nameEl.textContent = baseName + " — En cours...";
+            setTimeout(() => { callInProgress = false; endFakeCall(); }, 3000);
         }
 
         // ===== VIP MODAL =====

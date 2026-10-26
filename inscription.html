@@ -7,7 +7,7 @@
     <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro ivoirien. Un code SMS, une note vocale de 10 secondes, et tu peux commencer à matcher.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -23,6 +23,9 @@
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
         .mobile-menu.open { transform: translateX(0); }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 60; }
+        .menu-overlay.open { opacity: 1; pointer-events: auto; }
+        body.menu-open { overflow: hidden; }
 
         .field { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .75rem; padding: .8rem 1rem; font-size: .875rem; color: #1e293b; transition: border-color .15s, box-shadow .15s; }
         .field:focus { outline: none; border-color: #FF1E56; box-shadow: 0 0 0 3px rgba(255, 30, 86, .12); }
@@ -35,6 +38,7 @@
         .shake { animation: shake .35s ease; }
         @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -50,37 +54,38 @@
                 <a href="comment-ca-marche.html" class="hover:text-brandPink transition">Comment ça marche</a>
                 <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
                 <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis &amp; Cafés</a>
                 <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">
                     Rejoindre 🔥
                 </a>
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu">
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
-            <div class="flex justify-between items-center mb-8">
-                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
-                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
-                <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
-                <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
-                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
-                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
-                <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
-                <hr class="border-slate-200">
-                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
-            </div>
+</nav>
+<div id="menu-overlay" class="menu-overlay md:hidden" aria-hidden="true"></div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
-    </nav>
+        <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+            <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+            <a href="comment-ca-marche.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+            <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+            <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+            <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
+            <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+            <hr class="border-slate-200">
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+        </div>
+    </div>
 
     <!-- ===== HERO + FORMULAIRE ===== -->
     <header class="pt-28 pb-16 bg-brand-gradient text-white">
@@ -132,7 +137,7 @@
                     <label for="phone" class="block text-xs font-bold text-slate-500 uppercase mb-1">Numéro de téléphone</label>
                     <div class="flex gap-2">
                         <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm">🇨🇮 +225</span>
-                        <input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="07 XX XX XX XX" class="field flex-1">
+                        <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" aria-describedby="err-1" placeholder="07 XX XX XX XX" class="field flex-1">
                     </div>
                     <p id="err-1" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
 
@@ -165,7 +170,7 @@
 
                     <div class="flex items-center justify-between mt-4 text-xs">
                         <button type="button" id="btn-change" class="font-bold text-slate-500 hover:text-brandPink transition"><i class="fa-solid fa-arrow-left mr-1"></i> Changer de numéro</button>
-                        <button type="button" id="btn-resend" class="font-bold text-brandPink disabled:text-slate-400 disabled:cursor-not-allowed transition"></button>
+                        <button type="button" id="btn-resend" class="font-bold text-brandPink disabled:text-slate-400 disabled:cursor-not-allowed transition">Renvoyer le code</button>
                     </div>
                 </form>
 
@@ -220,7 +225,7 @@
 
                         <label class="flex items-start gap-3 cursor-pointer text-xs text-slate-600 leading-relaxed">
                             <input id="terms" type="checkbox" class="mt-0.5 w-4 h-4 accent-brandPink shrink-0">
-                            <span>Je confirme avoir <strong>18 ans ou plus</strong> et j'accepte les <a href="mentions-legales.html" target="_blank" class="text-brandPink font-bold hover:underline">Mentions légales & CGU</a>.</span>
+                            <span>Je confirme avoir <strong>18 ans ou plus</strong> et j'accepte les <a href="mentions-legales.html" target="_blank" class="text-brandPink font-bold hover:underline">Mentions légales &amp; CGU</a>.</span>
                         </label>
                     </div>
 
@@ -246,12 +251,12 @@
                         </ol>
                     </div>
 
-                    <a id="app-link" href="#" target="_blank" rel="noopener" class="hidden block bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition mb-3">
+                    <a id="app-link" href="app.html" style="display:none" class="bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition mb-3">
                         Ouvrir l'application 🚀
                     </a>
                     <p id="app-soon" class="text-xs text-slate-500 mb-3">On te prévient par SMS dès que ton accès est ouvert.</p>
 
-                    <a id="share-link" href="#" target="_blank" rel="noopener" class="block border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition text-sm">
+                    <a id="share-link" href="https://wa.me/" target="_blank" rel="noopener" class="block border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition text-sm">
                         <i class="fa-brands fa-whatsapp mr-1"></i> Invite tes potes sur WhatsApp
                     </a>
                 </div>
@@ -279,7 +284,7 @@
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-center">
                 <div class="w-14 h-14 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-2xl mb-4">💘</div>
-                <h3 class="font-extrabold mb-1">Écoute, like & matche</h3>
+                <h3 class="font-extrabold mb-1">Écoute, like &amp; matche</h3>
                 <p class="text-sm text-slate-600">Photos floutées au départ, débloquées après 5 messages. Tu découvres la vibe d'abord.</p>
             </div>
         </div>
@@ -350,10 +355,10 @@
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
                     <ul class="space-y-2 text-xs">
-                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis &amp; Cafés Sûrs</a></li>
                         <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
                         <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
-                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales &amp; CGU</a></li>
                     </ul>
                 </div>
                 <div>
@@ -366,16 +371,50 @@
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-                <p>© 2025 Viens chop Côte d'Ivoire. Tous droits réservés.</p>
+                <p>© <span id="year">2026</span> Viens chop Côte d'Ivoire. Tous droits réservés.</p>
                 <p>Application réservée aux majeurs (+18 ans).</p>
             </div>
         </div>
     </footer>
 
     <script>
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('open');
+        function toggleMobileMenu(force) {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            const open = typeof force === 'boolean' ? force : !menu.classList.contains('open');
+            menu.classList.toggle('open', open);
+            if (overlay) overlay.classList.toggle('open', open);
+            document.body.classList.toggle('menu-open', open);
+            document.querySelectorAll('[aria-controls="mobile-menu"]').forEach(b => b.setAttribute('aria-expanded', String(open)));
+            if (open) {
+                const first = menu.querySelector('a');
+                if (first) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+            }
         }
+
+        (function setYear() {
+            const y = document.getElementById('year');
+            if (y) y.textContent = new Date().getFullYear();
+        })();
+
+        (function initMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            if (overlay) overlay.addEventListener('click', () => toggleMobileMenu(false));
+            menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMobileMenu(false)));
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && menu.classList.contains('open')) {
+                    toggleMobileMenu(false);
+                    const b = document.querySelector('[aria-controls="mobile-menu"]');
+                    if (b) b.focus();
+                }
+            });
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768 && menu.classList.contains('open')) toggleMobileMenu(false);
+            });
+        })();
 
         /* ------------------------------------------------------------
            CONFIG — ⚠️ à régler avant la mise en ligne
@@ -549,7 +588,8 @@
                     otpInputs.forEach(i => i.classList.add('invalid'));
                     $('otp-row').classList.remove('shake'); void $('otp-row').offsetWidth; $('otp-row').classList.add('shake');
                     showError('err-2', "Code incorrect. Vérifie ton SMS et réessaie.");
-                    setTimeout(() => { resetOtp(); otpInputs[0].focus(); }, 900);
+                    const codeToClear = code;
+                    setTimeout(() => { if (getOtp() === codeToClear) { resetOtp(); otpInputs[0].focus(); } }, 900);
                 }
             } catch (err) {
                 showError('err-2', "Vérification impossible pour le moment. Réessaie dans un instant.");
@@ -561,7 +601,14 @@
 
         $('step-2').addEventListener('submit', e => { e.preventDefault(); verify(); });
 
-        $('btn-change').addEventListener('click', () => { clearInterval(resendTimer); goStep(1); });
+        $('btn-change').addEventListener('click', () => {
+            clearInterval(resendTimer);
+            resendTimer = null;
+            const r = $('btn-resend');
+            r.disabled = false;
+            r.textContent = 'Renvoyer le code';
+            goStep(1);
+        });
 
         let resendTimer;
         function startResendTimer() {
@@ -570,8 +617,14 @@
             btn.disabled = true;
             clearInterval(resendTimer);
             const tick = () => {
-                btn.textContent = s > 0 ? 'Renvoyer le code dans ' + s + 's' : 'Renvoyer le code';
-                if (s <= 0) { btn.disabled = false; clearInterval(resendTimer); }
+                if (s <= 0) {
+                    btn.textContent = 'Renvoyer le code';
+                    btn.disabled = false;
+                    clearInterval(resendTimer);
+                    resendTimer = null;
+                    return;
+                }
+                btn.textContent = 'Renvoyer le code dans ' + s + 's';
                 s--;
             };
             tick();
@@ -658,7 +711,7 @@
 
             if (CONFIG.APP_LINK) {
                 $('app-link').href = CONFIG.APP_LINK;
-                $('app-link').classList.remove('hidden');
+                $('app-link').style.display = 'block';   // « hidden » + « block » se neutralisaient : le bouton ne s'affichait jamais
                 $('app-soon').classList.add('hidden');
             }
             const site = new URL('index.html', location.href).href;

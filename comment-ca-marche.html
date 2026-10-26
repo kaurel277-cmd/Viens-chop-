@@ -7,7 +7,7 @@
     <meta name="description" content="Inscris-toi, enregistre ta voix, matche dans ta commune et gère tes rancarts sans pression. Voici comment Viens chop fonctionne.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -23,8 +23,12 @@
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
         .mobile-menu.open { transform: translateX(0); }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 60; }
+        .menu-overlay.open { opacity: 1; pointer-events: auto; }
+        body.menu-open { overflow: hidden; }
         .step-line { background: linear-gradient(180deg, #FF6B00, #FF1E56); }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -40,33 +44,34 @@
                 <a href="comment-ca-marche.html" class="text-brandPink font-bold">Comment ça marche</a>
                 <a href="securite.html" class="hover:text-brandPink transition">Sécurité</a>
                 <a href="tarifs.html" class="hover:text-brandPink transition">Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink transition">Maquis & Cafés</a>
+                <a href="maquis.html" class="hover:text-brandPink transition">Maquis &amp; Cafés</a>
                 <a href="faq.html" class="hover:text-brandPink transition">FAQ</a>
             </div>
             <div class="flex items-center gap-3">
                 <a href="inscription.html" class="bg-brand-gradient text-white font-semibold px-5 py-2 rounded-full text-sm shadow-md hover:opacity-90 transition hidden sm:block">Rejoindre 🔥</a>
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Menu">
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 text-2xl" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
-        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-6 md:hidden">
-            <div class="flex justify-between items-center mb-8">
-                <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
-                <button onclick="toggleMobileMenu()" class="text-slate-500 text-2xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
-                <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
-                <a href="comment-ca-marche.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
-                <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
-                <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
-                <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis & Cafés</a>
-                <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
-                <hr class="border-slate-200">
-                <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
-            </div>
+</nav>
+<div id="menu-overlay" class="menu-overlay md:hidden" aria-hidden="true"></div>
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-72 max-w-[85vw] h-[100dvh] bg-white shadow-2xl z-[70] p-6 md:hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-extrabold text-xl text-brand-gradient">🔥 Menu</span>
+            <button onclick="toggleMobileMenu(false)" class="text-slate-500 text-2xl" aria-label="Fermer le menu" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
-    </nav>
+        <div class="flex flex-col space-y-4 text-base font-semibold text-slate-700">
+            <a href="index.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-house w-6"></i> Accueil</a>
+            <a href="comment-ca-marche.html" class="text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-play w-6"></i> Comment ça marche</a>
+            <a href="securite.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-shield-halved w-6"></i> Sécurité</a>
+            <a href="tarifs.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-tags w-6"></i> Tarifs</a>
+            <a href="maquis.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-location-dot w-6"></i> Maquis &amp; Cafés</a>
+            <a href="faq.html" class="hover:text-brandPink flex items-center gap-3"><i class="fa-solid fa-circle-question w-6"></i> FAQ</a>
+            <hr class="border-slate-200">
+            <a href="inscription.html" class="bg-brand-gradient text-white text-center py-3 rounded-xl font-bold shadow-md">Rejoindre gratuitement 🔥</a>
+        </div>
+    </div>
 
     <!-- HERO -->
     <header class="pt-28 pb-16 bg-brand-gradient text-white">
@@ -155,7 +160,7 @@
                 </div>
             </div>
             <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5">
-                <h3 class="font-bold mb-2">🎮 Mode Flirt (Jeux & Quiz)</h3>
+                <h3 class="font-bold mb-2">🎮 Mode Flirt (Jeux &amp; Quiz)</h3>
                 <p class="text-sm text-slate-600">
                     Timide ? Lance un quiz à deux : <em>« Chawarma ou Alloco ? »</em>, <em>« Lounge ou concert ? »</em>, <em>« Damso ou Ninho ? »</em>. En mode gratuit : <strong>1 session par jour</strong>. En VIP : illimité.
                 </p>
@@ -168,7 +173,7 @@
             <span class="text-xs font-bold uppercase tracking-wider text-brandPink">Le rancart</span>
             <h2 class="text-2xl sm:text-3xl font-extrabold mt-1 mb-4">5 messages, photo débloquée, on se voit</h2>
             <p class="text-slate-600 leading-relaxed mb-6">
-                Match ? Vous discutez. Au bout de 5 messages, les photos se dévoilent. Ensuite, tu choisis un lieu chill dans le répertoire <strong>Maquis & Cafés Sûrs</strong> — bien éclairé, bon accueil, parfois une conso offerte via l’app.
+                Match ? Vous discutez. Au bout de 5 messages, les photos se dévoilent. Ensuite, tu choisis un lieu chill dans le répertoire <strong>Maquis &amp; Cafés Sûrs</strong> — bien éclairé, bon accueil, parfois une conso offerte via l’app.
             </p>
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
@@ -180,7 +185,7 @@
                     <p class="text-sm text-slate-500">Maquis, lounges, cafés sélectionnés. Tu n’es pas obligé d’improviser un plan random.</p>
                 </div>
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                    <h3 class="font-bold mb-2">📍 Check-in & SOS</h3>
+                    <h3 class="font-bold mb-2">📍 Check-in &amp; SOS</h3>
                     <p class="text-sm text-slate-500">Partage ta position à un proche. Gratuit pour tout le monde.</p>
                 </div>
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
@@ -281,10 +286,10 @@
                 <div>
                     <h4 class="font-bold text-white text-sm mb-4">Ressources</h4>
                     <ul class="space-y-2 text-xs">
-                        <li><a href="maquis.html" class="hover:text-white transition">Maquis & Cafés Sûrs</a></li>
+                        <li><a href="maquis.html" class="hover:text-white transition">Maquis &amp; Cafés Sûrs</a></li>
                         <li><a href="faq.html" class="hover:text-white transition">FAQ</a></li>
                         <li><a href="inscription.html" class="hover:text-white transition">Inscription Bêta</a></li>
-                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales & CGU</a></li>
+                        <li><a href="mentions-legales.html" class="hover:text-white transition">Mentions Légales &amp; CGU</a></li>
                     </ul>
                 </div>
                 <div>
@@ -297,16 +302,50 @@
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-                <p>© 2025 Viens chop Côte d’Ivoire. Tous droits réservés.</p>
+                <p>© <span id="year">2026</span> Viens chop Côte d’Ivoire. Tous droits réservés.</p>
                 <p>Réservé aux majeurs (+18 ans). Données protégées et confidentielles.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('open');
+        function toggleMobileMenu(force) {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            const open = typeof force === 'boolean' ? force : !menu.classList.contains('open');
+            menu.classList.toggle('open', open);
+            if (overlay) overlay.classList.toggle('open', open);
+            document.body.classList.toggle('menu-open', open);
+            document.querySelectorAll('[aria-controls="mobile-menu"]').forEach(b => b.setAttribute('aria-expanded', String(open)));
+            if (open) {
+                const first = menu.querySelector('a');
+                if (first) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+            }
         }
+
+        (function setYear() {
+            const y = document.getElementById('year');
+            if (y) y.textContent = new Date().getFullYear();
+        })();
+
+        (function initMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu) return;
+            const overlay = document.getElementById('menu-overlay');
+            if (overlay) overlay.addEventListener('click', () => toggleMobileMenu(false));
+            menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMobileMenu(false)));
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && menu.classList.contains('open')) {
+                    toggleMobileMenu(false);
+                    const b = document.querySelector('[aria-controls="mobile-menu"]');
+                    if (b) b.focus();
+                }
+            });
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768 && menu.classList.contains('open')) toggleMobileMenu(false);
+            });
+        })();
     </script>
 </body>
 </html>
