@@ -1,116 +1,84 @@
-# Ta prochaine action, précisément
+# Une seule action, puis on avance
 
-> État vérifié le 28 octobre 2026 en interrogeant ta propre API de production.
+> État au 28 octobre 2026, 11 h 45 (Abidjan)
 
 ---
 
-## ✅ Le backend est terminé
+## Ce que j'ai fait pendant ce temps
 
-```json
-{
-  "ok": true,
-  "etapes": {
-    "chaine_pooled": true,
-    "connexion": "OK (243 ms)",
-    "tables": { "users": true, "otp_codes": true, "likes": true,
-                "matches": true, "messages": true, "sessions": true },
-    "triggers_regles": "7 / 7",
-    "fonctions": "OK",
-    "comptes": 0
-  },
-  "conseils": []
-}
-```
+Le site n'est plus une démonstration : **la page d'inscription crée de vrais
+comptes dans ta base Neon.**
 
-Et l'envoi d'un code a été testé pour de vrai :
-
-```
-POST /api/auth/otp  →  {"ok":true,"expires_in":300}
-```
-
-Le code a été généré, haché et enregistré dans ta base PostgreSQL.
-
-| Élément | État |
+| Vérification | Résultat |
 |---|---|
-| Site statique (10 pages) | ✅ |
-| API déployée sur Render | ✅ `https://viens-chop-api.onrender.com` |
-| Base Neon reliée | ✅ 243 ms |
-| 6 tables + 7 triggers | ✅ |
-| Envoi de code SMS | ✅ (affiché dans les logs) |
+| Parcours complet dans un vrai navigateur, contre PostgreSQL | ✅ 12/12 |
+| Compte réellement créé (`Testeur`, 26 ans) | ✅ |
+| Âge recalculé par le serveur, pas par le navigateur | ✅ |
+| `seeking` déduit côté serveur | ✅ `F` |
+| Likes gratuits à 3 | ✅ |
+| Message d'erreur clair sur un mauvais code | ✅ « Ce code n'est pas le bon. » |
+| Régression du site (9 pages, mode démo) | ✅ 42/42 |
+| Appel du site vers ton API Render (CORS) | ✅ 200, aucune erreur |
+
+Deux bugs réels ont été trouvés et corrigés au passage :
+
+- après un code refusé, les cases restaient remplies et le formulaire
+  relançait la vérification tout seul, brûlant les 5 essais autorisés ;
+- le message d'erreur s'affichait puis disparaissait aussitôt.
 
 ---
 
-## 👉 Ce qu'il te reste : créer ton premier compte — 3 minutes
+## 👉 La seule chose qu'il te reste : 1 champ sur Render
 
-### 1. Récupérer le code dans les logs Render
+Aujourd'hui, sans opérateur SMS, le code n'existe que dans les logs — c'est
+pénible, et tu as raison de ne pas vouloir passer par là.
 
-1. Va sur **https://dashboard.render.com**
-2. Clique sur le service **viens-chop-api**
-3. Menu de gauche → **Logs**
-4. Cherche une ligne de cette forme :
+J'ai ajouté un **mode bêta** : un code fixe, sans SMS, sans logs.
 
-```
-📱 [SMS simulé] +2250701020304 : Viens chop : ton code est 482913. Il expire dans 5 min.
-```
+1. Va sur **https://dashboard.render.com** → service **viens-chop-api**
+2. Menu de gauche → **Environment**
+3. **Add Environment Variable** :
+   - Key : `BETA_OTP`
+   - Value : `123456` (ou les 6 chiffres que tu veux)
+4. **Save Changes** → Render redéploie seul en 2 minutes
 
-Les 6 chiffres sont ton code. ⚠️ Il expire en **5 minutes**.
+Ensuite, sur le site, **le code sera toujours celui que tu as choisi**. Plus de
+logs, plus d'attente, plus de code qui expire.
 
-> Si la ligne n'apparaît pas (le service était endormi), renvoie un code depuis
-> l'outil de test à l'étape suivante : elle réapparaîtra immédiatement.
-
-### 2. Ouvrir l'outil de test
-
-1. Dans ton dépôt GitHub, ouvre **`outil-test.html`**
-2. Bouton **Download raw file** (flèche vers le bas, en haut à droite)
-3. **Double-clique** sur le fichier téléchargé : il s'ouvre dans ton navigateur
-
-   ⚠️ Il doit être ouvert comme un fichier local, pas dans l'aperçu Arena
-   (cadre isolé, sans accès réseau).
-
-### 3. Créer le compte
-
-1. **Adresse de l'API** : `https://viens-chop-api.onrender.com`
-2. Numéro : `0701020304` → **Envoyer le code** (ou attends et utilise le code
-   déjà dans les logs)
-3. Reporte les 6 chiffres → **Valider**
-4. Clique sur **Voir mon profil**
-
-Attendu :
-
-```json
-{ "ok": true, "user": { "pseudo": "membreXXXX", "likes_left": 3, "plan": "coupe" } }
-```
-
-**Tu viens de créer un compte dans une vraie base PostgreSQL, via une vraie API
-déployée.** C'est la fin de la phase backend.
-
-### 4. Vérifier que la ligne existe
-
-Retourne sur `/api/health/db` : le champ `"comptes"` doit maintenant afficher
-`1` au lieu de `0`.
+> ⚠️ **À retirer avant l'ouverture au public.** Tant que `BETA_OTP` est défini,
+> n'importe qui connaissant cette valeur peut entrer. Supprime la variable dès
+> que tu branches un vrai fournisseur SMS.
 
 ---
 
-## Ce qu'on fait juste après
+## Comment tester, si tu veux
 
-| Ordre | Chantier | Prérequis |
+Le formulaire d'inscription du site est branché sur ton API.
+Ouvre `inscription.html`, mets un numéro, puis le code `BETA_OTP`.
+
+À la fin, la page affiche « Bienvenue, *ton pseudo* » et le compte existe
+réellement. Tu peux le vérifier de mon côté via `/api/health/db` : le champ
+`comptes` augmente.
+
+---
+
+## Une limite à connaître sur l'aperçu Arena
+
+L'aperçu intégré affiche le site dans un cadre isolé **sans accès réseau**.
+Sur cet aperçu, l'inscription affichera « Impossible de joindre le serveur ».
+C'est normal et attendu : le site réel (GitHub Pages, ou le fichier ouvert
+directement dans ton navigateur) fonctionne, lui.
+
+---
+
+## Ce que je fais ensuite
+
+| Ordre | Chantier | État |
 |---|---|---|
-| **1** | Brancher `inscription.html` sur l'API (l'écran d'inscription du site devient réel) | rien |
-| **2** | Brancher `app.html` : fil de découverte, likes, chat | rien |
-| **3** | Stockage des photos | compte Cloudflare (gratuit) |
-| **4** | Vrais SMS (Termii ou Twilio) | compte + budget par SMS |
-| **5** | Paiement Wave / Orange Money | compte marchand |
+| 1 | Inscription branchée sur l'API | ✅ **fait** |
+| 2 | `app.html` branché : fil de découverte, likes, matchs, chat | ⏳ à faire |
+| 3 | Stockage des photos (Cloudflare R2) | ⏳ |
+| 4 | Vrais SMS (Termii ou Twilio) | ⏳ |
+| 5 | Paiement Wave / Orange Money | ⏳ |
 
-Dis-moi simplement « c'est fait, le profil s'affiche » et j'enchaîne sur le
-point 1.
-
----
-
-## Si un problème survient
-
-| Symptôme | Cause probable | Correction |
-|---|---|---|
-| « Trop de demandes de code » | 5 codes max/heure/numéro | attends, ou change de numéro de test |
-| Le code est refusé | il a expiré (5 min) | renvoie-en un |
-| « Authentification requise » | le jeton n'a pas été gardé | refais Valider, sans recharger la page |
-| Le service met 50 s à répondre | offre gratuite Render endormie | normal, le service se réveille |
+Dis-moi « c'est fait » et j'attaque le point 2 sans te déranger.
