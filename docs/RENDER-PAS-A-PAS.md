@@ -251,7 +251,7 @@ https://viens-chop-api.onrender.com/api/health/db
 
 | `erreur` | Signification | Correction |
 |---|---|---|
-| `SCHEMA_ABSENT` | connexion OK, mais aucune table | exécute `database/neon-schema.sql` dans Neon → SQL Editor |
+| `SCHEMA_ABSENT` | connexion OK, mais des tables manquent | voir l'encadré ci-dessous |
 | `SCHEMA_INCOMPLET` | tables présentes, triggers manquants | réexécute le script **en entier** |
 | `FONCTIONS_ABSENTES` | schéma `app` manquant | idem |
 | `MOT_DE_PASSE_REFUSE` | chaîne tronquée, ou projet Neon en pause | recopie la chaîne ; vérifie que le projet est « Active » |
@@ -261,3 +261,22 @@ https://viens-chop-api.onrender.com/api/health/db
 
 Ce diagnostic ne divulgue aucun secret : il n'affiche que la classification de
 l'erreur et le nom d'hôte, jamais le mot de passe.
+
+### Si certaines tables existent et d'autres non
+
+C'est le cas typique d'une installation faite **en deux morceaux** : une partie
+du script a été collée, l'autre non. Les tables présentes ne sont alors pas
+forcément au bon format.
+
+La correction se fait en deux copier-coller, dans l'ordre :
+
+1. Neon → SQL Editor → coller **`database/REINITIALISER-NEON.sql`** → **Run**
+   → la dernière ligne doit afficher `tables restantes : 0`
+2. Toujours dans le SQL Editor → coller **`database/neon-schema.sql`**
+   **en entier** → **Run**
+
+Puis recharger `/api/health/db` : `"ok": true`, les six tables à `true`,
+`"triggers_regles": "7 / 7"`.
+
+> Aucun risque de perte : si la table `otp_codes` n'existait pas, aucun compte
+> n'a jamais pu être créé. La base ne contient rien d'utile à ce stade.
