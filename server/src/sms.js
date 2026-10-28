@@ -9,9 +9,22 @@ import { config } from './config.js';
  */
 export async function sendSms(phone, message) {
   switch (config.smsProvider) {
-    case 'console':
-      console.log(`\n📱 [SMS simulé] ${phone} : ${message}\n`);
+    case 'console': {
+      // Encadré volontairement visible : c'est ici qu'on lit le code tant
+      // qu'aucun opérateur SMS n'est branché.
+      const code = (message.match(/(\d{4,8})/) || [])[1] || '?';
+      const ligne = '='.repeat(52);
+      console.log(`
+${ligne}
+  CODE SMS POUR ${phone}
+${ligne}
+        >>>>>   ${code}   <<<<<
+
+  ${message}
+${ligne}
+`);
       return { ok: true, provider: 'console' };
+    }
 
     case 'twilio': {
       const { sid, token, from } = config.twilio;
