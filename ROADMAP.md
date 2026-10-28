@@ -43,14 +43,18 @@ temps réel ont donc été construits autour. Détail complet dans
 
 | Quoi | État | Où |
 |---|---|---|
-| Base de données | ✅ **livré** — schéma v3 testé sur PostgreSQL 17 | `database/neon-schema.sql` |
-| Règles métier (âge, quotas, match, déblocage) | ✅ **livré** — 14 vérifications SQL | `database/test-schema.sql` |
-| API Node (auth, feed, likes, chat, sécurité) | ✅ **livré** — 17 suites, 31 vérifications | `server/` |
-| Envoi des SMS | ⚙️ prêt, fournisseur à choisir (Termii / Twilio) | `server/src/sms.js` |
+| Base de données | ✅ **en production** — Neon, 6 tables, connexion vérifiée | `database/neon-schema.sql` |
+| Règles métier (âge, quotas, match, déblocage) | ✅ **en production** — 7/7 triggers actifs | `database/test-schema.sql` |
+| API Node (auth, feed, likes, chat, sécurité) | ✅ **déployée sur Render** — 20 routes | `server/` |
+| Envoi d'un code SMS | ✅ **fonctionnel** — testé de bout en bout | `server/src/sms.js` |
+| Envoi des SMS réels | ⚙️ fournisseur à choisir (Termii / Twilio) — le code s'affiche dans les logs en attendant | `server/src/sms.js` |
 | Brancher le site sur l'API | ⏳ **prochaine tâche** | `inscription.html` l. 484-504 |
 | Stockage des photos | ⏳ à faire (Cloudflare R2 conseillé) | voir BACKEND.md §6.1 |
 | Chat temps réel | ⏳ polling d'abord, SSE ensuite | voir BACKEND.md §6.2 |
 | Notifications | ⏳ push web ou SMS | — |
+
+**Adresse de l'API en production :** `https://viens-chop-api.onrender.com`
+Diagnostic de la base : `/api/health/db`
 
 ⚠️ Les règles sensibles doivent vivre **côté serveur**, pas dans le JavaScript :
 quota de likes, majorité 18+, déblocage après 5 messages, « qui m'a liké » flouté.
