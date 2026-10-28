@@ -11,3 +11,6 @@ server/node_modules/
 .DS_Store
 *.log
 coverage/
+
+# Fichiers de test locaux
+.env.test

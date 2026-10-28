@@ -205,6 +205,18 @@ https://viens-chop-api.onrender.com/api/health
 {"ok":true,"service":"viens-chop-api","time":"..."}
 ```
 
+⚠️ Cette page prouve seulement que le **serveur** tourne : elle ne touche pas à
+Neon. Pour vérifier la base, ouvre ensuite :
+
+```
+https://viens-chop-api.onrender.com/api/health/db
+```
+
+Tu dois y voir `"ok": true`, `"tables"` toutes à `true` et `"triggers_regles":
+"7 / 7"`. Si ce n'est pas le cas, le tableau de correspondance est dans
+[`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md#écran-g--le-diagnostic-de-la-base). Il contient aussi les sept erreurs
+possibles et leur correction.
+
 > ⚠️ Sur l'offre gratuite, Render endort le service après 15 minutes sans
 > visite. La première requête peut donc mettre **30 à 60 secondes** à répondre.
 > C'est normal : recharge la page.

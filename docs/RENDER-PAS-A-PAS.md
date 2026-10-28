@@ -209,3 +209,55 @@ Base "viens-chop"      ──────► DATABASE_URL
 - ❌ laisser `CORS_ORIGIN=*` après la mise en ligne du site : remplace-le par
   l'adresse exacte du site.
 - ❌ m'envoyer ces valeurs. Elles restent entre Neon, Render et toi.
+
+---
+
+## Écran G — Le diagnostic de la base
+
+`/api/health` dit seulement que le **processus** tourne. Il ne touche pas à
+Neon : il peut répondre `{"ok":true}` alors que la base est injoignable.
+
+Pour tester la vraie chaîne jusqu'à PostgreSQL, ouvre :
+
+```
+https://viens-chop-api.onrender.com/api/health/db
+```
+
+### Si tout va bien
+
+```json
+{
+  "ok": true,
+  "etapes": {
+    "variable_presente": true,
+    "chaine_pooled": true,
+    "ssl_demande": true,
+    "hote": "ep-xxx-pooler.eu-central-1.aws.neon.tech",
+    "connexion": "OK (38 ms)",
+    "tables": { "users": true, "otp_codes": true, "likes": true,
+                "matches": true, "messages": true, "sessions": true },
+    "triggers_regles": "7 / 7",
+    "fonctions": "OK",
+    "comptes": 0
+  },
+  "conseils": []
+}
+```
+
+`chaine_pooled` doit être **true**. S'il est à `false`, tu as collé la chaîne
+« Direct » au lieu de « Pooled » : ça fonctionne, mais ça finira par saturer.
+
+### Si ça renvoie une erreur
+
+| `erreur` | Signification | Correction |
+|---|---|---|
+| `SCHEMA_ABSENT` | connexion OK, mais aucune table | exécute `database/neon-schema.sql` dans Neon → SQL Editor |
+| `SCHEMA_INCOMPLET` | tables présentes, triggers manquants | réexécute le script **en entier** |
+| `FONCTIONS_ABSENTES` | schéma `app` manquant | idem |
+| `MOT_DE_PASSE_REFUSE` | chaîne tronquée, ou projet Neon en pause | recopie la chaîne ; vérifie que le projet est « Active » |
+| `BASE_INTROUVABLE` | nom de base faux | sur Neon : `neondb` |
+| `SERVEUR_INJOIGNABLE` | adresse fausse | recopie depuis Neon → Connect |
+| `DELAI_DEPASSE` | base endormie | recharge après quelques secondes |
+
+Ce diagnostic ne divulgue aucun secret : il n'affiche que la classification de
+l'erreur et le nom d'hôte, jamais le mot de passe.

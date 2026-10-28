@@ -10,6 +10,7 @@ import { feedRouter } from './routes/feed.js';
 import { likesRouter } from './routes/likes.js';
 import { matchesRouter } from './routes/matches.js';
 import { safetyRouter } from './routes/safety.js';
+import { healthRouter } from './routes/health.js';
 
 export const app = express();
 
@@ -35,9 +36,8 @@ if (config.rateLimitEnabled) {
   }));
 }
 
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'viens-chop-api', time: new Date().toISOString() });
-});
+// /api/health = le processus répond. /api/health/db = la base répond vraiment.
+app.use('/api/health', healthRouter);
 
 app.use('/api/auth',    authRouter);
 app.use('/api/users',   usersRouter);
