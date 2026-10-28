@@ -15,6 +15,7 @@ ROADMAP.md          Où en est le projet et ce qu'il reste à faire
 ## Démarrage rapide
 
 **Pas à pas, sans ligne de commande : [docs/GUIDE-DEMARRAGE.md](docs/GUIDE-DEMARRAGE.md)**
+Détail du déploiement Render, écran par écran : [docs/RENDER-PAS-A-PAS.md](docs/RENDER-PAS-A-PAS.md)
 
 ```bash
 # Site statique

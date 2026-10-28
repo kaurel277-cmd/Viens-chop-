@@ -140,8 +140,13 @@ Le script efface ses propres données de test à la fin. Ta base reste vide.
 L'API a besoin de deux longues chaînes aléatoires. Elles protègent les sessions
 et les codes SMS.
 
-**Méthode simple, sans terminal :** invente deux phrases longues et différentes,
-puis mélange les caractères. Exemple de forme :
+**Méthode simple, sans terminal :** tu n'as rien à inventer. Sur Render, le champ
+de droite propose un bouton **⚙ Generate** qui produit une valeur aléatoire : tu
+cliques, tu acceptes. À faire une fois pour `JWT_SECRET`, une fois pour
+`OTP_PEPPER` (deux valeurs différentes). Voir
+[`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md), écran B.
+
+À titre indicatif, la forme d'un secret correct :
 
 ```
 JWT_SECRET  → k7Qm2pXv9LrT4wZb8NcJ6yHd3FsA1gEu5RtY0oPi2WqX8vBn4MkJ7hGf6DsA9zC1
@@ -156,6 +161,11 @@ Note-les dans ton fichier texte, à côté de `POOLED` et `DIRECT`.
 ---
 
 ## Étape 7 — Déployer l'API sur Render · *10 min*
+
+> 📌 **Cette étape est détaillée écran par écran dans
+> [`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md)** — avec les 6 variables à
+> saisir, le bouton « Generate » pour les secrets, et le réglage
+> **Root Directory = `server`** sans lequel le déploiement échoue.
 
 1. Va sur **https://render.com** → **Get Started** → **GitHub** → autorise.
 2. Clique sur **New +** en haut à droite → **Blueprint**.
