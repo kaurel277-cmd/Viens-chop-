@@ -44,6 +44,10 @@ export const config = {
   // En développement uniquement : accepte le code 123456 et le renvoie dans la réponse
   devOtpBypass: !isProd && process.env.DEV_OTP_BYPASS === 'true',
 
+  // Code OTP fixe pour la bêta : permet de tester sans fournisseur SMS.
+  // ⚠️ À retirer avant l'ouverture publique (sinon n'importe qui entre).
+  betaOtp: process.env.BETA_OTP || null,
+
   // Plafonds de requêtes (désactivés pendant les tests, ils ont leur propre test)
   rateLimitEnabled: process.env.NODE_ENV !== 'test',
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 300),

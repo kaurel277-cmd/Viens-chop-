@@ -168,6 +168,8 @@
                         <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 2 du code">
                         <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 3 du code">
                         <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 4 du code">
+                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 5 du code">
+                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 6 du code">
                     </div>
                     <p id="err-2" role="alert" class="hidden text-xs font-semibold text-red-500 text-center mb-2"></p>
 
@@ -381,6 +383,7 @@
         </div>
     </footer>
 
+    <script src="assets/js/api.js"></script>
     <script>
         function toggleMobileMenu(force) {
             const menu = document.getElementById('mobile-menu');
@@ -428,14 +431,23 @@
            APP_LINK   : lien optionnel vers l'appli (vide = on garde le bouton interne app.html)
            ------------------------------------------------------------ */
         const CONFIG = {
-            DEMO_MODE: true,
-            DEMO_CODE: "1234",
-            OTP_LENGTH: 4,
+            /* Adresse de l'API. Mettre "" pour revenir au mode démonstration
+               (aucun appel réseau, code 123456 accepté). */
+            API_BASE: "https://viens-chop-api.onrender.com",
+            DEMO_MODE: false,
+            DEMO_CODE: "123456",
+            OTP_LENGTH: 6,
             RESEND_SECONDS: 30,
             VIP_TOTAL: 500,
             VIP_TAKEN: null,
             APP_LINK: "app.html"
         };
+
+        /* Bascule automatique : si une API est configurée, on quitte la démo. */
+        if (CONFIG.API_BASE) {
+            CONFIG.DEMO_MODE = false;
+            VCAPI.configure(CONFIG.API_BASE);
+        }
 
         /* ------------------------------------------------------------
            RÈGLE AUTOMATIQUE « JE VEUX RENCONTRER »
@@ -484,26 +496,47 @@
            ------------------------------------------------------------ */
         const wait = ms => new Promise(r => setTimeout(r, ms));
 
+        /* Réponse unique face aux erreurs de l'API : on affiche le message du
+           serveur (il est déjà rédigé en français et orienté utilisateur). */
+        function apiMessage(err) {
+            const m = {
+                TROP_DE_DEMANDES: "Trop de demandes de code pour ce numéro. Réessaie dans une heure.",
+                CODE_INCORRECT: "Ce code n'est pas le bon.",
+                CODE_EXPIRE: "Ce code a expiré. Demande-en un nouveau.",
+                AUCUN_CODE: "Aucun code en cours. Clique d'abord sur « Recevoir mon code ».",
+                TROP_D_ESSAIS: "Trop de tentatives. Demande un nouveau code.",
+                TELEPHONE_DEJA_UTILISE: "Ce numéro a déjà un compte.",
+                MINEUR_INTERDIT: "Viens chop est réservé aux personnes de 18 ans et plus.",
+                RESEAU: "Impossible de joindre le serveur. Vérifie ta connexion.",
+                TELEPHONE_INVALIDE: "Ce numéro de téléphone n'est pas valide."
+            };
+            return m[err && err.code] || (err && err.message) || "Une erreur est survenue.";
+        }
+
         async function sendOtp(phone) {
             if (CONFIG.DEMO_MODE) { await wait(700); return true; }
-            // TODO : const r = await fetch('/api/otp/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: '+225' + phone }) });
-            //        if (!r.ok) throw new Error('send failed'); return true;
-            throw new Error('API non branchée');
+            await VCAPI.auth.sendCode(phone);
+            return true;
         }
 
         async function verifyOtp(phone, code) {
             if (CONFIG.DEMO_MODE) { await wait(600); return code === CONFIG.DEMO_CODE; }
-            // TODO : const r = await fetch('/api/otp/verify', { ... }); const data = await r.json(); return data.valid === true;
-            throw new Error('API non branchée');
+            await VCAPI.auth.verify(phone, code);   // garde la session en mémoire
+            return true;
         }
 
         async function registerUser(payload) {
             if (CONFIG.DEMO_MODE) { await wait(800); return true; }
-            // TODO : envoyer payload au backend. Le serveur doit AUSSI :
-            //        - vérifier l'âge (18+)
-            //        - refuser un numéro déjà inscrit (1 compte par numéro)
-            //        - recalculer seeking à partir de gender (même règle que SEEKING_RULE)
-            throw new Error('API non branchée');
+            /* Le serveur recalcule lui-même l'âge, la majorité et le champ
+               « seeking » : on ne lui fait pas confiance sur ces valeurs. */
+            await VCAPI.users.updateProfile({
+                pseudo: payload.pseudo,
+                birth_date: payload.birthDate,
+                gender: payload.gender,
+                commune: payload.commune,
+                artists: payload.artists || []
+            });
+            return true;
         }
 
         /* ---------- Helpers ---------- */
@@ -643,14 +676,18 @@
                 const ok = await verifyOtp(state.phone, code);
                 if (ok) { clearInterval(resendTimer); goStep(3); }
                 else {
-                    otpInputs.forEach(i => i.classList.add('invalid'));
+                    /* On vide d'abord : sinon le code reste complet et la saisie
+                       automatique relance verify() en boucle, ce qui consomme
+                       les essais autorisés par le serveur.
+                       resetOtp() masque aussi le message d'erreur : on affiche
+                       donc le message APRÈS. */
+                    resetOtp();
                     $('otp-row').classList.remove('shake'); void $('otp-row').offsetWidth; $('otp-row').classList.add('shake');
                     showError('err-2', "Code incorrect. Vérifie ton SMS et réessaie.");
-                    const codeToClear = code;
-                    setTimeout(() => { if (getOtp() === codeToClear) { resetOtp(); otpInputs[0].focus(); } }, 900);
+                    otpInputs[0].focus();
                 }
             } catch (err) {
-                showError('err-2', "Vérification impossible pour le moment. Réessaie dans un instant.");
+                showError('err-2', apiMessage(err));
             } finally {
                 verifying = false;
                 setLoading(btn, false);
@@ -751,11 +788,11 @@
             const btn = $('btn-register');
             setLoading(btn, true, 'Création du compte...');
             try {
-                await registerUser({ phone: '+225' + state.phone, pseudo, birth, gender, seeking, city });
+                await registerUser({ phone: '+225' + state.phone, pseudo, birthDate: birth, gender, seeking, commune: city });
                 state.pseudo = pseudo;
                 showDone();
             } catch (err) {
-                showError('err-3', "Impossible de créer ton compte pour le moment. Réessaie dans un instant.");
+                showError('err-3', apiMessage(err));
             } finally {
                 setLoading(btn, false);
             }

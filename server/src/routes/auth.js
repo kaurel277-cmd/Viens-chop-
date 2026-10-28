@@ -34,7 +34,10 @@ authRouter.post('/otp', async (req, res, next) => {
     // Antibruteforce porté par la base : 5 codes max par heure
     await query('select app.check_otp_rate_limit($1)', [phone]);
 
-    const code = config.devOtpBypass ? '123456'.slice(0, config.otpLength) : generateOtp();
+    // Bêta : code fixe si BETA_OTP est défini (pas de fournisseur SMS requis)
+    const code = config.betaOtp
+      ? config.betaOtp.slice(0, config.otpLength)
+      : (config.devOtpBypass ? '123456'.slice(0, config.otpLength) : generateOtp());
     const expires = new Date(Date.now() + config.otpTtlMinutes * 60_000);
 
     // Un seul code actif à la fois : les précédents sont invalidés
@@ -53,8 +56,9 @@ authRouter.post('/otp', async (req, res, next) => {
     res.json({
       ok: true,
       expires_in: config.otpTtlMinutes * 60,
-      // jamais renvoyé en production
-      ...(config.devOtpBypass ? { dev_code: code } : {})
+      // Jamais renvoyé en production : seulement en développement ou en mode bêta explicite
+      ...(config.devOtpBypass ? { dev_code: code } : {}),
+      ...(config.betaOtp ? { mode_beta: true } : {})
     });
   } catch (err) { next(err); }
 });
