@@ -6,16 +6,29 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Outil de test API</title>
 <style>
-  :root { --bg:#0b141a; --card:#111b21; --line:#22303a; --txt:#e9edef; --dim:#8696a0; --orange:#FF6B00; --pink:#FF1E56; --green:#25d366; --red:#ef4444; }
+  :root { --bg:#0b141a; --card:#111b21; --line:#22303a; --txt:#e9edef; --dim:#8696a0;
+          --orange:#FF6B00; --pink:#FF1E56; --green:#25d366; --red:#ef4444; --amber:#f59e0b; }
   * { box-sizing:border-box; }
   body { margin:0; padding:24px; background:var(--bg); color:var(--txt);
          font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.5; }
-  main { max-width:820px; margin:0 auto; }
+  main { max-width:840px; margin:0 auto; }
   h1 { font-size:22px; margin:0 0 4px; }
-  .sub { color:var(--dim); font-size:14px; margin-bottom:24px; }
-  section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
-  h2 { font-size:15px; margin:0 0 12px; color:var(--orange); text-transform:uppercase; letter-spacing:.6px; }
-  label { display:block; font-size:12px; color:var(--dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+  .sub { color:var(--dim); font-size:14px; margin-bottom:20px; }
+  .session { display:flex; align-items:center; gap:10px; background:var(--card);
+             border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:16px;
+             font-size:14px; }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--red); flex-shrink:0; }
+  .dot.on { background:var(--green); }
+  section { background:var(--card); border:1px solid var(--line); border-radius:14px;
+            padding:18px; margin-bottom:16px; }
+  section.done { border-color:rgba(37,211,102,.35); }
+  h2 { font-size:15px; margin:0 0 12px; color:var(--orange); text-transform:uppercase;
+       letter-spacing:.6px; display:flex; align-items:center; gap:8px; }
+  h2 .etat { font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px;
+             background:rgba(255,255,255,.08); color:var(--dim); text-transform:none; letter-spacing:0; }
+  h2 .etat.ok { background:rgba(37,211,102,.15); color:var(--green); }
+  label { display:block; font-size:12px; color:var(--dim); margin-bottom:6px;
+          text-transform:uppercase; letter-spacing:.5px; }
   input { width:100%; padding:11px 13px; border-radius:10px; border:1px solid var(--line);
           background:#0b141a; color:var(--txt); font-size:15px; font-family:inherit; }
   input:focus { outline:2px solid var(--orange); outline-offset:-1px; }
@@ -25,79 +38,142 @@
            cursor:pointer; font-family:inherit; color:#fff;
            background:linear-gradient(135deg,var(--orange),var(--pink)); }
   button.sec { background:#202c33; color:var(--txt); border:1px solid var(--line); }
-  button:disabled { opacity:.5; cursor:not-allowed; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
   pre { background:#0b141a; border:1px solid var(--line); border-radius:10px; padding:12px;
-        font-size:12.5px; overflow:auto; max-height:260px; margin:12px 0 0; white-space:pre-wrap; word-break:break-word; }
-  .badge { display:inline-block; font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px; margin-left:8px; vertical-align:2px; }
+        font-size:12.5px; overflow:auto; max-height:300px; margin:12px 0 0;
+        white-space:pre-wrap; word-break:break-word; }
+  .head { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; color:var(--dim); }
+  .badge { font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px; }
   .ok { background:rgba(37,211,102,.15); color:var(--green); }
   .ko { background:rgba(239,68,68,.15); color:var(--red); }
-  .note { font-size:13px; color:var(--dim); margin-top:10px; }
+  .wait { background:rgba(245,158,11,.15); color:var(--amber); }
+  .hint { font-size:13px; color:var(--dim); margin-top:10px; }
+  .alerte { margin-top:12px; padding:12px 14px; border-radius:10px; font-size:13.5px; line-height:1.55; }
+  .alerte.err { background:rgba(239,68,68,.1); border-left:3px solid var(--red); }
+  .alerte.warn { background:rgba(245,158,11,.1); border-left:3px solid var(--amber); }
   code { background:#202c33; padding:1px 6px; border-radius:5px; font-size:12.5px; }
 </style>
 </head>
 <body>
 <main>
   <h1>Outil de test — API Viens chop</h1>
-  <p class="sub">Page privée (non indexée). Sers-toi en local ou depuis ton site pour vérifier que le backend répond.</p>
+  <p class="sub">Page privée. Suis les étapes dans l'ordre, de haut en bas.</p>
 
-  <section>
-    <h2>1. Connexion</h2>
+  <div class="session">
+    <span class="dot" id="dot"></span>
+    <span id="session-txt">Aucune session. Commence par l'étape 3.</span>
+  </div>
+
+  <!-- 1 -->
+  <section id="s1">
+    <h2>1 · Connexion à l'API <span class="etat" id="etat1">à faire</span></h2>
     <label for="api">Adresse de l'API</label>
-    <input id="api" type="url" value="http://localhost:3001" placeholder="https://viens-chop-api.onrender.com">
-    <div class="row">
-      <button type="button" id="btn-health">Tester /api/health</button>
-    </div>
+    <input id="api" type="url" value="https://viens-chop-api.onrender.com">
+    <div class="row"><button type="button" id="btn-health">Vérifier que l'API répond</button></div>
     <div id="out-health"></div>
   </section>
 
-  <section>
-    <h2>2. Recevoir un code SMS</h2>
+  <!-- 2 -->
+  <section id="s2">
+    <h2>2 · Recevoir un code <span class="etat" id="etat2">à faire</span></h2>
     <label for="phone">Numéro (10 chiffres, sans indicatif)</label>
     <input id="phone" type="tel" value="0701020304" maxlength="10" inputmode="numeric">
-    <div class="row">
-      <button type="button" id="btn-otp">Envoyer le code</button>
-    </div>
-    <p class="note">Le code part par SMS si un fournisseur est configuré. Sinon, il apparaît dans les
-      <strong>logs</strong> de l'hébergeur (fournisseur « console »).</p>
+    <div class="row"><button type="button" id="btn-otp">Envoyer le code</button></div>
+    <p class="hint">Le code n'arrive pas par SMS : il s'affiche dans
+      <strong>Render → Logs</strong>. Il est valable <strong>5 minutes</strong>.</p>
     <div id="out-otp"></div>
   </section>
 
-  <section>
-    <h2>3. Valider le code</h2>
-    <label for="code">Code reçu</label>
-    <input id="code" type="text" inputmode="numeric" maxlength="6" placeholder="123456">
-    <div class="row">
-      <button type="button" id="btn-verify">Valider</button>
-      <button type="button" id="btn-me" class="sec">Voir mon profil</button>
-    </div>
+  <!-- 3 -->
+  <section id="s3">
+    <h2>3 · Valider le code <span class="etat" id="etat3">verrouillé</span></h2>
+    <label for="code">Les 6 chiffres lus dans les logs Render</label>
+    <input id="code" type="text" inputmode="numeric" maxlength="6" placeholder="482913" disabled>
+    <div class="row"><button type="button" id="btn-verify" disabled>Valider</button></div>
     <div id="out-verify"></div>
   </section>
 
-  <section>
-    <h2>4. Parcours</h2>
+  <!-- 4 -->
+  <section id="s4">
+    <h2>4 · Mon profil <span class="etat" id="etat4">verrouillé</span></h2>
+    <p class="hint" style="margin-top:0">Disponible une fois le code validé.</p>
     <div class="row">
-      <button type="button" id="btn-feed" class="sec">Fil de découverte</button>
-      <button type="button" id="btn-matches" class="sec">Mes matchs</button>
-      <button type="button" id="btn-liked" class="sec">Qui m'a liké</button>
+      <button type="button" id="btn-me" class="sec" disabled>Voir mon profil</button>
+      <button type="button" id="btn-feed" class="sec" disabled>Fil de découverte</button>
+      <button type="button" id="btn-matches" class="sec" disabled>Mes matchs</button>
     </div>
-    <div id="out-parcours"></div>
+    <div id="out-profil"></div>
   </section>
 </main>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const state = { access: null, refresh: null };
+const state = { access: null, refresh: null, otpSentAt: null };
 
-function show(target, data, ok = true) {
-  const el = $(target);
-  const badge = ok
-    ? '<span class="badge ok">OK</span>'
-    : '<span class="badge ko">ERREUR</span>';
-  el.innerHTML = badge + '<pre>' + JSON.stringify(data, null, 2).replace(/</g, '&lt;') + '</pre>';
+/* ---------- état de la session, visible en permanence ---------- */
+function refreshSessionUI() {
+  const connected = !!state.access;
+  $('dot').className = 'dot' + (connected ? ' on' : '');
+  $('session-txt').textContent = connected
+    ? 'Session active — tu peux utiliser l\'étape 4.'
+    : 'Aucune session. Valide d\'abord le code à l\'étape 3.';
+  $('etat4').textContent = connected ? 'prêt' : 'verrouillé';
+  $('etat4').className = 'etat' + (connected ? ' ok' : '');
+  ['btn-me', 'btn-feed', 'btn-matches'].forEach(id => { $(id).disabled = !connected; });
+  $('code').disabled = !state.otpSentAt;
+  $('btn-verify').disabled = !state.otpSentAt;
+  $('etat3').textContent = state.otpSentAt ? 'à faire' : 'verrouillé';
+  $('etat3').className = 'etat' + (state.otpSentAt ? '' : '');
 }
 
+function setStep(n, text, ok) {
+  const el = $('etat' + n);
+  el.textContent = text;
+  el.className = 'etat' + (ok ? ' ok' : '');
+}
+
+/* ---------- rendu d'une réponse ---------- */
+function render(target, { label, status, json, ms }) {
+  const el = $(target);
+  const ok = status >= 200 && status < 300;
+  el.innerHTML =
+    '<div class="head"><span class="badge ' + (ok ? 'ok' : 'ko') + '">' + (ok ? 'OK' : 'ERREUR') + '</span>' +
+    '<span>' + label + ' — HTTP ' + status + (ms ? ' · ' + ms + ' ms' : '') + '</span></div>' +
+    '<pre>' + JSON.stringify(json, null, 2).replace(/</g, '&lt;') + '</pre>' +
+    (ok ? '' : (json && json.error ? explication(json.error.code) : ''));
+}
+
+function attente(target, label) {
+  $(target).innerHTML =
+    '<div class="head"><span class="badge wait">EN COURS</span>' +
+    '<span>' + label + ' — <span class="chrono">0</span> s</span></div>' +
+    '<div class="alerte warn">Sur l\'offre gratuite, la première requête réveille le serveur : ' +
+    'cela peut prendre <strong>jusqu\'à 60 secondes</strong>. Ne clique pas deux fois, et ne clique pas ' +
+    'sur un autre bouton pendant ce temps.</div>';
+  const t0 = Date.now();
+  return setInterval(() => {
+    const c = $(target).querySelector('.chrono');
+    if (c) c.textContent = Math.round((Date.now() - t0) / 1000);
+  }, 250);
+}
+
+function explication(code) {
+  const m = {
+    NON_AUTHENTIFIE: 'Tu n\'as pas de session : valide d\'abord le code à l\'étape 3, sans recharger la page.',
+    CODE_INCORRECT: 'Les 6 chiffres ne correspondent pas. Recopie-les exactement depuis les logs Render.',
+    CODE_EXPIRE: 'Le code a dépassé 5 minutes. Clique sur « Envoyer le code » puis relis les logs.',
+    AUCUN_CODE: 'Aucun code en cours pour ce numéro. Clique d\'abord sur « Envoyer le code ».',
+    TROP_DE_DEMANDES: '5 codes maximum par heure pour un même numéro. Attends, ou utilise un autre numéro.',
+    TROP_D_ESSAIS: 'Trop de mauvais codes d\'affilée. Demande un nouveau code.',
+    TELEPHONE_INVALIDE: 'Le numéro doit contenir 10 chiffres (ex. 0701020304).'
+  }[code];
+  return m ? '<div class="alerte err"><strong>Que faire :</strong> ' + m + '</div>' : '';
+}
+
+/* ---------- appel réseau ---------- */
 async function call(path, { method = 'GET', body, auth = true } = {}) {
-  const base = $('api').value.replace(/\/$/, '');
+  const base = $('api').value.trim().replace(/\/$/, '');
+  const t0 = Date.now();
   const res = await fetch(base + path, {
     method,
     headers: {
@@ -106,50 +182,82 @@ async function call(path, { method = 'GET', body, auth = true } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined
   });
-  const json = await res.json().catch(() => ({ raw: 'réponse non JSON' }));
-  return { ok: res.ok, status: res.status, json };
+  const json = await res.json().catch(() => ({ erreur: 'réponse non JSON' }));
+  return { status: res.status, json, ms: Date.now() - t0 };
 }
 
-async function run(target, fn, btn) {
-  btn.disabled = true;
+let busy = false;
+async function run(target, label, fn) {
+  if (busy) return;
+  busy = true;
+  document.querySelectorAll('button').forEach(b => { b.dataset.off = b.disabled; b.disabled = true; });
+  const chrono = attente(target, label);
   try {
     const r = await fn();
-    show(target, { status: r.status, ...r.json }, r.ok);
+    clearInterval(chrono);
+    render(target, { label, ...r });
+    return r;
   } catch (e) {
-    show(target, { message: e.message, piste: 'Vérifie l\'adresse de l\'API et que le serveur tourne.' }, false);
+    clearInterval(chrono);
+    $(target).innerHTML =
+      '<div class="head"><span class="badge ko">ÉCHEC</span><span>' + label + '</span></div>' +
+      '<div class="alerte err"><strong>' + e.message + '</strong><br>Vérifie l\'adresse de l\'API ' +
+      'et que le service Render est démarré.</div>';
   } finally {
-    btn.disabled = false;
+    clearInterval(chrono);
+    busy = false;
+    document.querySelectorAll('button').forEach(b => { b.disabled = (b.dataset.off === 'true'); });
+    refreshSessionUI();
   }
 }
 
-$('btn-health').onclick = (e) => run('out-health', () => call('/api/health', { auth: false }), e.target);
+/* ---------- actions ---------- */
+$('btn-health').onclick = async () => {
+  const r = await run('out-health', 'GET /api/health', () => call('/api/health', { auth: false }));
+  if (r && r.status === 200) setStep(1, 'API joignable', true);
+};
 
-$('btn-otp').onclick = (e) => run('out-otp', () =>
-  call('/api/auth/otp', { method: 'POST', auth: false, body: { phone: $('phone').value.trim() } }), e.target);
+$('btn-otp').onclick = async () => {
+  const phone = $('phone').value.trim();
+  const r = await run('out-otp', 'POST /api/auth/otp', () =>
+    call('/api/auth/otp', { method: 'POST', auth: false, body: { phone } }));
+  if (r && r.status === 200) {
+    state.otpSentAt = Date.now();
+    setStep(2, 'code envoyé', true);
+    refreshSessionUI();          // déverrouille l'étape 3 (fait après coup : run() a déjà rafraîchi)
+    $('out-otp').insertAdjacentHTML('beforeend',
+      '<div class="alerte warn"><strong>Étape suivante :</strong> ouvre ' +
+      '<a href="https://dashboard.render.com" target="_blank" rel="noopener" style="color:#f59e0b">' +
+      'Render → Logs</a>, cherche la ligne <code>📱 [SMS simulé] … ton code est 482913</code>, ' +
+      'puis saisis ces 6 chiffres à l\'étape 3. Le code expire dans 5 minutes.</div>');
+  }
+};
 
-$('btn-verify').onclick = (e) => run('out-verify', async () => {
-  const r = await call('/api/auth/verify', {
-    method: 'POST', auth: false,
-    body: { phone: $('phone').value.trim(), code: $('code').value.trim() }
-  });
-  if (r.ok) {
+$('btn-verify').onclick = async () => {
+  const phone = $('phone').value.trim();
+  const code = $('code').value.trim();
+  const r = await run('out-verify', 'POST /api/auth/verify', () =>
+    call('/api/auth/verify', { method: 'POST', auth: false, body: { phone, code } }));
+  if (r && r.status === 200 && r.json.access_token) {
     state.access = r.json.access_token;
     state.refresh = r.json.refresh_token;
     sessionStorage.setItem('vc_access', state.access);
-    sessionStorage.setItem('vc_refresh', state.refresh);
+    setStep(3, 'validé', true);
+    refreshSessionUI();
+    // enchaîne automatiquement sur le profil
+    await run('out-profil', 'GET /api/auth/me', () => call('/api/auth/me'));
+    setStep(4, 'profil chargé', true);
   }
-  return r;
-}, e.target);
+};
 
-$('btn-me').onclick = (e) => run('out-verify', () => call('/api/auth/me'), e.target);
+$('btn-me').onclick = () => run('out-profil', 'GET /api/auth/me', () => call('/api/auth/me'));
+$('btn-feed').onclick = () => run('out-profil', 'GET /api/feed', () => call('/api/feed'));
+$('btn-matches').onclick = () => run('out-profil', 'GET /api/matches', () => call('/api/matches'));
 
-$('btn-feed').onclick = (e) => run('out-parcours', () => call('/api/feed'), e.target);
-$('btn-matches').onclick = (e) => run('out-parcours', () => call('/api/matches'), e.target);
-$('btn-liked').onclick = (e) => run('out-parcours', () => call('/api/likes/who-liked-me'), e.target);
-
-// Restaure la session après un rechargement
+/* ---------- reprise après rechargement ---------- */
 state.access = sessionStorage.getItem('vc_access');
 state.refresh = sessionStorage.getItem('vc_refresh');
+refreshSessionUI();
 </script>
 </body>
 </html>
