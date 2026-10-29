@@ -135,26 +135,23 @@ Le script efface ses propres données de test à la fin. Ta base reste vide.
 
 ---
 
-## Étape 6 — Générer deux secrets · *2 min*
+## Étape 6 — Générer un secret · *2 min*
 
-L'API a besoin de deux longues chaînes aléatoires. Elles protègent les sessions
-et les codes SMS.
+L'API a besoin d'une longue chaîne aléatoire : elle signe les sessions.
 
 **Méthode simple, sans terminal :** tu n'as rien à inventer. Sur Render, le champ
 de droite propose un bouton **⚙ Generate** qui produit une valeur aléatoire : tu
-cliques, tu acceptes. À faire une fois pour `JWT_SECRET`, une fois pour
-`OTP_PEPPER` (deux valeurs différentes). Voir
+cliques, tu acceptes. À faire une fois pour `JWT_SECRET`. Voir
 [`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md), écran B.
 
 À titre indicatif, la forme d'un secret correct :
 
 ```
 JWT_SECRET  → k7Qm2pXv9LrT4wZb8NcJ6yHd3FsA1gEu5RtY0oPi2WqX8vBn4MkJ7hGf6DsA9zC1
-OTP_PEPPER  → tR5yU8iO2pA6sD9fG3hJ7kL1zX4cV0bN8mQ2wE5rT9yU3iO6pA1sD4fG7hJ0kL
 ```
 
-Règles : **au moins 32 caractères**, les deux **différentes**, et tu ne les
-changes plus jamais (sinon tout le monde est déconnecté).
+Règles : **au moins 32 caractères**, et tu ne le changes plus jamais
+(sinon tout le monde est déconnecté).
 
 Note-les dans ton fichier texte, à côté de `POOLED` et `DIRECT`.
 
@@ -163,8 +160,8 @@ Note-les dans ton fichier texte, à côté de `POOLED` et `DIRECT`.
 ## Étape 7 — Déployer l'API sur Render · *10 min*
 
 > 📌 **Cette étape est détaillée écran par écran dans
-> [`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md)** — avec les 6 variables à
-> saisir, le bouton « Generate » pour les secrets, et le réglage
+> [`RENDER-PAS-A-PAS.md`](RENDER-PAS-A-PAS.md)** — avec les variables à
+> saisir, le bouton « Generate » pour le secret, et le réglage
 > **Root Directory = `server`** sans lequel le déploiement échoue.
 
 1. Va sur **https://render.com** → **Get Started** → **GitHub** → autorise.
@@ -177,8 +174,7 @@ Note-les dans ton fichier texte, à côté de `POOLED` et `DIRECT`.
    | Variable | Ce que tu colles |
    |---|---|
    | `DATABASE_URL` | la chaîne **POOLED** de l'étape 3 |
-   | `JWT_SECRET` | ton premier secret de l'étape 6 |
-   | `OTP_PEPPER` | ton second secret de l'étape 6 |
+   | `JWT_SECRET` | ton secret de l'étape 6 |
    | `CORS_ORIGIN` | `*` pour l'instant (on le restreindra plus tard) |
 
 6. Clique sur **Apply** / **Create**.
@@ -244,12 +240,10 @@ Trois choix, qu'on prendra ensemble :
 
 1. **Le nom de domaine** — ex. `viens-chop.ci`. Nécessaire pour le partage
    WhatsApp et la crédibilité.
-2. **Le fournisseur SMS** — sans lui, impossible d'inscrire qui que ce soit.
-   Il faut ouvrir un compte (Termii, Twilio, ou Orange CI directement) et
-   prévoir un budget par SMS. Compte environ 25 à 45 FCFA par code selon le
-   fournisseur.
-3. **Le stockage des photos** — je recommande Cloudflare R2 (10 Go gratuits,
-   aucun frais de transfert).
+2. **Le traitement des signalements** — qui regarde les profils signalés, et
+   sous quel délai. Aujourd'hui ils s'empilent dans la base avec
+   `status = 'open'` (voir `docs/SECURITE-MODERATION.md`).
+3. **Le nom de domaine** — voir le point 1, c'est le même sujet.
 
 ---
 
@@ -263,7 +257,7 @@ Trois choix, qu'on prendra ensemble :
 | `Application failed to respond` sur Render | mauvaises variables | vérifie que `DATABASE_URL` est bien la chaîne **pooled** |
 | `CORS policy` dans la console du navigateur | origine non autorisée | mets `CORS_ORIGIN=*` le temps des tests |
 | `password authentication failed` | chaîne tronquée au copier-coller | recopie-la entièrement depuis Neon |
-| Le code SMS n'arrive pas | aucun fournisseur branché | lis-le dans les logs Render (étape 9) |
+| Le mot de passe est oublié | aucune récupération automatique pour l'instant | à traiter (piste : question de secours) |
 
 ---
 
@@ -274,4 +268,4 @@ Quand tu as terminé, dis-moi simplement :
 - ✅ « l'API répond » (ou colle-moi la réponse de `/api/health`)
 - l'adresse de ton API Render
 
-**Ne me communique pas** : `DATABASE_URL`, `JWT_SECRET`, `OTP_PEPPER`.
+**Ne me communique pas** : `DATABASE_URL`, `JWT_SECRET`.

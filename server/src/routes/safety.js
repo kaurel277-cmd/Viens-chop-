@@ -67,6 +67,23 @@ safetyRouter.post('/block', requireAuth, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/* ---------------------------------------------------------------------------
+   GET /api/safety/blocks — la liste de mes profils bloqués (pour débloquer)
+   --------------------------------------------------------------------------- */
+safetyRouter.get('/blocks', requireAuth, async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `select b.blocked_id as id, b.created_at as blocked_at, u.pseudo, u.commune
+         from public.blocks b
+         join public.users u on u.id = b.blocked_id
+        where b.blocker_id = $1
+        order by b.created_at desc`,
+      [req.user.id]
+    );
+    res.json({ ok: true, blocks: rows });
+  } catch (err) { next(err); }
+});
+
 safetyRouter.delete('/block/:id', requireAuth, async (req, res, next) => {
   try {
     await query('delete from public.blocks where blocker_id = $1 and blocked_id = $2',

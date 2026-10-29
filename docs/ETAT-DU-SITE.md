@@ -10,7 +10,7 @@
 
 ## Réponse courte
 
-**Le site vitrine : oui, il est opérationnel.** 10 pages, toutes en ligne,
+**Le site vitrine : oui, il est opérationnel.** 9 pages, toutes en ligne,
 aucune erreur.
 
 **L'application de rencontre : non, pas encore.** `app.html` est une
@@ -26,7 +26,7 @@ aucune erreur.
 | Élément | État | Preuve |
 |---|---|---|
 | 9 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `app` |
-| Erreurs JavaScript | ✅ **0** sur les 10 pages | parcours automatisé |
+| Erreurs JavaScript | ✅ **0** sur les 9 pages | parcours automatisé |
 | Ressources manquantes (404, images cassées) | ✅ **0** | idem |
 | Liens internes (9 cibles distinctes) | ✅ **0 lien mort** | idem |
 | Titres d'onglet (ta consigne : juste le nom) | ✅ conformes | idem |
@@ -35,7 +35,9 @@ aucune erreur.
 | Mot de passe | ✅ jamais en clair (PBKDF2) | vérifié dans le stockage |
 | Moins de 18 ans | ✅ bloqué | testé |
 | Numéro déjà utilisé | ✅ refusé avec message clair | testé |
-| Régression complète du site | ✅ **39/39** | `audit/regression.js` |
+| Régression complète du site | ✅ **40/40** | `audit/regression.js` |
+| Signaler / bloquer un profil | ✅ fonctionne (fil + discussion) | 31/31, `audit/test-securite.js` |
+| Liste « Profils bloqués » + déblocage | ✅ fonctionne | idem |
 | Backend Neon (base + API) | ✅ `ok:true`, 6 tables | `/api/health/db` en production |
 | Mobile | ✅ testé en 390 × 844 | captures |
 
@@ -57,13 +59,13 @@ C'est la partie importante, et je ne veux pas te la vendre comme finie.
 
 Tous trouvés **en exécution**, pas en théorie. Les plus notables :
 
-1. Boucle de re-vérification du code SMS qui brûlait les 5 essais.
-2. Message d'erreur effacé par le nettoyage du formulaire.
-3. Bouton « Commencer » qui sautait l'écran de connexion.
-4. Le fil de découverte s'ouvrait par-dessus un écran de connexion encore actif.
-5. Problème SSL de connexion à Neon (avertissement `pg`).
-6. Code SMS illisible dans les logs Render.
-7. 4 tests de régression faux (ils testaient un parcours supprimé).
+1. Compteur de likes affiché « ∞/3 » au lieu de 3.
+2. Profil passé qui revenait au rechargement (table `public.passes`).
+3. Onglet « Sécurité » qui envoyait sur le Faux Appel.
+4. Faux Appel bloqué par le contrôle VIP alors que l'essai gratuit est prévu.
+5. Bouton « Se déconnecter » absent de l'écran Mon profil.
+6. Texte « Stockage de l'appareil » alors que les photos sont en ligne.
+7. Un profil bloqué restait dans la liste des discussions.
 
 ## 4. Verdict honnête
 

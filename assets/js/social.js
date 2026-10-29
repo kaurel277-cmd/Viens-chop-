@@ -47,6 +47,7 @@ window.VCSo = (function () {
         const rep = await API.matches.list();
         return (rep.matches || []).map(m => ({
             id: m.id,
+            userId: m.other_id,
             nom: m.other_pseudo,
             age: m.other_age,
             commune: m.other_commune,

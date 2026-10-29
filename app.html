@@ -235,7 +235,81 @@
         .call-btn.decline { background: #ff3b30; color: #fff; }
         .call-btn.accept { background: #34c759; color: #fff; }
 
-        /* ===== Debout (ex-Boss) MODAL ===== */
+/* ===== SÉCURITÉ : menu ⋯, signalement, blocage ===== */
+        .card-safety-btn {
+            position: absolute; top: 10px; right: 10px; z-index: 5;
+            width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(0,0,0,.45); color: #fff; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        }
+        .card-safety-btn:hover, .card-safety-btn:focus-visible { background: rgba(0,0,0,.7); outline: none; }
+
+        #safety-sheet {
+            display: none; position: fixed; inset: 0; z-index: 9100;
+            background: rgba(0,0,0,.66); align-items: flex-end; justify-content: center;
+        }
+        #safety-sheet.active { display: flex; }
+        .sheet-box {
+            background: #16202a; width: 100%; max-width: 460px;
+            border-radius: 22px 22px 0 0; padding: 8px 14px calc(18px + env(safe-area-inset-bottom));
+            border-top: 1px solid rgba(255,255,255,.1); animation: slideUp .22s ease;
+        }
+        .sheet-title {
+            text-align: center; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.5);
+            padding: 10px 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .sheet-item {
+            display: flex; align-items: center; gap: 12px; width: 100%; padding: 15px 12px;
+            background: none; border: none; color: #E9EDEF; font-family: 'Outfit'; font-size: 15px;
+            font-weight: 600; text-align: left; cursor: pointer; border-radius: 12px;
+        }
+        .sheet-item:hover, .sheet-item:focus-visible { background: rgba(255,255,255,.07); outline: none; }
+        .sheet-item.warn { color: #fbbf24; }
+        .sheet-item.danger { color: #FF6B6B; }
+        .sheet-item.annuler { justify-content: center; color: rgba(255,255,255,.55); font-weight: 500; margin-top: 4px; }
+
+        #safety-modal {
+            display: none; position: fixed; inset: 0; z-index: 9200; background: rgba(0,0,0,.75);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            padding: 24px; align-items: center; justify-content: center;
+        }
+        #safety-modal.active { display: flex; }
+        .safety-card {
+            background: #141b1f; border: 1px solid rgba(255,255,255,.12); border-radius: 22px;
+            padding: 22px 20px; width: 100%; max-width: 400px; max-height: 88vh; overflow-y: auto;
+            animation: slideUp .22s ease;
+        }
+        .safety-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .safety-intro { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.5; margin-bottom: 14px; }
+        .motif-btn {
+            display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+            padding: 11px 12px; margin-bottom: 8px; border-radius: 12px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+            color: #E9EDEF; font-family: 'Outfit'; font-size: 14px; font-weight: 600;
+        }
+        .motif-btn[aria-pressed="true"] { border-color: #FF6B00; background: rgba(255,107,0,.16); }
+        #report-details {
+            width: 100%; min-height: 64px; resize: vertical; margin: 4px 0 14px; padding: 10px 12px;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05);
+            color: #fff; font-family: 'Outfit'; font-size: 13px;
+        }
+        .btn-danger {
+            width: 100%; padding: 14px; border-radius: 14px; border: none; cursor: pointer;
+            background: #E5484D; color: #fff; font-family: 'Outfit'; font-weight: 800; font-size: 15px;
+        }
+        .btn-danger:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-ghost {
+            width: 100%; padding: 12px; margin-top: 8px; border-radius: 14px; cursor: pointer;
+            background: none; border: none; color: rgba(255,255,255,.55); font-family: 'Outfit'; font-size: 13px;
+        }
+        .blocked-row {
+            display: flex; align-items: center; gap: 10px; padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,.07); font-size: 14px;
+        }
+        .blocked-row:last-child { border-bottom: none; }
+
+                /* ===== Debout (ex-Boss) MODAL ===== */
         #vip-modal {
             display: none; position: fixed; inset: 0; z-index: 8888;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
@@ -627,10 +701,6 @@
                 <i class="fa-solid fa-camera"></i> Ajouter une photo
             </button>
 
-            <button class="btn-secondary" style="margin-top:12px; color:#FF6B6B; border-color:rgba(255,107,107,.35);" onclick="seDeconnecter()" type="button">
-                <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
-            </button>
-
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
                 <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:rgba(255,255,255,.6); margin-bottom:8px;">
                     <span>Photos de profil en ligne</span>
@@ -644,6 +714,21 @@
                     Rien ne passe par le disque de Render, qui est effacé à chaque déploiement.
                 </p>
             </div>
+
+            <div style="margin-top:22px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                    <h3 style="font-size:14px; font-weight:800;">Profils bloqués</h3>
+                    <span id="blocked-count" style="font-size:12px; color:rgba(255,255,255,.45);"></span>
+                </div>
+                <div id="blocked-list">
+                    <p style="font-size:12px; color:rgba(255,255,255,.45);">Chargement…</p>
+                </div>
+            </div>
+
+            <button class="btn-secondary" style="margin-top:22px; color:#FF6B6B; border-color:rgba(255,107,107,.35);" onclick="seDeconnecter()" type="button">
+                <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
+            </button>
+
         </div>
     </div>
 
@@ -670,6 +755,10 @@
             <div class="profile-card" id="current-card">
                 <div class="photo-area" id="card-photo" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b);">
                     <div id="card-photo-vide" style="font-size:64px; opacity:0.3; position:absolute;">👤</div>
+                    <button id="card-safety" class="card-safety-btn" onclick="ouvrirSecuriteProfil()" type="button"
+                            aria-label="Signaler ou bloquer ce profil" title="Signaler ou bloquer">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
                 </div>
                 <div class="card-info">
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
@@ -741,6 +830,9 @@
                 </button>
                 <button onclick="triggerFakeCall()" style="background:none; border:none; color:#fbbf24; font-size:20px; cursor:pointer;" title="Faux Appel" type="button" aria-label="Lancer un faux appel">
                     <i class="fa-solid fa-phone-volume"></i>
+                </button>
+                <button id="chat-safety" onclick="ouvrirSecuriteChat()" style="background:none; border:none; color:#AEBAC1; font-size:20px; cursor:pointer;" title="Signaler ou bloquer" type="button" aria-label="Signaler ou bloquer cette personne">
+                    <i class="fa-solid fa-ellipsis"></i>
                 </button>
             </div>
         </div>
@@ -830,6 +922,24 @@
                 Non merci, je reste en mode « coulé » 😅
             </button>
         </div>
+    </div>
+
+    <!-- ==================== SÉCURITÉ : signaler / bloquer ==================== -->
+    <div id="safety-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-titre">
+        <div class="sheet-box">
+            <p class="sheet-title" id="sheet-titre">—</p>
+            <button class="sheet-item warn" onclick="ouvrirSignalement()" type="button">
+                <i class="fa-solid fa-triangle-exclamation"></i> Signaler ce profil
+            </button>
+            <button class="sheet-item danger" onclick="demanderBlocage()" type="button">
+                <i class="fa-solid fa-ban"></i> Bloquer ce profil
+            </button>
+            <button class="sheet-item annuler" onclick="fermerSecurite()" type="button">Annuler</button>
+        </div>
+    </div>
+
+    <div id="safety-modal" role="dialog" aria-modal="true" aria-labelledby="safety-titre">
+        <div class="safety-card" id="safety-card"></div>
     </div>
 
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
@@ -1376,7 +1486,7 @@
             
             // Show success
             const successMsg = document.createElement('div');
-            successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:slideDown 0.3s ease;';
+            successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:fadeIn 0.25s ease;';
             successMsg.textContent = `✅ Paiement ${method} confirmé ! Tu es maintenant Debout 👑`;
             document.body.appendChild(successMsg);
             setTimeout(() => successMsg.remove(), 4000);
@@ -1940,6 +2050,7 @@
             window.openMonProfil = function () {
                 renderMonProfil();
                 goTo('mon-profil');
+                if (typeof window.renderBloques === 'function') window.renderBloques();
             };
 
             function renderMonProfil() {
@@ -2197,6 +2308,19 @@
            En mode appareil (hors ligne), ces remplacements ne sont pas faits :
            la démonstration d'origine continue de fonctionner.
            ================================================================== */
+        /* Sécurité : sans compte (mode démo), le ⋯ explique quoi faire.
+           Le vrai comportement est branché plus bas, quand l'API est active. */
+        function alerteDemoSecurite() {
+            const d = document.createElement('div');
+            d.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:14px;z-index:9999;text-align:center;' +
+                'font-weight:700;font-size:14px;color:#fff;background:#37474f;animation:fadeIn .25s ease;';
+            d.textContent = 'Signaler et bloquer : crée ton compte pour utiliser ces protections.';
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 3500);
+        }
+        function ouvrirSecuriteProfil() { alerteDemoSecurite(); }
+        function ouvrirSecuriteChat() { alerteDemoSecurite(); }
+
         (async function initSocial() {
             const C = window.VCCompte;
             const S = window.VCSo;
@@ -2480,6 +2604,214 @@
                     bulle('Message non envoyé : ' + (raisons[err.code] || 'réessaie dans un instant'), 'system');
                 }
             };
+
+            /* ---------- 5 bis. SIGNALER / BLOQUER ----------
+               Accessible par le ⋯ de la carte du fil et par celui du chat.
+               Le signalement est anonyme ; le blocage retire la personne du
+               fil, des discussions et coupe la conversation. */
+            let cibleSecurite = null;        // { id, nom, origine }
+            let toastSecurite = null;
+
+            const MOTIFS = [
+                ['fake_profile', '🙈', 'Faux profil ou usurpation'],
+                ['harassment', '😠', 'Harcèlement ou insultes'],
+                ['nudity', '🔞', 'Photos ou propos déplacés'],
+                ['scam', '💸', 'Arnaque, demande d\'argent'],
+                ['minor', '🚸', 'Personne mineure'],
+                ['other', '❓', 'Autre chose']
+            ];
+
+            function messageHaut(texte, couleur) {
+                if (toastSecurite) toastSecurite.remove();
+                const d = document.createElement('div');
+                d.setAttribute('role', 'status');
+                d.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:14px;z-index:9999;text-align:center;' +
+                    'font-weight:700;font-size:14px;color:#fff;background:' + (couleur || '#059669') +
+                    ';animation:fadeIn .25s ease;';
+                d.textContent = texte;
+                document.body.appendChild(d);
+                toastSecurite = d;
+                setTimeout(() => { if (d === toastSecurite) { d.remove(); toastSecurite = null; } }, 4000);
+            }
+
+            function profilCourant() {
+                return (typeof profiles !== 'undefined' && profiles.length)
+                    ? profiles[typeof currentProfileIndex !== 'undefined' ? currentProfileIndex : 0]
+                    : null;
+            }
+
+            window.ouvrirSecuriteProfil = function () {
+                const p = profilCourant();
+                if (!p || !p.userId) {
+                    messageHaut('Crée ton compte pour signaler ou bloquer quelqu\'un.', '#37474f');
+                    return;
+                }
+                ouvrirFeuille({ id: p.userId, nom: p.name || 'ce profil', origine: 'fil' });
+            };
+
+            window.ouvrirSecuriteChat = function () {
+                if (!matchCourant || !matchCourant.userId) {
+                    messageHaut('Impossible d\'identifier cette personne.', '#37474f');
+                    return;
+                }
+                ouvrirFeuille({ id: matchCourant.userId, nom: matchCourant.nom || 'cette personne', origine: 'chat' });
+            };
+
+            function ouvrirFeuille(cible) {
+                cibleSecurite = cible;
+                $('sheet-titre').textContent = cible.nom;
+                $('safety-sheet').classList.add('active');
+            }
+
+            window.fermerSecurite = function () {
+                $('safety-sheet').classList.remove('active');
+            };
+
+            window.fermerModaleSecurite = function () {
+                $('safety-modal').classList.remove('active');
+                $('safety-card').innerHTML = '';
+            };
+
+            window.ouvrirSignalement = function () {
+                if (!cibleSecurite) return;
+                fermerSecurite();
+                $('safety-card').innerHTML =
+                    '<h3 id="safety-titre">Signaler ' + echapper(cibleSecurite.nom) + '</h3>' +
+                    '<p class="safety-intro">Dis-nous ce qui ne va pas. Ton signalement est anonyme : ' +
+                        'la personne ne saura jamais qui l\'a signalé.</p>' +
+                    MOTIFS.map(([code, emoji, label]) =>
+                        '<button class="motif-btn" type="button" data-motif="' + code + '" aria-pressed="false" ' +
+                            'onclick="choisirMotif(this)"><span>' + emoji + '</span><span>' + label + '</span></button>'
+                    ).join('') +
+                    '<textarea id="report-details" maxlength="500" aria-label="Détails du signalement" ' +
+                        'placeholder="Détails (facultatif)"></textarea>' +
+                    '<button class="btn-danger" id="report-send" type="button" onclick="envoyerSignalement()" disabled>' +
+                        'Envoyer le signalement</button>' +
+                    '<button class="btn-ghost" type="button" onclick="fermerModaleSecurite()">Annuler</button>';
+                $('safety-modal').classList.add('active');
+            };
+
+            window.choisirMotif = function (el) {
+                $('safety-card').querySelectorAll('.motif-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+                el.setAttribute('aria-pressed', 'true');
+                const envoi = $('report-send');
+                if (envoi) envoi.disabled = false;
+            };
+
+            window.envoyerSignalement = async function () {
+                const choisi = $('safety-card').querySelector('.motif-btn[aria-pressed="true"]');
+                if (!choisi || !cibleSecurite) return;
+                const details = ($('report-details').value || '').trim();
+                const btn = $('report-send');
+                btn.disabled = true;
+                btn.textContent = 'Envoi…';
+                try {
+                    await window.VCAPI.safety.report(cibleSecurite.id, choisi.dataset.motif, details);
+                    fermerModaleSecurite();
+                    messageHaut('Signalement envoyé. Merci, on le vérifie sous 24 h.', '#059669');
+                } catch (err) {
+                    btn.disabled = false;
+                    btn.textContent = 'Envoyer le signalement';
+                    messageHaut('Signalement impossible : réessaie dans un instant.', '#E5484D');
+                }
+            };
+
+            window.demanderBlocage = function () {
+                if (!cibleSecurite) return;
+                fermerSecurite();
+                const nom = echapper(cibleSecurite.nom);
+                $('safety-card').innerHTML =
+                    '<h3 id="safety-titre">Bloquer ' + nom + ' ?</h3>' +
+                    '<p class="safety-intro">' + nom + ' ne pourra plus voir ton profil ni t\'écrire, ' +
+                        'et la discussion disparaîtra. Tu pourras débloquer à tout moment depuis ton profil.</p>' +
+                    '<button class="btn-danger" id="block-confirm" type="button" onclick="bloquerCible()">Oui, bloquer</button>' +
+                    '<button class="btn-ghost" type="button" onclick="fermerModaleSecurite()">Annuler</button>';
+                $('safety-modal').classList.add('active');
+            };
+
+            window.bloquerCible = async function () {
+                const cible = cibleSecurite;
+                if (!cible) return;
+                const btn = $('block-confirm');
+                btn.disabled = true;
+                btn.textContent = 'Blocage…';
+                try {
+                    await window.VCAPI.safety.block(cible.id);
+                } catch (err) {
+                    btn.disabled = false;
+                    btn.textContent = 'Oui, bloquer';
+                    messageHaut('Blocage impossible : réessaie dans un instant.', '#E5484D');
+                    return;
+                }
+                fermerModaleSecurite();
+                messageHaut(cible.nom + ' est bloqué(e). Tu ne le verras plus.', '#E5484D');
+                if (cible.origine === 'chat') {
+                    S.close();
+                    matchCourant = null;
+                    goTo('discussions');
+                    renderConversations();
+                } else {
+                    rechargerFil();
+                }
+                renderBloques();
+            };
+
+            window.renderBloques = async function () {
+                const zone = $('blocked-list');
+                if (!zone) return;
+                let liste = [];
+                try {
+                    const r = await window.VCAPI.safety.blocks();
+                    liste = r.blocks || [];
+                } catch (e) {
+                    zone.innerHTML = '<p style="font-size:12px; color:rgba(255,255,255,.45);">' +
+                        'Liste indisponible pour le moment.</p>';
+                    return;
+                }
+                const compte = $('blocked-count');
+                if (compte) compte.textContent = liste.length ? liste.length + (liste.length > 1 ? ' personnes' : ' personne') : '';
+                if (!liste.length) {
+                    zone.innerHTML = '<p style="font-size:12px; color:rgba(255,255,255,.45);">' +
+                        'Personne n\'est bloqué. Si quelqu\'un te dérange, touche le ⋯ sur son profil ' +
+                        'ou dans la discussion.</p>';
+                    return;
+                }
+                zone.innerHTML = liste.map(b =>
+                    '<div class="blocked-row">' +
+                        '<span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' +
+                            echapper(b.pseudo || 'Membre') +
+                            (b.commune ? ' <span style="opacity:.5; font-size:12px;">· ' + echapper(b.commune) + '</span>' : '') +
+                        '</span>' +
+                        '<button type="button" onclick="debloquerProfil(\'' + b.id + '\')" ' +
+                            'style="padding:7px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.2); ' +
+                            'background:none; color:#E9EDEF; font-family:Outfit; font-size:12px; font-weight:700; cursor:pointer;">' +
+                            'Débloquer</button>' +
+                    '</div>'
+                ).join('');
+            };
+
+            window.debloquerProfil = async function (id) {
+                try {
+                    await window.VCAPI.safety.unblock(id);
+                } catch (e) {
+                    messageHaut('Déblocage impossible : réessaie dans un instant.', '#E5484D');
+                    return;
+                }
+                messageHaut('Profil débloqué.', '#059669');
+                renderBloques();
+                rechargerFil();
+            };
+
+            // Fermeture au clic sur le fond ou avec Échap
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id === 'safety-sheet') fermerSecurite();
+                if (e.target && e.target.id === 'safety-modal') fermerModaleSecurite();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+                fermerSecurite();
+                fermerModaleSecurite();
+            });
 
             /* ---------- 6. Nettoyage et rafraîchissement ----------
                Sans ça, une personne qui s'inscrit après toi n'apparaîtrait

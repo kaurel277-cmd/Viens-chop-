@@ -245,6 +245,12 @@
     block(userId) {
       return request('/api/safety/block', { method: 'POST', body: { user_id: userId } });
     },
+    blocks() {
+      return request('/api/safety/blocks');
+    },
+    unblock(userId) {
+      return request('/api/safety/block/' + encodeURIComponent(userId), { method: 'DELETE' });
+    },
     quiz() {
       return request('/api/safety/quiz');
     }

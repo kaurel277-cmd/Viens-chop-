@@ -153,8 +153,9 @@ avec la même règle que le site (`M → F`, `F → A`).
 |---|---|---|
 | `POST` | `/api/safety/fake-call` | 1/semaine en gratuit, illimité en Debout |
 | `POST` | `/api/safety/report` | motifs : `fake_profile`, `harassment`, `nudity`, `scam`, `minor`, `other` |
-| `POST` | `/api/safety/block` | le profil disparaît du fil et du chat |
-| `DELETE` | `/api/safety/block/:id` | débloquer |
+| `POST` | `/api/safety/block` | le profil disparaît du fil **et** de la liste des discussions |
+| `GET` | `/api/safety/blocks` | mes profils bloqués (écran « Profils bloqués ») |
+| `DELETE` | `/api/safety/block/:id` | débloquer : le profil et la discussion reviennent |
 | `GET` | `/api/safety/quiz` | 1 session/jour en gratuit |
 
 ### Codes d'erreur
@@ -163,7 +164,7 @@ Toujours `{ error: { code, message } }`. Les plus utiles côté site :
 
 | HTTP | Code | Signification |
 |---|---|---|
-| 400 | `CODE_INCORRECT` / `CODE_EXPIRE` | mauvais code ou expiré |
+| 400 | `MOT_DE_PASSE_COURT` | mot de passe de moins de 8 caractères |
 | 403 | `MINEUR_INTERDIT` | moins de 18 ans |
 | 409 | `TELEPHONE_DEJA_UTILISE` | numéro déjà inscrit |
 | 429 | `QUOTA_LIKES` | 3 likes du jour épuisés |

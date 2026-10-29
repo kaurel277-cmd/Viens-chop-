@@ -354,18 +354,52 @@ test('qui m\'a liké : liste offerte, photo réservée au Mode Debout', async ()
   ok('photo révélée en Mode Debout');
 });
 
-test('blocage : le profil disparaît du fil', async () => {
+test('blocage : le profil quitte le fil et la discussion, et revient au déblocage', async () => {
   const a = await signup('+2250701000090', 'BlockA', { gender: 'F', commune: 'Abobo' });
   const b = await signup('+2250701000091', 'BlockB', { gender: 'M', commune: 'Abobo' });
 
   const avant = await api('/api/feed', { token: a.token });
   assert.ok(avant.json.profiles.some((p) => p.id === b.id));
 
+  // 1. Blocage / déblocage côté fil
   await api('/api/safety/block', { method: 'POST', token: a.token, body: { user_id: b.id } });
-
   const apres = await api('/api/feed', { token: a.token });
   assert.ok(!apres.json.profiles.some((p) => p.id === b.id));
   ok('profil bloqué absent du fil');
+
+  await api(`/api/safety/block/${b.id}`, { method: 'DELETE', token: a.token });
+  const retour = await api('/api/feed', { token: a.token });
+  assert.ok(retour.json.profiles.some((p) => p.id === b.id));
+  ok('déblocage : le profil revient dans le fil');
+
+  // 2. Blocage côté discussion : on crée d'abord un match
+  await api('/api/likes', { method: 'POST', token: a.token, body: { user_id: b.id } });
+  const l2 = await api('/api/likes', { method: 'POST', token: b.token, body: { user_id: a.id } });
+  assert.equal(l2.json.matched, true);
+
+  await api('/api/safety/block', { method: 'POST', token: a.token, body: { user_id: b.id } });
+
+  const conv = await api('/api/matches', { token: a.token });
+  assert.equal(conv.json.matches.length, 0);
+  ok('discussion avec un profil bloqué retirée de la liste');
+
+  const liste = await api('/api/safety/blocks', { token: a.token });
+  assert.equal(liste.status, 200);
+  assert.ok(liste.json.blocks.some((x) => x.id === b.id));
+  ok('le profil apparaît dans « Profils bloqués »');
+
+  const ecrire = await api(`/api/matches/${l2.json.match_id}/messages`, {
+    method: 'POST', token: b.token, body: { body: 'Coucou' }
+  });
+  assert.equal(ecrire.status, 403);
+  ok('la personne bloquée ne peut plus écrire');
+
+  await api(`/api/safety/block/${b.id}`, { method: 'DELETE', token: a.token });
+  const convRetour = await api('/api/matches', { token: a.token });
+  assert.equal(convRetour.json.matches.length, 1);
+  const listeVide = await api('/api/safety/blocks', { token: a.token });
+  assert.equal(listeVide.json.blocks.length, 0);
+  ok('déblocage : la discussion revient et la liste se vide');
 });
 
 test('signalement enregistré', async () => {

@@ -8,16 +8,17 @@
 
 | Contrôle | Méthode | Résultat |
 |---|---|---|
-| Liens internes et ancres | `audit/coherence.js` sur les 10 pages | 0 lien mort, 0 ancre cassée, 0 ressource manquante |
+| Liens internes et ancres | `audit/coherence.js` sur les 9 pages | 0 lien mort, 0 ancre cassée, 0 ressource manquante |
 | Vocabulaire périmé (flou, SMS, note vocale, Boss, 5 messages…) | même script | 0 occurrence |
 | Titres d'onglet | même script | un nom de page, rien d'autre |
-| Syntaxe HTML | `html-validate` sur les 10 pages | 0 erreur |
+| Syntaxe HTML | `html-validate` sur les 9 pages | 0 erreur |
 | Écrans de l'appli (7) | `audit/parcours-complet.js` | tous présents, tous atteignables |
 | Boutons et modales (quiz, faux appel, Debout, certification) | même script | fonctionnement vérifié |
 | Requêtes serveur pendant le parcours | même script (écoute réseau) | 0 requête en échec |
 | Erreurs JavaScript | même script, mode local + serveur + API coupée | 0 |
-| Règles métier côté base | `server/test/api.test.js` | 19/19 |
+| Règles métier côté base | `server/test/api.test.js` | 20/20 |
 | Likes, matchs, messages | `audit/test-likes-matchs.js` | 17/17 |
+| Signaler / bloquer / débloquer | `audit/test-securite.js` | 31/31 |
 | Photos et profil vu par un autre compte | `audit/test-serveur.js` | 14/14 |
 | Médias en vue unique | `audit/test-media.js` | 22/22 |
 | Inscription locale et bascule hors ligne | `audit/test-inscription-locale.js` | 31/31 |

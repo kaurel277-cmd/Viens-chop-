@@ -37,6 +37,12 @@ matchesRouter.get('/', requireAuth, async (req, res, next) => {
                where match_id = m.id order by created_at desc limit 1
          ) last on true
         where $1 in (m.user_a, m.user_b)
+          -- Une conversation avec une personne bloquée (dans un sens ou l'autre)
+          -- disparaît des discussions, exactement comme elle disparaît du fil.
+          and not exists (
+                select 1 from public.blocks bl
+                 where (bl.blocker_id = $1 and bl.blocked_id = o.id)
+                    or (bl.blocker_id = o.id and bl.blocked_id = $1))
         order by coalesce(last.created_at, m.created_at) desc`,
       [req.user.id]
     );

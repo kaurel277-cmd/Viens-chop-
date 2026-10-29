@@ -78,10 +78,14 @@ renouvellement mensuel, et gestion des échecs.
 
 Une app de rencontre sans modération se fait fermer, ou se vide.
 
+- ✅ **Fait** — bouton **Signaler** et **Bloquer** sur chaque profil (fil) et dans
+  la discussion : 6 motifs de signalement, blocage immédiat, liste
+  « Profils bloqués » dans Mon profil avec déblocage. Voir
+  `docs/SECURITE-MODERATION.md`.
 - Vérification selfie **réelle** (comparaison photo/selfie, détection de visage).
-- Bouton **Signaler** et **Bloquer** sur chaque profil et chaque message.
 - Modération des photos (au moins un filtre automatique + une revue manuelle).
-- Journal des signalements et délai de traitement.
+- Journal des signalements et délai de traitement : les signalements arrivent
+  dans `public.reports` (`status = open`), il reste à décider qui les traite.
 - Test des politiques RLS : vérifier qu'un utilisateur ne peut pas lire les
   messages d'un autre.
 

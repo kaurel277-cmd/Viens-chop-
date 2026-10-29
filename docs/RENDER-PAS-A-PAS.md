@@ -54,32 +54,24 @@ C'est l'écran que tu as en ce moment. Il y a **6 variables** à saisir.
 
 Les lignes sont ajoutées avec **+ Add Environment Variable**.
 
-### Les 6 variables, dans l'ordre
+### Les 4 variables, dans l'ordre
 
 | # | Case de gauche (KEY) | Case de droite (VALUE) | Comment l'obtenir |
 |---|---|---|---|
 | 1 | `DATABASE_URL` | la chaîne **Pooled** de Neon | voir « Écran C » ci-dessous |
 | 2 | `JWT_SECRET` | une valeur générée | taper la clé, **puis cliquer sur « Generate »** |
-| 3 | `OTP_PEPPER` | une **autre** valeur générée | taper la clé, **puis cliquer sur « Generate »** |
-| 4 | `CORS_ORIGIN` | `*` | à taper : une étoile |
-| 5 | `SMS_PROVIDER` | `console` | à taper tel quel |
-| 6 | `NODE_ENV` | `production` | à taper tel quel |
+| 3 | `CORS_ORIGIN` | `*` | à taper : une étoile |
+| 4 | `NODE_ENV` | `production` | à taper tel quel |
 
 ### ⚠️ Le bouton « Generate » — c'est la réponse à ta question sur les secrets
 
-Dans mes premières instructions je te disais « invente deux longues phrases
-aléatoires ». C'était imprécis : **tu n'as rien à inventer**, il y a un bouton
+Dans mes premières instructions je te disais « invente une longue phrase
+aléatoire ». C'était imprécis : **tu n'as rien à inventer**, il y a un bouton
 exprès pour ça dans l'écran que tu as sous les yeux.
 
-1. Pour `JWT_SECRET` : tape la clé à gauche, clique dans la case de droite,
-   clique sur **⚙ Generate**.
+1. Tape `JWT_SECRET` à gauche, clique dans la case de droite,
+   puis clique sur **⚙ Generate**.
 2. Une valeur aléatoire apparaît. **Accepte-la telle quelle.**
-3. Recommence à l'identique pour `OTP_PEPPER` (la valeur sera différente,
-   c'est le but).
-
-Ne recopie pas la même valeur dans les deux : `JWT_SECRET` signe les sessions,
-`OTP_PEPPER` protège les codes SMS. Deux rôles différents, deux secrets
-différents.
 
 ---
 
@@ -186,10 +178,8 @@ Neon                          Render                      Ton navigateur
 ─────────────────────────     ──────────────────────     ─────────────────────
 Base "viens-chop"      ──────► DATABASE_URL
   ↗ chaîne Pooled              JWT_SECRET (Generate)
-  ↘ chaîne Direct              OTP_PEPPER (Generate)
-    (pour le SQL Editor)       CORS_ORIGIN = *
-                               SMS_PROVIDER = console
-                               NODE_ENV = production
+  ↘ chaîne Direct              CORS_ORIGIN = *
+    (pour le SQL Editor)       NODE_ENV = production
                                      │
                                      ▼
                                /api/health  ──────────►  {"ok":true}
@@ -199,8 +189,6 @@ Base "viens-chop"      ──────► DATABASE_URL
 
 ## Ce qu'il ne faut jamais faire
 
-- ❌ mettre `DEV_OTP_BYPASS` en production : n'importe qui entrerait avec
-  le code `123456`.
 - ❌ coller `DATABASE_URL_DIRECT` dans Render : utilise la chaîne **Pooled**.
 - ❌ laisser `CORS_ORIGIN=*` après la mise en ligne du site : remplace-le par
   l'adresse exacte du site.
@@ -230,7 +218,7 @@ https://viens-chop-api.onrender.com/api/health/db
     "ssl_demande": true,
     "hote": "ep-xxx-pooler.eu-central-1.aws.neon.tech",
     "connexion": "OK (38 ms)",
-    "tables": { "users": true, "otp_codes": true, "likes": true,
+    "tables": { "users": true, "passes": true, "likes": true,
                 "matches": true, "messages": true, "sessions": true },
     "triggers_regles": "7 / 7",
     "fonctions": "OK",
@@ -274,5 +262,6 @@ La correction se fait en deux copier-coller, dans l'ordre :
 Puis recharger `/api/health/db` : `"ok": true`, les six tables à `true`,
 `"triggers_regles": "7 / 7"`.
 
-> Aucun risque de perte : si la table `otp_codes` n'existait pas, aucun compte
-> n'a jamais pu être créé. La base ne contient rien d'utile à ce stade.
+> Aucun risque de perte : si une table manquait, c'est que le schéma n'a pas
+> été exécuté en entier. La base ne contient rien d'utile à ce stade : il suffit
+> de relancer le script.
