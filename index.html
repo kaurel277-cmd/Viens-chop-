@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
-    <meta name="description" content="La première application de rencontre pensée pour toi. Découvre les affinités d'abord, débloque les photos après 5 messages, et rencontre ton crush dans un lieu certifié sûr.">
+    <meta name="description" content="La première application de rencontre pensée pour toi. Découvre les profils et les affinités d'abord, like en toute connaissance de cause, et rencontre ton crush dans un lieu certifié sûr.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -103,11 +103,11 @@
 
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5">
                     Ton profil.<br>
-                    Puis la photo.<br>
+                    Les photos.<br>
                     <span class="underline decoration-white/40">Viens chop.</span> <i class="vc vc-logo"></i></h1>
 
                 <p class="text-lg text-white/90 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
-                    La première appli de rencontre pensée pour toi. Ici, les photos sont floutées au départ : tu craques d'abord sur <strong>vos sons en commun</strong> et votre humour.
+                    La première appli de rencontre pensée pour toi. Ici, tu craques d'abord sur <strong>vos sons en commun</strong> et votre humour — et tu vois toujours la personne avant de liker.
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
@@ -125,8 +125,8 @@
                         <p class="text-[11px] text-white/80">Inscrit en 2 min</p>
                     </div>
                     <div class="bg-white/10 rounded-xl p-3 border border-white/15">
-                        <p class="font-extrabold text-sm">🔓 5 messages</p>
-                        <p class="text-[11px] text-white/80">pour voir la photo</p>
+                        <p class="font-extrabold text-sm">📸 Photos visibles</p>
+                        <p class="text-[11px] text-white/80">tu vois qui tu likes</p>
                     </div>
                     <div class="bg-white/10 rounded-xl p-3 border border-white/15">
                         <p class="font-extrabold text-sm">🛡️ Sécurité</p>
@@ -149,13 +149,13 @@
                         <div class="rounded-2xl p-5 text-white overflow-hidden mb-4" id="demo-card-bg" style="background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);">
                             <div class="flex items-center gap-4">
                                 <div class="relative shrink-0">
-                                    <div id="demo-avatar" class="w-16 h-16 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-3xl blur-[3px] select-none">👩🏾</div>
-                                    <span class="absolute -bottom-1 -right-1 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🔒</span>
+                                    <div id="demo-avatar" class="w-16 h-16 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-3xl select-none">👩🏾</div>
+                                    <span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">✓</span>
                                 </div>
                                 <div class="min-w-0">
                                     <h2 id="demo-name" class="font-extrabold text-xl leading-tight">Awa, 22 ans</h2>
                                     <p id="demo-city" class="text-xs text-white/85 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>Cocody, Riviera 2</p>
-                                    <p class="text-[11px] text-white/75 mt-1">🔓 Photo visible après 5 messages</p>
+                                    <p class="text-[11px] text-white/75 mt-1">📸 Photo visible avant le like</p>
                                 </div>
                             </div>
                             <p id="demo-quote" class="text-xs text-white/90 italic mt-4">« Salut ! Moi c'est Awa. Si tu connais tous les sons de Himra par cœur et que t'aimes l'allocodrome de Cocody, on va bien s'entendre 😂 »</p>
@@ -200,7 +200,7 @@
                 <div class="w-14 h-14 bg-brand-gradient text-white rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🎙️</div>
                 <h3 class="text-xl font-extrabold mb-2">Le profil avant la photo</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
-                    Tes artistes, ta commune, ton style d'humour : ça dit tout. Ici, tu découvres la personne avant son visage et les photos se débloquent après <strong>5 messages échangés</strong>.
+                    Tes artistes, ta commune, ton style d'humour : ça dit tout. Ici, tu vois la personne, ses sons et sa commune avant de liker : tu sais pour qui tu craques.
                 </p>
             </div>
 
@@ -234,7 +234,7 @@
                 <ul class="space-y-3 text-sm text-slate-700 mb-6">
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Quiz à deux</strong> : « Garba ou Alloco ? », « Rancart posé ou soirée mouvementée ? »</span></li>
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Disquettes prêtes à envoyer</strong> en un clic si tu bloques.</span></li>
-                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>5 messages échangés</strong> = les photos se débloquent automatiquement !</span></li>
+                    <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Les photos sont visibles</strong> : pas de like à l'aveugle.</span></li>
                 </ul>
             </div>
 
@@ -283,7 +283,7 @@
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">3</div>
                 <h3 class="font-extrabold text-lg mb-2">Match &amp; Débloque 🔓</h3>
-                <p class="text-sm text-slate-600">Like et discute. Au bout de 5 messages échangés, vos photos se dévoilent.</p>
+                <p class="text-sm text-slate-600">Regarde, like, discute. Quand vous vous likez tous les deux, la discussion s'ouvre.</p>
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                 <div class="w-12 h-12 bg-brand-gradient text-white rounded-2xl flex items-center justify-center font-extrabold text-lg mb-4">4</div>
@@ -448,7 +448,7 @@
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100">
                     <p class="text-amber-400 text-sm mb-3">★★★★★</p>
-                    <p class="text-sm text-slate-700 leading-relaxed mb-4">« Le fait que la photo soit floutée au début, ça change tout. On discute vraiment avant de juger. J'ai matché avec un gars qui écoute les mêmes sons que moi ! »</p>
+                    <p class="text-sm text-slate-700 leading-relaxed mb-4">« Voir les photos dès le départ, ça rassure : on sait à qui on parle. Et comme les goûts musicaux sont affichés, on accroche sur le fond ! »</p>
                     <p class="text-xs font-extrabold text-slate-900">Sarah, 21 ans • Cocody</p>
                 </div>
                 <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100">
@@ -478,10 +478,10 @@
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
                 <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
-                    Quand est-ce que les photos se débloquent ?
+                    Est-ce que je vois les photos ?
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                 </summary>
-                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Dès que vous avez échangé 5 messages après votre match, les photos se dévoilent automatiquement pour tous les deux.</p>
+                <p class="text-sm text-slate-600 mt-3 leading-relaxed">Oui, dès le fil de découverte : tu vois la photo de la personne avant de liker. Pas de like à l'aveugle, pas de photo cachée.</p>
             </details>
             <details class="bg-white rounded-2xl border border-slate-200 p-5 group">
                 <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
@@ -635,7 +635,7 @@
         const disquettes = [
             "« Ton profil là, c'est mieux qu'un son de Tiakola sous la pluie. On fait connaissance ? »",
             "« Question sérieuse pour commencer : Team Alloco bien cuit ou Team Garba attiéké chaud ? 👀 »",
-            "« J'ai regardé ton profil 3 fois déjà… il reste que 5 messages avant de débloquer nos photos, on s'y met ? 😏 »",
+            "« J'ai regardé ton profil 3 fois déjà… et si on passait du virtuel au vrai maquis ? 😏 »",
             "« Si t'aimes Himra autant que moi, c'est que le destin a déjà validé le match 💯 »",
             "« Promis je suis plus intéressant(e) qu'un simple 'Salut ça va'. Raconte-moi ton meilleur plan chill à Abidjan ! 🍹 »"
         ];

@@ -56,6 +56,17 @@ async function signup(phone, pseudo, extra = {}) {
   return { token, id: p.json.user.id, refresh: v.json.refresh_token };
 }
 
+/** Donne une photo principale à un utilisateur (contourne l'upload multipart). */
+async function donnerPhoto(userId) {
+  const { rows } = await query(
+    `insert into public.photos (user_id, position, mime, bytes, data)
+     values ($1, 0, 'image/webp', 8, decode('5249464600000000', 'hex')) returning id`,
+    [userId]
+  );
+  await query('update public.users set main_photo_id = $2 where id = $1', [userId, rows[0].id]);
+  return rows[0].id;
+}
+
 before(async () => {
   await new Promise((resolve) => {
     server = app.listen(0, '127.0.0.1', resolve);
@@ -139,20 +150,25 @@ test('profil : champs invalides rejetés', async () => {
   ok('plus de 12 artistes refusé');
 });
 
-test('fil de découverte : filtres et photo jamais exposée', async () => {
+test('fil de découverte : filtres respectés et photo exposée', async () => {
   const awa   = await signup('+2250701000010', 'Awa',   { gender: 'F', commune: 'Cocody' });
   const franck = await signup('+2250701000011', 'Franck', { gender: 'M', commune: 'Cocody' });
+  const photoId = await donnerPhoto(franck.id);
 
   const feed = await api('/api/feed', { token: awa.token });
   assert.equal(feed.status, 200);
-  assert.ok(feed.json.profiles.length >= 1);
-  assert.ok(!('photo_url' in feed.json.profiles[0]), 'la photo ne doit pas figurer dans le fil');
-  ok('fil renvoyé sans photo', `${feed.json.profiles.length} profils`);
+  const ligne = feed.json.profiles.find((p) => p.id === franck.id);
+  assert.ok(ligne, 'Franck doit figurer dans le fil d\'Awa');
+  assert.ok(!feed.json.profiles.some((p) => p.pseudo === 'Awa'), 'on ne se voit pas soi-même');
+  assert.equal(ligne.main_photo_id, photoId, 'la photo doit être exposée dans le fil');
+  assert.equal(ligne.has_photo, true);
+  ok('fil : photo exposée', `${feed.json.profiles.length} profils`);
 });
 
 test('like réciproque -> match', async () => {
   const j1 = await signup('+2250701000020', 'J1', { gender: 'F' });
   const j2 = await signup('+2250701000021', 'J2', { gender: 'M' });
+  await donnerPhoto(j2.id);
 
   const l1 = await api('/api/likes', { method: 'POST', token: j1.token, body: { user_id: j2.id } });
   assert.equal(l1.status, 201);
@@ -167,8 +183,9 @@ test('like réciproque -> match', async () => {
 
   const ms = await api('/api/matches', { token: j1.token });
   assert.equal(ms.json.matches.length, 1);
-  assert.equal(ms.json.matches[0].photo_unlocked, false);
-  ok('match visible sans photo débloquée');
+  assert.ok(ms.json.matches[0].other_photo_url, 'la photo doit être visible dès le match');
+  assert.equal(ms.json.matches[0].photo_unlocked, false, 'photo_unlocked ne pilote plus rien');
+  ok('photo visible dès le match, sans attendre aucun message');
 });
 
 test('quota de 3 likes/jour en Mode Coulé', async () => {
@@ -197,31 +214,39 @@ test('quota de 3 likes/jour en Mode Coulé', async () => {
   ok('likes illimités en Mode Debout');
 });
 
-test('chat : photo débloquée au 5ᵉ message, pas avant', async () => {
+test('chat : photo visible dès le premier message', async () => {
   const a = await signup('+2250701000040', 'ChatA', { gender: 'F' });
   const b = await signup('+2250701000041', 'ChatB', { gender: 'M' });
+  const photoB = await donnerPhoto(b.id);
+
+  // La photo se voit avant même le match
+  const profil = await api(`/api/users/${b.id}`, { token: a.token });
+  assert.equal(profil.status, 200);
+  assert.equal(profil.json.profile.photo_url, `/api/photos/${photoB}`);
+  assert.equal(profil.json.profile.photo_count, 1);
+  ok('profil public : photo et nombre de photos renvoyés');
+
   await api('/api/likes', { method: 'POST', token: a.token, body: { user_id: b.id } });
   const l = await api('/api/likes', { method: 'POST', token: b.token, body: { user_id: a.id } });
   const matchId = l.json.match_id;
 
-  for (let i = 1; i <= 4; i++) {
+  const ms0 = await api('/api/matches', { token: a.token });
+  assert.ok(ms0.json.matches[0].other_photo_url, 'photo attendue dès le match, sans message');
+  ok('match : photo disponible à 0 message');
+
+  for (let i = 1; i <= 5; i++) {
     const r = await api(`/api/matches/${matchId}/messages`, {
       method: 'POST', token: i % 2 ? a.token : b.token, body: { body: 'message ' + i }
     });
     assert.equal(r.status, 201);
-    assert.equal(r.json.photo_unlocked, false, `débloqué trop tôt au message ${i}`);
+    assert.ok(r.json.other_photo_url === undefined || r.json.other_photo_url, 'photo jamais masquée');
   }
-  ok('non débloquée après 4 messages');
-
-  const fifth = await api(`/api/matches/${matchId}/messages`, {
-    method: 'POST', token: a.token, body: { body: 'message 5' }
-  });
-  assert.equal(fifth.json.photo_unlocked, true);
-  ok('débloquée au 5ᵉ message');
+  ok('photo visible pendant les 5 premiers messages');
 
   const ms = await api('/api/matches', { token: a.token });
-  assert.equal(ms.json.matches[0].photo_unlocked, true);
-  ok('le match expose alors photo_unlocked = true');
+  assert.ok(ms.json.matches[0].other_photo_url, 'photo toujours là après 5 messages');
+  assert.equal(ms.json.matches[0].photo_unlocked, true, 'photo_unlocked reste informatif');
+  ok('photo_unlocked conservé pour compatibilité');
 });
 
 test('chat : un tiers ne peut pas lire ni écrire', async () => {
@@ -268,24 +293,25 @@ test('faux appel : 1 par semaine en gratuit', async () => {
   ok('2ᵉ faux appel refusé la même semaine');
 });
 
-test('qui m\'a liké : photo masquée hors Mode Debout', async () => {
+test('qui m\'a liké : liste offerte, photo réservée au Mode Debout', async () => {
   const cible = await signup('+2250701000080', 'Cible80', { gender: 'F' });
   const fan   = await signup('+2250701000081', 'Fan81',   { gender: 'M' });
-  await query(`update public.users set photo_url = 'https://cdn.exemple/photo.jpg' where id = $1`, [fan.id]);
+  const photoFan = await donnerPhoto(fan.id);
   await api('/api/likes', { method: 'POST', token: fan.token, body: { user_id: cible.id } });
 
   const gratuit = await api('/api/likes/who-liked-me', { token: cible.token });
   const ligne = gratuit.json.likes.find((l) => l.user_id === fan.id);
   assert.ok(ligne, 'le like doit apparaître');
   assert.equal(ligne.photo_url, null);
-  assert.equal(ligne.is_blurred, true);
-  ok('photo masquée en Mode Coulé');
+  assert.equal(ligne.photo_visible, false);
+  ok('liste visible, photo réservée au Debout');
 
   await query(`update public.users set plan = 'debout', plan_expires_at = now() + interval '30 days'
                 where id = $1`, [cible.id]);
   const debout = await api('/api/likes/who-liked-me', { token: cible.token });
   const ligne2 = debout.json.likes.find((l) => l.user_id === fan.id);
-  assert.equal(ligne2.photo_url, 'https://cdn.exemple/photo.jpg');
+  assert.equal(ligne2.photo_url, `/api/photos/${photoFan}`);
+  assert.equal(ligne2.photo_visible, true);
   ok('photo révélée en Mode Debout');
 });
 

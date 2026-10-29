@@ -93,7 +93,7 @@ refuse. C'est le principal intérêt de les avoir mises en SQL.
 | 3 likes/jour en gratuit, illimité en Debout | trigger `likes_quota` | test « 4ᵉ like refusé » |
 | Un seul like par couple | contrainte `one_like_per_pair` | test dédié |
 | Like réciproque → match automatique | trigger `likes_create_match` | test dédié |
-| Photos débloquées au 5ᵉ message | trigger `messages_unlock` | test « pas avant / au 5ᵉ » |
+| Photos visibles dès le fil | trigger `messages_unlock` (hérité, inutilisé par l'UI) | test photo présente au 1ᵉʳ message |
 | Seuls les 2 participants écrivent | trigger `messages_check_sender` | test « un tiers » |
 | 1 faux appel/semaine en gratuit | trigger `users_fakecall_quota` | test dédié |
 | Paiement confirmé → 30 jours de Debout | trigger `payments_activate` | `test-schema.sql` |
@@ -132,8 +132,8 @@ attente d'ouverture d'accès. Le profil se complète ensuite.
 | Méthode | Route | Notes |
 |---|---|---|
 | `POST` | `/api/users/me` | pseudo, date de naissance, genre, commune, artistes |
-| `GET` | `/api/users/:id` | photo renvoyée seulement si le match est débloqué |
-| `GET` | `/api/feed` | même commune d'abord, **jamais de photo** |
+| `GET` | `/api/users/:id` | photo + nombre de photos renvoyés à tout inscrit |
+| `GET` | `/api/feed` | même commune d'abord, **photo principale renvoyée** |
 
 `seeking` n'est **jamais** envoyé par le client : le serveur le déduit du genre
 avec la même règle que le site (`M → F`, `F → A`).
@@ -221,17 +221,17 @@ Neon ne stocke pas de fichiers. Trois options crédibles :
 
 À faire dans tous les cas :
 - upload via **URL signée** générée par l'API (le navigateur n'a pas la clé) ;
-- redimensionner et flouter côté serveur avant publication ;
-- **jamais** d'URL publique devinable : passer par des URLs signées à durée
-  courte, sinon la photo floutée devient inutile.
+- redimensionner et compresser côté serveur avant publication ;
+- **jamais** d'URL publique devinable : les photos passent par la route
+  authentifiée `GET /api/photos/:id`, réservée aux inscrits.
 
 ### 6.2 Chat temps réel
 
 Le schéma est prêt (`messages` + index). Trois approches, par ordre de simplicité :
 
 1. **Polling** toutes les 3 s sur `GET /api/matches/:id/messages` — 20 lignes de
-   code, suffisant pour un lancement, et le CDC impose déjà 5 messages avant
-   déblocage (donc peu de trafic).
+   code, suffisant pour un lancement (peu de conversations simultanées, et
+   l'API ne renvoie que les nouveautés).
 2. **SSE** (`text/event-stream`) depuis l'API : un seul flux par utilisateur,
    compatible avec tous les hébergeurs Node.
 3. **Service tiers** (Ably, Pusher) si le trafic explose.

@@ -56,7 +56,7 @@ Après « Changer de numéro », le bouton « Renvoyer le code » restait **fig�
 ## 🟠 Bugs visibles / UX corrigés
 
 6. **Champs OTP** : impossible de saisir deux chiffres dans une case ; ajout du collage automatique du code, du retour arrière intelligent et de `inputmode="numeric"` + `autocomplete="one-time-code"`.
-7. **Déblocage photo purement décoratif** (`app.html`) : après 5 messages, l'appli annonçait « photo débloquée » alors que le flou restait. Le flou est maintenant réellement retiré (avec transition), et remis à chaque nouvelle conversation.
+7. **Flou des photos** (`app.html`) — historique : le déblocage au 5ᵉ message était décoratif. **Décision du 29/10/2026 : le flou est supprimé partout** (carte du fil, chat, avatars, « qui m'a aimé »). On voit la personne avant de liker ; `photo_unlocked` reste renvoyé par l'API mais ne pilote plus l'affichage.
 8. **Faux appel** : cliquer deux fois sur « accepter » empilait « — En cours... — En cours... ». Protection anti-double-clic ajoutée.
 9. **Numéro WhatsApp du formulaire partenaire** (`maquis.html`) : le formulaire affichait « Merci, proposition reçue » alors que **rien n'était envoyé**. Il génère désormais un message WhatsApp pré-rempli (nom, ville, type, téléphone, précisions) dès que le numéro est configuré.
 10. **Année du copyright figée** sur « © 2025 » → affichage dynamique de l'année courante.

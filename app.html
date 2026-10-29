@@ -672,12 +672,8 @@
         <!-- Card Stack -->
         <div class="card-stack">
             <div class="profile-card" id="current-card">
-                <div class="photo-area blurred" id="card-photo" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b);">
-                    <div style="font-size:64px; opacity:0.3; position:absolute;">👤</div>
-                    <div class="blur-overlay">
-                        <i class="fa-solid fa-lock" style="font-size:24px; opacity:0.7;"></i>
-                        <span style="font-size:12px; font-weight:600; opacity:0.7;">Photo visible après 5 messages</span>
-                    </div>
+                <div class="photo-area" id="card-photo" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b);">
+                    <div id="card-photo-vide" style="font-size:64px; opacity:0.3; position:absolute;">👤</div>
                 </div>
                 <div class="card-info">
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
@@ -736,12 +732,11 @@
             <button onclick="goTo('discover')" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;" type="button" aria-label="Retour aux profils">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <div id="chat-avatar" style="width:44px; height:44px; font-size:24px; line-height:1; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px); transition:filter .4s ease;">👤</div>
+            <div id="chat-avatar" style="width:44px; height:44px; font-size:24px; line-height:1; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center;">👤</div>
             <div style="flex:1;">
                 <h3 style="font-size:15px; font-weight:700;" id="chat-name">Awa</h3>
                 <p id="chat-sub" style="font-size:11px; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     <span id="chat-status"><span style="color:#25D366;">● En ligne</span></span>
-                    • photo après <span id="msg-countdown">5</span> msg
                 </p>
             </div>
             <div style="display:flex; gap:12px;">
@@ -756,7 +751,7 @@
 
         <div class="chat-messages" id="chat-messages">
             <div class="msg system">
-                🔒 Ses photos sont floutées. Échangez 5 messages pour les débloquer sans pression !
+                💬 Prends le temps de discuter, sans pression.
             </div>
             <div class="msg system">
                 🎲 Lance un quiz Mode Flirt avec l'icône 🎮 en haut à droite !
@@ -797,10 +792,10 @@
         </div>
         <div style="flex:1; overflow-y:auto; padding:16px;">
             <p id="likes-hint" style="font-size:13px; color:rgba(233,237,239,.6); text-align:center; margin-bottom:16px;">
-                <i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en Debout pour les voir.
+                <i class="fa-solid fa-heart"></i> Toutes les personnes qui t'ont liké.
             </p>
             <div id="likes-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:12px;"></div>
-            <button class="btn-primary" style="margin-top:24px;" onclick="showVipModal('Débloque « Qui m\'a aimé » et vois toutes les photos en clair avec le Mode Debout 👑')" type="button">
+            <button class="btn-primary" style="margin-top:24px;" onclick="showVipModal('Passe en Mode Debout : likes illimités, Mode Flirt illimité et les photos de « Qui m\'a aimé » 👑')" type="button">
                 <i class="fa-solid fa-crown"></i> Débloquer avec le Mode Debout — 700 FCFA
             </button>
         </div>
@@ -1126,7 +1121,11 @@
             const p = profiles[index];
             document.getElementById('card-name').textContent = `${p.name}, ${p.age}`;
             document.getElementById('card-location').textContent = `📍 ${p.city}`;
-            document.getElementById('card-photo').style.background = p.color;
+            const zonePhoto = document.getElementById('card-photo');
+            zonePhoto.style.background = p.color;
+            zonePhoto.style.backgroundImage = '';
+            const vide = document.getElementById('card-photo-vide');
+            if (vide) vide.style.display = p.photoId || p.photoUrl ? 'none' : 'block';
             
             const artistsDiv = document.getElementById('card-artists');
             artistsDiv.innerHTML = p.artists.map(a => `<span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎵 ${a}</span>`).join('');
@@ -1189,16 +1188,15 @@
         function openChat(profile) {
             document.getElementById('chat-name').textContent = profile.name;
             const av = document.getElementById('chat-avatar');
-            if (av) av.style.filter = 'blur(3px)';
+            if (av) av.style.filter = 'none';
             messageCount = 0;
             photoUnlocked = false;
-            document.getElementById('msg-countdown').textContent = '5';
             
             // Clear messages
             const msgContainer = document.getElementById('chat-messages');
             msgContainer.innerHTML = `
                 <div class="msg system">🎉 Match avec ${profile.name} ! C'est le moment de gérer sans pression.</div>
-                <div class="msg system">🔒 Photos floutées. Échangez 5 messages pour les débloquer !</div>
+                <div class="msg system">💬 À toi de jouer, sois toi-même.</div>
                 <div class="msg system">🎲 Lance un quiz Mode Flirt avec l'icône 🎮 en haut à droite !</div>
             `;
 
@@ -1252,17 +1250,11 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        // Plus de palier de messages : la photo est visible dès le départ.
+        // La fonction reste déclarée car plusieurs écrans l'appellent encore.
         function updatePhotoCountdown() {
-            const remaining = Math.max(0, 5 - Math.floor(messageCount / 2));
-            document.getElementById('msg-countdown').textContent = remaining;
-            
-            if(remaining <= 0 && !photoUnlocked) {
-                photoUnlocked = true;
-                // Le flou du chat disparaît vraiment, au lieu de rester flouté après l'annonce.
-                const av = document.getElementById('chat-avatar');
-                if (av) av.style.filter = 'none';
-                addMessage("🔓 Photo débloquée ! La photo de ton crush est maintenant visible 🍑", 'system');
-            }
+            const av = document.getElementById('chat-avatar');
+            if (av) av.style.filter = 'none';
         }
 
         // ===== MODE FLIRT QUIZ =====
@@ -1602,7 +1594,7 @@
             if (av) {
                 av.textContent = conv.emoji;
                 av.style.background = conv.color;
-                av.style.filter = photoUnlocked ? 'none' : 'blur(3px)';
+                av.style.filter = 'none';
             }
             updatePhotoCountdown();
             goTo('chat');
@@ -1618,7 +1610,7 @@
 
         /* ---------------------------------------------------------------
            4. « QUI M'A AIMÉ » — CDC §4 :
-              gratuit = photos floutées   |   Debout = totalement visible
+              gratuit = 3 likes / jour   |   Debout = likes illimités
            --------------------------------------------------------------- */
         const likedMeSamples = [
             { name: 'Awa', age: 22, city: 'Cocody', emoji: '👩🏾', color: 'linear-gradient(135deg,#7c3aed,#db2777)' },
@@ -1634,18 +1626,15 @@
             const hint = document.getElementById('likes-hint');
             grid.innerHTML = likedMeSamples.map(p =>
                 '<div style="border-radius:16px; overflow:hidden; background:' + p.color + '; aspect-ratio:3/4; display:flex; flex-direction:column; justify-content:flex-end; padding:10px; position:relative;">' +
-                    '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:44px; ' +
-                        (isVIP ? '' : 'filter:blur(9px);') + '">' + p.emoji + '</div>' +
-                    (isVIP ? '' : '<div style="position:absolute; top:8px; right:8px; font-size:12px;">🔒</div>') +
+                    '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:44px;">' + p.emoji + '</div>' +
                     '<div style="position:relative; background:rgba(0,0,0,.55); border-radius:8px; padding:4px 6px; font-size:11px; font-weight:700;">' +
-                        (isVIP ? escapeHTML(p.name) + ', ' + p.age + '<br><span style="font-weight:400; opacity:.75;">📍 ' + escapeHTML(p.city) + '</span>'
-                              : '•••••<br><span style="font-weight:400; opacity:.75;">Qui ça peut être ?</span>') +
+                        escapeHTML(p.name) + ', ' + p.age + '<br><span style="font-weight:400; opacity:.75;">📍 ' + escapeHTML(p.city) + '</span>' +
                     '</div>' +
                 '</div>'
             ).join('');
             hint.innerHTML = isVIP
                 ? '<i class="fa-solid fa-crown" style="color:#fbbf24;"></i> Mode Debout : <strong>' + likedMeSamples.length + ' personnes</strong> t\'ont liké'
-                : '<i class="fa-solid fa-lock"></i> En Mode Coulé, les photos sont floutées. Passe en Debout pour tout voir.';
+                : '<i class="fa-solid fa-heart"></i> Toutes les personnes qui t\'ont liké.';
             goTo('likes');
         }
 
@@ -1828,6 +1817,8 @@
                 const zone = document.getElementById('card-photo');
                 if (!zone) return;
                 zone.style.backgroundImage = '';
+                const icone = document.getElementById('card-photo-vide');
+                if (icone) icone.style.display = (!p || (!p.photoUrl && !p.photoId)) ? 'block' : 'none';
                 if (!p) return;
 
                 if (p.photoUrl) {                      // photo servie par l'API
@@ -2269,9 +2260,9 @@
                     const apercu = m.dernier
                         ? echapper(m.dernier)
                         : '<em style="opacity:.6">Vous vous êtes likés — dis bonjour !</em>';
-                    const avatar = m.photo && m.photoDebloquee
+                    const avatar = m.photo
                         ? '<div class="conv-avatar" style="background-image:url(' + m.photo + '); background-size:cover; background-position:center;"></div>'
-                        : '<div class="conv-avatar" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b); filter:blur(2px);">👤</div>';
+                        : '<div class="conv-avatar" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b);">👤</div>';
                     return '<button class="conv-item" onclick="ouvrirMatch(\'' + m.id + '\')" aria-label="Ouvrir la discussion avec ' + echapper(m.nom) + '" type="button">' +
                         avatar +
                         '<div class="conv-body">' +
@@ -2301,13 +2292,10 @@
                 try { conv = await S.open(matchId); } catch (e) { alert('Conversation impossible à ouvrir.'); return; }
 
                 $('chat-name').textContent = matchCourant.nom;
-                majEntete(conv.photoDebloquee);
+                majEntete();
 
                 const zone = $('chat-messages');
                 zone.innerHTML = '<div class="msg system">🎉 Vous vous êtes likés. À toi de jouer !</div>';
-                if (!conv.photoDebloquee) {
-                    zone.innerHTML += '<div class="msg system">🔒 Les photos se débloquent après 5 messages. Il en reste ' + conv.restants + '.</div>';
-                }
                 conv.messages.forEach(m => bulle(m.body, m.sender_id === (window.VCCompte.current() || {}).id ? 'sent' : 'received', m.created_at));
 
                 $('chat-notif').style.display = 'none';
@@ -2328,57 +2316,33 @@
                         bulle(m.body, m.sender_id === moi ? 'sent' : 'received', m.created_at);
                     });
                     zone.scrollTop = zone.scrollHeight;
-                }, async () => {
-                    bulle('🔓 Photos débloquées !', 'system');
-                    if (matchCourant) matchCourant.photoDebloquee = true;
-                    // L'URL de la photo n'est fournie par l'API qu'une fois le
-                    // match débloqué : on recharge la fiche pour l'afficher.
-                    try {
-                        const liste = await S.matches();
-                        const frais = liste.find(m => m.id === matchId);
-                        if (frais && matchCourant) matchCourant.photo = frais.photo;
-                    } catch (e) {}
-                    majEntete(true);
                 });
             };
 
-            function majEntete(debloquee) {
+            function majEntete() {
                 const av = $('chat-avatar');
                 const sous = $('chat-sub');
-                const reste = S.ouvert ? S.ouvert.restants : 0;
+                if (!av) return;
 
-                if (debloquee) {
-                    av.style.filter = 'none';
-                    if (matchCourant && matchCourant.photo) {
-                        av.style.backgroundImage = 'url(' + matchCourant.photo + ')';
-                        av.style.backgroundSize = 'cover';
-                        av.style.backgroundPosition = 'center';
-                        av.textContent = '';
-                    } else {
-                        av.style.backgroundImage = 'linear-gradient(135deg,#FF6B00,#FF1E56)';
-                        av.textContent = (matchCourant && matchCourant.nom ? matchCourant.nom[0] : '?').toUpperCase();
-                    }
-                    if (sous) sous.innerHTML = '<span id="chat-status">🔓 Photos débloquées</span>';
+                // Photo toujours visible, dès le match.
+                av.style.filter = 'none';
+                if (matchCourant && matchCourant.photo) {
+                    av.style.backgroundImage = 'url(' + matchCourant.photo + ')';
+                    av.style.backgroundSize = 'cover';
+                    av.style.backgroundPosition = 'center';
+                    av.textContent = '';
                 } else {
-                    av.style.filter = 'blur(3px)';
-                    av.style.backgroundImage = 'linear-gradient(135deg,#2d1b4e,#1b3a4b)';
-                    av.textContent = '👤';
-                    // On reconstruit le sous-titre en entier : le remplacer par
-                    // textContent détruisait #msg-countdown utilisé ailleurs.
-                    if (sous) {
-                        sous.innerHTML = '<span id="chat-status">🔒 Photo</span> après ' +
-                            '<span id="msg-countdown">' + reste + '</span> message' + (reste > 1 ? 's' : '');
-                    }
+                    av.style.backgroundImage = 'linear-gradient(135deg,#FF6B00,#FF1E56)';
+                    av.textContent = (matchCourant && matchCourant.nom ? matchCourant.nom[0] : '?').toUpperCase();
                 }
+                // On reconstruit le sous-titre en entier (et non par textContent)
+                // pour ne jamais casser les éléments internes.
+                if (sous) sous.innerHTML = '<span id="chat-status">● En ligne</span>';
             }
 
-            /* La fonction d'origine suppose #msg-countdown toujours présent :
-               on la remplace par une version qui ne casse jamais. */
-            window.updatePhotoCountdown = function () {
-                const el = $('msg-countdown');
-                if (!el || !S.ouvert) return;
-                el.textContent = S.ouvert.restants;
-            };
+            /* Plus aucun compteur de déblocage : on garde une version neutre
+               pour ne jamais casser un appel existant. */
+            window.updatePhotoCountdown = function () {};
 
             function bulle(texte, sens, date) {
                 const zone = $('chat-messages');
@@ -2403,13 +2367,7 @@
                 try {
                     const r = await S.send(matchCourant.id, texte);
                     if (r.message && r.message.id) vus.add(r.message.id);
-                    if (r.photo_unlocked && !matchCourant.photoDebloquee) {
-                        matchCourant.photoDebloquee = true;
-                        majEntete(true);
-                        bulle('🔓 Photos débloquées !', 'system');
-                    } else {
-                        majEntete(matchCourant.photoDebloquee);
-                    }
+                    majEntete();
                     if (typeof messageCount !== 'undefined') messageCount++;
                 } catch (err) {
                     const raisons = {

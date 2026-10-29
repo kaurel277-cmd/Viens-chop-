@@ -11,8 +11,8 @@
 
 - 9 pages statiques complètes, responsive, validées (HTML 0 erreur, 0 erreur JS,
   0 débordement, 42 tests de régression au vert).
-- Charte, ton et parcours utilisateur fixés : profil → photo floutée → 5 messages
-  → déblocage, likes 3/jour, Mode Coulé / Mode Debout.
+- Charte, ton et parcours utilisateur fixés : profil + photo visibles → like →
+  match → chat, likes 3/jour, Mode Coulé / Mode Debout.
 - `database/neon-schema.sql` : 11 tables, 9 triggers, testé sur PostgreSQL 17.
 - `server/` : API Node complète (auth SMS, feed, likes, chat, sécurité),
   17 suites de tests d'intégration au vert contre un vrai PostgreSQL.
@@ -57,7 +57,7 @@ temps réel ont donc été construits autour. Détail complet dans
 Diagnostic de la base : `/api/health/db`
 
 ⚠️ Les règles sensibles doivent vivre **côté serveur**, pas dans le JavaScript :
-quota de likes, majorité 18+, déblocage après 5 messages, « qui m'a liké » flouté.
+quota de likes, majorité 18+, « qui m'a liké ».
 Le schéma SQL les contient déjà ; il faut les tester.
 
 ---
@@ -123,7 +123,7 @@ Une app de rencontre sans modération se fait fermer, ou se vide.
 1. **Bêta fermée, 500 personnes** — celles du Mode Debout offert. But : mesurer
    la rétention à J+7, pas le nombre d'inscrits.
 2. Corriger ce qui bloque la conversation (le vrai indicateur : combien de
-   matchs deviennent une discussion de 5 messages ?).
+   matchs deviennent une vraie discussion ?).
 3. Ouvrir progressivement, commune par commune, pour garder une densité de
    profils suffisante — une app de rencontre vide ne se relance pas.
 

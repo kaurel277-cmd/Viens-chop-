@@ -62,31 +62,24 @@ usersRouter.post('/me', requireAuth, async (req, res, next) => {
 
 /* ---------------------------------------------------------------------------
    GET /api/users/:id — profil public
-   La photo n'est renvoyée que si un match existe ET qu'il est débloqué.
+   La photo est visible par tous les inscrits : on doit voir la personne
+   avant de la liker. (La règle « photo après 5 messages » a été retirée.)
    --------------------------------------------------------------------------- */
 usersRouter.get('/:id', requireAuth, async (req, res, next) => {
   try {
     const { rows } = await query(
       `select u.id, u.pseudo, u.age, u.gender, u.commune, u.artists, u.bio,
               u.is_certified, u.last_seen_at,
-              exists (
-                select 1 from public.matches m
-                 where (m.user_a = u.id and m.user_b = $2 or m.user_b = u.id and m.user_a = $2)
-                   and m.unlocked_at is not null
-              ) as photo_unlocked
+              case when u.main_photo_id is not null
+                   then '/api/photos/' || u.main_photo_id::text end as photo_url,
+              (select count(*) from public.photos ph where ph.user_id = u.id)::int as photo_count
          from public.users u
         where u.id = $1`,
-      [req.params.id, req.user.id]
+      [req.params.id]
     );
     if (!rows.length) throw new AppError(404, 'PROFIL_INTROUVABLE', 'Profil introuvable.');
 
-    const profile = rows[0];
-    if (profile.photo_unlocked) {
-      const { rows: p } = await query('select photo_url from public.users where id = $1', [req.params.id]);
-      profile.photo_url = p[0]?.photo_url ?? null;
-    }
-    delete profile.photo_unlocked;
-
-    res.json({ ok: true, profile });
+    res.json({ ok: true, profile: rows[0] });
   } catch (err) { next(err); }
 });
+

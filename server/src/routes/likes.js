@@ -65,13 +65,15 @@ likesRouter.delete('/:id', requireAuth, async (req, res, next) => {
 });
 
 /* ---------------------------------------------------------------------------
-   GET /api/likes/who-liked-me — la photo n'est révélée qu'en Mode Debout
+   GET /api/likes/who-liked-me — la liste est offerte, la photo est un
+   avantage Mode Debout (ce n'est pas un flou : rien n'est affiché si la
+   photo n'est pas débloquée, et la photo du fil reste visible partout).
    --------------------------------------------------------------------------- */
 likesRouter.get('/who-liked-me', requireAuth, async (req, res, next) => {
   try {
     // Requête directe (au lieu de la vue who_liked_me) pour utiliser les
     // photos stockées en base : main_photo_id -> /api/photos/<id>.
-    // La photo n'est révélée qu'en Mode Debout, comme prévu au cahier des charges.
+    // Photo réservée au Mode Debout ; aucun flou nulle part ailleurs.
     const { rows } = await query(
       `select l.id              as like_id,
               u.id              as user_id,
@@ -81,7 +83,7 @@ likesRouter.get('/who-liked-me', requireAuth, async (req, res, next) => {
               u.artists,
               u.is_certified,
               case when $2 then u.main_photo_id end as photo_id,
-              not $2 as is_blurred,
+              $2 as photo_visible,
               l.created_at
          from public.likes l
          join public.users u on u.id = l.sender_id

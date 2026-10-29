@@ -42,7 +42,7 @@ et la texture reste visible. Le PNG d'origine (1,5 Mo) a été converti : **−8
 |---|---|---|
 | Likes / jour | 10 pour tous | 10 en gratuit, **illimités en VIP** ✅ |
 | **Faux Appel** | bloqué à 100 % en gratuit | **1 essai / semaine** en gratuit, **illimité 24/7** en VIP ✅ |
-| **Qui m'a aimé** | inexistant | **photos floutées** en gratuit, **en clair** en VIP ✅ |
+| **Qui m'a aimé** | inexistant | liste complète en VIP, aperçu en gratuit ✅ |
 
 Le quota est réel : après un essai, le prochain est bloqué 7 jours et le message indique
 le temps restant (« Prochain essai gratuit dans 7 jours »). L'état survit au rechargement.
@@ -81,9 +81,9 @@ L'âge saisi à la main (`<input type="number">`, contournable) est remplacé pa
 - `users` avec `age` et `is_adult` **colonnes générées** exactement comme au CDC ;
 - `likes`, `matches`, `messages` (texte / vocal / quiz / système), `quiz_sessions`, `payments` ;
 - **8 triggers métier** : majorité, création automatique du match sur like réciproque,
-  **quota 10 likes/jour**, **quota faux appel 7 jours**, `updated_at` ;
-- **RLS activée** sur les 6 tables + vue `who_liked_me` qui **ne renvoie l'URL de la photo
-  que si l'appelant est VIP** (le floutage n'est donc pas qu'une illusion côté client).
+  **quota 3 likes/jour**, **quota faux appel 7 jours**, `updated_at` ;
+- **RLS activée** sur les 6 tables + vue `who_liked_me`. **Les photos sont visibles
+  dès le fil de découverte** : on doit voir la personne avant de la liker.
 
 ---
 

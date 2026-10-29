@@ -9,7 +9,7 @@ export const feedRouter = Router();
    Règles :
      - même commune d'abord, puis le reste du pays
      - jamais soi-même, jamais un profil déjà liké/passé, jamais un bloqué
-     - la photo n'est jamais exposée ici (elle se débloque au 5e message)
+     - la photo principale est exposée : on like en voyant la personne
    --------------------------------------------------------------------------- */
 feedRouter.get('/', requireAuth, async (req, res, next) => {
   try {

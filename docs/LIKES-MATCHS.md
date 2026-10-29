@@ -10,7 +10,7 @@
 | Deux likes réciproques | jamais détecté | **match créé automatiquement** |
 | Compteur de likes | décrémenté dans le navigateur | **vrai quota de 3/jour, imposé par la base** |
 | Discussions | conversations inventées | **vrais matchs, vrais messages** |
-| Photo du profil | floutée pour toujours | **débloquée au 5ᵉ message** |
+| Photo du profil | pas affichée sur la carte | **visible dès le fil : on voit qui on like** |
 | Nouveaux arrivants | jamais visibles | fil rafraîchi en revenant sur « Découvrir » |
 
 ## Les règles vivent dans PostgreSQL, pas dans le navigateur
@@ -19,16 +19,16 @@ Un utilisateur qui bricole le code de la page ne peut pas contourner :
 
 - `app.enforce_daily_like_quota` → 4ᵉ like refusé (`QUOTA_LIKES`)
 - `app.maybe_create_match` → match seulement si les deux se likent
-- `app.unlock_photos_after_five` → photo révélée au 5ᵉ message
+- `app.unlock_photos_after_five` → **hérité**, conservé en base pour compatibilité ;
+  l'interface n'attend plus rien pour afficher la photo (décision du 29/10/2026)
 - `app.check_message_sender` → impossible d'écrire dans un match des autres
 
 ## Comment ça se passe, concrètement
 
 1. Kevin like Aïcha → rien ne s'ouvre, le compteur passe à 2/3.
 2. Aïcha like Kevin → **le chat s'ouvre tout seul** des deux côtés.
-3. Ils échangent. À partir du 5ᵉ message, le bandeau affiche
-   « 🔓 Photos débloquées » et la photo devient nette — sans recharger la page
-   (vérification toutes les 3 secondes).
+3. Ils échangent. La photo reste visible du début à la fin : plus aucun flou,
+   aucun bandeau à attendre, aucun palier de messages.
 
 ## Bugs trouvés et corrigés pendant les tests
 
