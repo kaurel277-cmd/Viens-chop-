@@ -223,19 +223,15 @@ possibles et leur correction.
 
 ---
 
-## Étape 9 — Créer un compte pour de vrai · *5 min*
+## Étape 9 — Créer un compte pour de vrai · *2 min*
 
-1. Ouvre `outil-test.html` (il est à la racine de ton dépôt, ajouté pour ça).
-   Pour l'utiliser : ouvre **`https://kaurel277-cmd.github.io/...`** si tu as
-   activé GitHub Pages, ou télécharge le fichier et ouvre-le dans ton navigateur.
-2. Dans **Adresse de l'API**, colle ton adresse Render.
-3. Laisse le numéro `0701020304` → clique sur **Envoyer le code**.
-4. Le code n'arrive pas par SMS (aucun fournisseur n'est encore branché). Va le
-   lire dans **Render → ton service → Logs** : tu y verras
-   `📱 [SMS simulé] +2250701020304 : Viens chop : ton code est 4 8 2 9 1 3`.
-5. Reporte le code dans l'outil → **Valider**.
-6. Clique sur **Voir mon profil** : tu dois voir ton compte, avec
-   `"likes_left": 3`.
+1. Ouvre **`inscription.html`** sur ton site (ou `index.html` → « Je m'inscris
+   gratuitement »).
+2. Numéro : `07 01 02 03 04`. Mot de passe : `Chop2026!`.
+   Date de naissance : `1999-01-01`. Coche les CGU.
+3. Clique sur **Créer mon compte** : le compte est créé **immédiatement**.
+   Aucun code à recevoir, aucun SMS, aucune attente.
+4. Le bouton **Entrer dans l'application** t'amène dans l'appli, déjà connecté.
 
 ✅ **À ce stade, le backend fonctionne pour de vrai.** Un compte a été créé dans
 une vraie base PostgreSQL, avec une vraie session.

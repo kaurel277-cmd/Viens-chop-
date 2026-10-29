@@ -25,7 +25,7 @@ aucune erreur.
 
 | Élément | État | Preuve |
 |---|---|---|
-| 10 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `outil-test`, `app` |
+| 9 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `app` |
 | Erreurs JavaScript | ✅ **0** sur les 10 pages | parcours automatisé |
 | Ressources manquantes (404, images cassées) | ✅ **0** | idem |
 | Liens internes (9 cibles distinctes) | ✅ **0 lien mort** | idem |
@@ -52,7 +52,6 @@ C'est la partie importante, et je ne veux pas te la vendre comme finie.
 | **Le compte ne suit pas d'un appareil à l'autre** | C'est la contrepartie du « sans API ». |
 | **Mot de passe non récupérable** | Oublié = perdu, il faut écrire au support. |
 | **Pas de paiement** | Les écrans Wave / Orange Money sont des maquettes. |
-| **`outil-test.html` est public** | C'est un outil de développement, à retirer de la version publique. |
 
 ## 3. Les bugs corrigés jusqu'ici
 

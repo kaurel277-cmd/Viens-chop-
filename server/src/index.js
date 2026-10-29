@@ -48,12 +48,6 @@ if (config.rateLimitEnabled) {
     message: { error: { code: 'TROP_DE_COMPTES', message: 'Trop d\'inscriptions depuis ce réseau.' } }
   }));
 
-  // Plafond resserré sur l'envoi de SMS (coût réel par message)
-  app.use('/api/auth/otp', rateLimit({
-    windowMs: 60 * 60 * 1000,
-    limit: config.otpRateLimitMax,
-    message: { error: { code: 'TROP_DE_DEMANDES', message: 'Trop de demandes de code. Réessaie plus tard.' } }
-  }));
 }
 
 // /api/health = le processus répond. /api/health/db = la base répond vraiment.
@@ -85,6 +79,6 @@ app.use((err, _req, res, _next) => {
 // Démarrage (sauté pendant les tests)
 if (process.env.NODE_ENV !== 'test') {
   app.listen(config.port, '0.0.0.0', () => {
-    console.log(`✅ Viens chop API sur http://0.0.0.0:${config.port} (SMS: ${config.smsProvider})`);
+    console.log(`✅ Viens chop API sur http://0.0.0.0:${config.port}`);
   });
 }

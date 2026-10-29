@@ -15,7 +15,7 @@ autour d'elle les briques qui, chez Supabase, étaient incluses.
 | Brique | Supabase | Neon |
 |---|---|---|
 | Base PostgreSQL | ✅ | ✅ **c'est son métier** |
-| Authentification par SMS | ✅ `auth.users` | ❌ à coder → `database/neon-schema.sql` + `server/src/routes/auth.js` |
+| Comptes (numéro + mot de passe) | ✅ `auth.users` | ✅ codé → `database/neon-schema.sql` + `server/src/routes/auth.js` |
 | Stockage des photos | ✅ Storage | ❌ **à choisir** (voir §6) |
 | Temps réel (chat) | ✅ Realtime | ❌ à choisir (voir §6) |
 | Row Level Security | ✅ via `auth.uid()` | ⚠️ possible, mais il faut porter l'identité soi-même |
@@ -52,7 +52,7 @@ psql "$DATABASE_URL_DIRECT" -v ON_ERROR_STOP=1 -f database/test-schema.sql
 
 # 4. Configurer l'API
 cd server
-cp .env.example .env      # puis remplir DATABASE_URL, JWT_SECRET, OTP_PEPPER
+cp .env.example .env      # puis remplir DATABASE_URL et JWT_SECRET
 npm install
 npm run dev               # http://localhost:3001
 
@@ -76,8 +76,7 @@ Neon en fournit deux. **Ce n'est pas un détail** :
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-À faire deux fois : une valeur pour `JWT_SECRET`, une autre pour `OTP_PEPPER`.
-**Changer `OTP_PEPPER` invalide tous les codes en cours** — à ne jamais faire
+`JWT_SECRET` signe les jetons : s'il change, tout le monde doit se reconnecter.
 en production.
 
 ---
@@ -97,7 +96,6 @@ refuse. C'est le principal intérêt de les avoir mises en SQL.
 | Seuls les 2 participants écrivent | trigger `messages_check_sender` | test « un tiers » |
 | 1 faux appel/semaine en gratuit | trigger `users_fakecall_quota` | test dédié |
 | Paiement confirmé → 30 jours de Debout | trigger `payments_activate` | `test-schema.sql` |
-| 5 codes SMS max/heure/numéro | `app.check_otp_rate_limit()` | test API |
 
 **Les tests tournent contre un vrai PostgreSQL**, pas contre des mocks :
 
@@ -117,15 +115,15 @@ Authentification : `Authorization: Bearer <access_token>` (JWT, 15 min).
 
 | Méthode | Route | Corps | Réponse |
 |---|---|---|---|
-| `POST` | `/api/auth/otp` | `{ phone }` | `{ expires_in }` — envoie le SMS |
-| `POST` | `/api/auth/verify` | `{ phone, code }` | `{ access_token, refresh_token, is_new }` |
+| `POST` | `/api/auth/register` | `{ phone, password, birth_date }` | `{ access_token, refresh_token, user }` |
+| `POST` | `/api/auth/login` | `{ phone, password }` | `{ access_token, refresh_token }` |
 | `POST` | `/api/auth/refresh` | `{ refresh_token }` | nouveaux jetons (l'ancien est révoqué) |
 | `POST` | `/api/auth/logout` | `{ refresh_token }` | `{ ok }` |
 | `GET` | `/api/auth/me` | — | profil + `likes_left` |
 
-**L'inscription est automatique**, comme demandé : `POST /api/auth/verify`
-crée le compte immédiatement (`is_new: true`). Aucun lien à cliquer, aucune
-attente d'ouverture d'accès. Le profil se complète ensuite.
+**L'inscription est immédiate**, comme demandé : `POST /api/auth/register`
+crée le compte tout de suite. Aucun code à recevoir, aucun lien à cliquer,
+aucune attente. Le profil se complète ensuite.
 
 ### Profil et découverte
 
@@ -170,28 +168,19 @@ Toujours `{ error: { code, message } }`. Les plus utiles côté site :
 | 409 | `TELEPHONE_DEJA_UTILISE` | numéro déjà inscrit |
 | 429 | `QUOTA_LIKES` | 3 likes du jour épuisés |
 | 429 | `QUOTA_FAUX_APPEL` | 1 essai par semaine |
-| 429 | `TROP_DE_DEMANDES` | trop de SMS demandés |
+| 429 | `TROP_DE_COMPTES` | trop d'inscriptions depuis le même réseau |
 
 ---
 
 ## 5. Brancher le site
 
-Aujourd'hui `inscription.html` simule tout (`DEMO_MODE: true`, code `1234`).
-Le contrat est déjà écrit dans le fichier, aux lignes 484-504. Il suffit de
-remplacer les trois fonctions :
+C'est fait : `inscription.html` et `app.html` parlent à l'API (`assets/js/api.js`).
+Pour forcer une autre adresse sans toucher au code : `inscription.html?api=https://…`.
 
 ```js
-const API = 'https://api.viens-chop.ci';
+const VCAPI = { base: 'https://viens-chop-api.onrender.com' };
 
-async function sendOtp(phone) {
-  const r = await fetch(`${API}/api/auth/otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: '+225' + phone })
-  });
-  if (!r.ok) throw new Error((await r.json()).error.message);
-  return true;
-}
+await VCAPI.auth.register('0701020304', 'Chop2026!', '1999-01-01');
 ```
 
 Puis stocker les jetons côté client :
@@ -252,10 +241,9 @@ L'API est un serveur Node classique.
 | Cloudflare Workers | Nécessite le driver HTTP Neon également |
 
 Variables à définir dans l'hébergeur : `DATABASE_URL`, `JWT_SECRET`,
-`OTP_PEPPER`, `SMS_PROVIDER`, `CORS_ORIGIN`, `NODE_ENV=production`.
+`CORS_ORIGIN`, `NODE_ENV=production`.
 
 **En production : `CORS_ORIGIN` doit être l'URL exacte du site**, pas `*`.
-Et `DEV_OTP_BYPASS` doit rester absent (sinon n'importe qui entre avec `123456`).
 
 ---
 

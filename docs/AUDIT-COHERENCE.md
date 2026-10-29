@@ -55,5 +55,5 @@
 | Mode discret | **Prévu** — idem |
 | Blocage et signalement | API prête (`/api/safety/block`, `/api/safety/report`), pas encore de bouton dans l'appli |
 | Paiement Mobile Money | maquette |
-| `outil-test.html` | outil de développement, public, à retirer avant le lancement |
+| Faxe de sécurité restant | SOS, Check-in et Mode discret restent à coder |
 | Profils de démonstration | en mode appareil uniquement ; en mode serveur, ce sont de vrais comptes |

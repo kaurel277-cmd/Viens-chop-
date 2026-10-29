@@ -14,19 +14,16 @@
 - Charte, ton et parcours utilisateur fixés : profil + photo visibles → like →
   match → chat, likes 3/jour, Mode Coulé / Mode Debout.
 - `database/neon-schema.sql` : 11 tables, 9 triggers, testé sur PostgreSQL 17.
-- `server/` : API Node complète (auth SMS, feed, likes, chat, sécurité),
+- `server/` : API Node complète (comptes, feed, likes, chat, sécurité),
   17 suites de tests d'intégration au vert contre un vrai PostgreSQL.
 - Site rapide sans aucune dépendance externe (CSS compilé en local, polices
   système, images optimisées à 160 Ko).
 
 **Le point bloquant**
 
-> Le site est une **maquette de démonstration**. Rien n'est réel :
-> `DEMO_MODE: true` (code SMS `1234`), aucun appel serveur (`0` requête réseau),
-> photos non stockées, paiements simulés, swipe joué à partir d'un tableau JS.
-> On ne peut pas ouvrir au public en l'état.
-
-La prochaine étape n'est donc pas une nouvelle page : c'est **brancher un backend**.
+> Le site **est branché sur l'API** : comptes, photos, likes, matchs et messages
+> sont réels et partagés entre les inscrits. Il reste la modération, la mise en
+> ligne soignée et le paiement avant une ouverture au public.
 
 ---
 
@@ -46,12 +43,11 @@ temps réel ont donc été construits autour. Détail complet dans
 | Base de données | ✅ **en production** — Neon, 6 tables, connexion vérifiée | `database/neon-schema.sql` |
 | Règles métier (âge, quotas, match, déblocage) | ✅ **en production** — 7/7 triggers actifs | `database/test-schema.sql` |
 | API Node (auth, feed, likes, chat, sécurité) | ✅ **déployée sur Render** — 20 routes | `server/` |
-| Envoi d'un code SMS | ✅ **fonctionnel** — testé de bout en bout | `server/src/sms.js` |
-| Envoi des SMS réels | ⚙️ fournisseur à choisir (Termii / Twilio) — le code s'affiche dans les logs en attendant | `server/src/sms.js` |
-| Brancher le site sur l'API | ⏳ **prochaine tâche** | `inscription.html` l. 484-504 |
+| Inscription | ✅ numéro + mot de passe, **aucun code à recevoir** | `server/src/routes/auth.js` |
+| Brancher le site sur l'API | ✅ **fait** — inscription, fil, likes, matchs, chat | `assets/js/api.js` |
 | Stockage des photos | ⏳ à faire (Cloudflare R2 conseillé) | voir BACKEND.md §6.1 |
 | Chat temps réel | ⏳ polling d'abord, SSE ensuite | voir BACKEND.md §6.2 |
-| Notifications | ⏳ push web ou SMS | — |
+| Notifications | ⏳ push web | — |
 
 **Adresse de l'API en production :** `https://viens-chop-api.onrender.com`
 Diagnostic de la base : `/api/health/db`

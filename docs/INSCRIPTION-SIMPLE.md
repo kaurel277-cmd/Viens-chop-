@@ -6,8 +6,8 @@
 
 | Avant | Maintenant |
 |---|---|
-| On demandait un numéro, puis un **code à 6 chiffres envoyé par SMS** | On demande un numéro et un **mot de passe choisi par toi** |
-| Il fallait que le SMS arrive (donc l'API, donc les logs) | **Aucun réseau, aucune attente** : ça marche tout de suite |
+| On demandait un numéro, puis un **code à 6 chiffres** | On demande un numéro et un **mot de passe choisi par toi** |
+| Il fallait qu'un code arrive (donc l'API, donc les logs) | **Aucune attente** : ça marche tout de suite |
 | 3 écrans | **Un seul formulaire** |
 | Compte perdu si le téléphone change de navigateur | Compte enregistré **sur l'appareil** |
 
@@ -46,8 +46,8 @@ Un compte enregistré sur l'appareil **ne suit pas la personne** d'un téléphon
 API ». Pour la version publique, il faudra :
 
 1. les vrais comptes serveur (c'est déjà écrit et testé : `server/`) ;
-2. un fournisseur SMS (Termii ou Twilio) pour vérifier les numéros ;
-3. ou la connexion par WhatsApp / Google, qui évite le SMS.
+2. la connexion par WhatsApp ou Google, si tu veux un jour un autre chemin
+   que le mot de passe.
 
 Rien n'est perdu : `assets/js/api.js` et le parcours serveur restent dans le
 dépôt, prêts à reprendre quand tu voudras.

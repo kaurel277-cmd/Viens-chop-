@@ -128,7 +128,7 @@ et une adresse en haut du type :
 https://viens-chop-api.onrender.com
 ```
 
-**Note cette adresse**, c'est celle que tu colleras dans `outil-test.html`.
+**Note cette adresse**, c'est celle que tu colleras dans `inscription.html?api=…` si tu veux la forcer à la main (sinon elle est déjà dans le code).
 
 ### Ce que tu ne dois PAS voir
 
@@ -168,16 +168,12 @@ Réponse attendue :
 
 ## Écran F — Le premier vrai compte
 
-1. Ouvre `outil-test.html` (à la racine du dépôt).
-2. Dans **Adresse de l'API**, colle `https://viens-chop-api.onrender.com`.
-3. Numéro : `0701020304` → **Envoyer le code**.
-4. Le code n'arrive pas par SMS : il s'affiche dans **Render → ton service →
-   Logs**, sous la forme :
-   ```
-   📱 [SMS simulé] +2250701020304 : Viens chop : ton code est 482913. Il expire dans 5 min.
-   ```
-5. Reporte ce code dans l'outil → **Valider**.
-6. Clique sur **Voir mon profil** → tu dois voir `"likes_left": 3`.
+1. Ouvre **`inscription.html`** sur ton site.
+2. Numéro : `07 01 02 03 04`. Mot de passe : `Chop2026!`. Date de naissance :
+   `1999-01-01`. Coche les CGU.
+3. Clique sur **Créer mon compte** → l'écran de confirmation apparaît tout de
+   suite : **aucun code à attendre**.
+4. Clique sur **Entrer dans l'application** : tu arrives dans le fil.
 
 C'est bon : un compte existe réellement dans ta base PostgreSQL.
 

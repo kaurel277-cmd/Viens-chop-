@@ -1,3 +1,7 @@
+> **Note (29/10/2026)** : ce rapport décrit une version antérieure. Depuis,
+> l'inscription par code envoyé par SMS a été **supprimée du produit** :
+> on s'inscrit avec un numéro et un mot de passe, sans code à recevoir.
+
 # Audit Viens chop — rapport de correction
 
 **Dépôt** : `kaurel277-cmd/Viens-chop-` (branche `main`)

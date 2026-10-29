@@ -119,7 +119,7 @@ Fichiers de build conservés dans `build/` (`tailwind.config.js`, `input.css`, `
 
 | # | Point | Où |
 |---|---|---|
-| 1 | Passer `DEMO_MODE: false` et brancher l'API SMS / OTP | `inscription.html` |
+| 1 | Brancher l'inscription sur l'API (numéro + mot de passe) | `inscription.html` |
 | 2 | Exécuter `database/neon-schema.sql`, lancer `server/` et brancher l'app | Neon + Node |
 | 3 | Renseigner les numéros WhatsApp Business | `faq.html`, `maquis.html` |
 | 4 | Compléter les mentions légales (`[Ton Nom ou Société]`, hébergeur, téléphone) | `mentions-legales.html` |

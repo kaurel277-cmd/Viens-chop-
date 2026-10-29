@@ -150,20 +150,6 @@
       return d;
     },
 
-    async sendCode(phone) {
-      const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
-      return request('/api/auth/otp', { method: 'POST', auth: false, body: { phone: local } });
-    },
-
-    async verify(phone, code) {
-      const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
-      const d = await request('/api/auth/verify', {
-        method: 'POST', auth: false, body: { phone: local, code }
-      });
-      saveSession(d.access_token, d.refresh_token);
-      return d;
-    },
-
     me() {
       return request('/api/auth/me');
     },

@@ -7,7 +7,7 @@ Viens chop est la première application de rencontre et de flirt 100 % pour la j
 *.html              Site vitrine + aperçu de l'app (statique)
 assets/             CSS compilé, images, icônes
 database/           neon-schema.sql (tables + règles) et test-schema.sql
-server/             API Node : auth SMS, feed, likes, chat, sécurité
+server/             API Node : comptes, feed, likes, chat, sécurité
 docs/BACKEND.md     Architecture Neon, endpoints, déploiement
 ROADMAP.md          Où en est le projet et ce qu'il reste à faire
 ```

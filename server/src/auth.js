@@ -5,18 +5,8 @@ import { query } from './db.js';
 import { AppError } from './errors.js';
 
 /* ---------------------------------------------------------------------------
-   Codes OTP et jetons — tout est haché avant d'atteindre la base.
+   Jetons et sessions — tout est haché avant d'atteindre la base.
    --------------------------------------------------------------------------- */
-
-export function generateOtp() {
-  // crypto.randomInt est cryptographiquement sûr (pas Math.random)
-  const max = 10 ** config.otpLength;
-  return String(crypto.randomInt(0, max)).padStart(config.otpLength, '0');
-}
-
-export function hashOtp(code) {
-  return crypto.createHmac('sha256', config.otpPepper).update(code).digest('hex');
-}
 
 export function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');

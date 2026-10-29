@@ -11,7 +11,7 @@
 --     (PostgreSQL refuse `age()` dans une colonne calculée : non immutable) ;
 --   * `voice_note_url` supprimée (la note vocale a été retirée du produit) ;
 --   * `is_vip` remplacé par `plan` ('coupe' | 'debout'), aligné sur le produit ;
---   * ajout des tables d'authentification (otp_codes, sessions) et de
+--   * ajout des tables d'authentification (sessions) et de
 --     modération (reports, blocks), indispensables hors Supabase Auth ;
 --   * RLS désactivée : l'accès passe uniquement par l'API (voir docs/BACKEND.md).
 -- ============================================================================
@@ -136,39 +136,6 @@ create trigger users_touch
 -- ============================================================================
 -- 2. AUTHENTIFICATION (ce que Supabase Auth fournissait)
 -- ============================================================================
-
--- --- 2.1 Codes OTP -----------------------------------------------------------
-create table if not exists public.otp_codes (
-    id          bigserial primary key,
-    phone       varchar(20) not null,
-    code_hash   text not null,                 -- sha256(code + pepper), jamais en clair
-    expires_at  timestamptz not null,
-    attempts    int not null default 0,
-    consumed_at timestamptz,
-    created_at  timestamptz not null default now()
-);
-
-create index if not exists otp_phone_idx on public.otp_codes (phone, created_at desc);
-
--- Antibruteforce : 5 envois max par numéro et par heure
-create or replace function app.check_otp_rate_limit(p_phone varchar)
-returns void
-language plpgsql
-as $$
-declare
-    v_count int;
-begin
-    select count(*) into v_count
-      from public.otp_codes
-     where phone = p_phone
-       and created_at > now() - interval '1 hour';
-
-    if v_count >= 5 then
-        raise exception 'TROP_DE_DEMANDES : 5 codes maximum par heure. Réessaie plus tard.'
-            using errcode = 'check_violation';
-    end if;
-end;
-$$;
 
 -- --- 2.2 Sessions (JWT + refresh token) --------------------------------------
 create table if not exists public.sessions (
@@ -540,7 +507,6 @@ $$;
 -- 12. COMMENTAIRES
 -- ============================================================================
 comment on table  public.users      is 'Comptes. La majorité est vérifiée par trigger, pas par le client.';
-comment on table  public.otp_codes  is 'Codes SMS hachés (sha256 + pepper). 5 envois max par heure et par numéro.';
 comment on table  public.sessions   is 'Refresh tokens hachés. Le JWT court (15 min) n''est pas stocké.';
 comment on table  public.likes      is 'Quota de 3/jour appliqué par trigger ; illimité en Mode Debout.';
 comment on table  public.matches    is 'Paire ordonnée (user_a < user_b) : un seul match par couple.';

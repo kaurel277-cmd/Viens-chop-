@@ -34,12 +34,11 @@ async function api(path, { method = 'GET', body, token } = {}) {
 
 /** Inscrit un utilisateur complet et renvoie son jeton. */
 async function signup(phone, pseudo, extra = {}) {
-  const a = await api('/api/auth/otp', { method: 'POST', body: { phone } });
-  assert.equal(a.status, 200, `envoi OTP : ${JSON.stringify(a.json)}`);
-  const code = a.json.dev_code || '123456';
-
-  const v = await api('/api/auth/verify', { method: 'POST', body: { phone, code } });
-  assert.equal(v.status, 200, `vérification OTP : ${JSON.stringify(v.json)}`);
+  const v = await api('/api/auth/register', {
+    method: 'POST',
+    body: { phone, password: 'Chop2026!', birth_date: extra.birth_date || '2000-05-12' }
+  });
+  assert.equal(v.status, 201, `inscription : ${JSON.stringify(v.json)}`);
 
   const token = v.json.access_token;
   const p = await api('/api/users/me', {
@@ -74,8 +73,8 @@ before(async () => {
   base = `http://127.0.0.1:${server.address().port}`;
 
   // Base propre pour la campagne
-  await query(`truncate public.messages, public.matches, public.likes, public.sessions,
-                        public.otp_codes, public.reports, public.blocks, public.quiz_sessions,
+  await query(`truncate public.messages, public.matches, public.likes, public.passes,
+                        public.sessions, public.reports, public.blocks, public.quiz_sessions,
                         public.payments, public.users cascade`);
 });
 
@@ -92,39 +91,59 @@ test('santé de l\'API', async () => {
   ok('GET /api/health', 'service en ligne');
 });
 
-test('inscription : OTP -> compte créé automatiquement', async () => {
+test('inscription : numéro + mot de passe, sans SMS ni code', async () => {
+  const tel = '+2250701000001';
+  const r = await api('/api/auth/register', {
+    method: 'POST', body: { phone: tel, password: 'Chop2026!', birth_date: '1999-06-01' }
+  });
+  assert.equal(r.status, 201, JSON.stringify(r.json));
+  assert.ok(r.json.access_token);
+  ok('compte créé immédiatement', 'aucun code à recevoir');
+
+  const tropCourt = await api('/api/auth/register', {
+    method: 'POST', body: { phone: '+2250701000002', password: '123', birth_date: '1999-06-01' }
+  });
+  assert.equal(tropCourt.status, 400);
+  ok('mot de passe trop court refusé', tropCourt.json.error.code);
+
+  const doublon = await api('/api/auth/register', {
+    method: 'POST', body: { phone: tel, password: 'Chop2026!', birth_date: '1999-06-01' }
+  });
+  assert.equal(doublon.status, 409);
+  ok('un numéro = un seul compte', doublon.json.error.code);
+
+  const mauvais = await api('/api/auth/login', { method: 'POST', body: { phone: tel, password: 'PasLeBon!' } });
+  assert.equal(mauvais.status, 401);
+  ok('mauvais mot de passe refusé');
+
+  const bon = await api('/api/auth/login', { method: 'POST', body: { phone: tel, password: 'Chop2026!' } });
+  assert.equal(bon.status, 200);
+  assert.ok(bon.json.access_token);
+  ok('bon mot de passe accepté');
+});
+
+// Plus aucun point d'entrée par code envoyé par SMS
+test("l'ancienne connexion par code SMS n'existe plus", async () => {
   const a = await api('/api/auth/otp', { method: 'POST', body: { phone: '+2250701000001' } });
-  assert.equal(a.status, 200);
-  ok('envoi du code OTP');
-
-  const bad = await api('/api/auth/verify', { method: 'POST', body: { phone: '+2250701000001', code: '000000' } });
-  assert.equal(bad.status, 400);
-  ok('code erroné refusé', bad.json.error.code);
-
-  const v = await api('/api/auth/verify', { method: 'POST', body: { phone: '+2250701000001', code: a.json.dev_code } });
-  assert.equal(v.status, 200);
-  assert.ok(v.json.access_token);
-  assert.equal(v.json.is_new, true);
-  ok('compte créé sans aucune validation par lien', 'is_new = true');
-
-  // Le même numéro ne crée pas de doublon
-  const a2 = await api('/api/auth/otp', { method: 'POST', body: { phone: '0701000001' } });
-  const v2 = await api('/api/auth/verify', { method: 'POST', body: { phone: '0701000001', code: a2.json.dev_code } });
-  assert.equal(v2.json.is_new, false);
-  assert.equal(v2.json.user.id, v.json.user.id);
-  ok('un numéro = un seul compte', 'is_new = false au 2ᵉ passage');
+  const b = await api('/api/auth/verify', { method: 'POST', body: { phone: '+2250701000001', code: '123456' } });
+  assert.equal(a.status, 404, '/api/auth/otp doit avoir disparu');
+  assert.equal(b.status, 404, '/api/auth/verify doit avoir disparu');
+  ok('routes SMS supprimées', '404 sur /otp et /verify');
 });
 
 test('numéro invalide refusé', async () => {
-  const r = await api('/api/auth/otp', { method: 'POST', body: { phone: 'abc' } });
+  const r = await api('/api/auth/register', {
+    method: 'POST', body: { phone: 'abc', password: 'Chop2026!', birth_date: '1999-06-01' }
+  });
   assert.equal(r.status, 400);
   assert.equal(r.json.error.code, 'TELEPHONE_INVALIDE');
   ok('numéro invalide rejeté');
 });
 
 test('profil : majorité vérifiée par le serveur, pas par le client', async () => {
-  const a = await api('/api/auth/otp', { method: 'POST', body: { phone: '+2250701000099' } });
-  const v = await api('/api/auth/verify', { method: 'POST', body: { phone: '+2250701000099', code: a.json.dev_code } });
+  const v = await api('/api/auth/register', {
+    method: 'POST', body: { phone: '+2250701000099', password: 'Chop2026!', birth_date: '1995-02-02' }
+  });
 
   const mineur = new Date();
   mineur.setFullYear(mineur.getFullYear() - 16);

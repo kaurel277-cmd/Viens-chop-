@@ -2,11 +2,10 @@ import { Router } from 'express';
 import { config } from '../config.js';
 import { query } from '../db.js';
 import {
-  generateOtp, hashOtp, signAccessToken, createSession,
+  signAccessToken, createSession,
   rotateSession, revokeSession, requireAuth
 } from '../auth.js';
 import { AppError } from '../errors.js';
-import { sendSms } from '../sms.js';
 import { hashPassword, verifyPassword, passwordProblem } from '../password.js';
 
 export const authRouter = Router();
@@ -23,120 +22,6 @@ export function normalizePhone(input) {
   if (!/^\d{8,10}$/.test(local)) return null;
   return `+225${local}`;
 }
-
-/* ---------------------------------------------------------------------------
-   POST /api/auth/otp — envoie un code
-   --------------------------------------------------------------------------- */
-authRouter.post('/otp', async (req, res, next) => {
-  try {
-    const phone = normalizePhone(req.body?.phone);
-    if (!phone) throw new AppError(400, 'TELEPHONE_INVALIDE', 'Numéro de téléphone invalide.');
-
-    // Antibruteforce porté par la base : 5 codes max par heure
-    await query('select app.check_otp_rate_limit($1)', [phone]);
-
-    // Bêta : code fixe si BETA_OTP est défini (pas de fournisseur SMS requis)
-    const code = config.betaOtp
-      ? config.betaOtp.slice(0, config.otpLength)
-      : (config.devOtpBypass ? '123456'.slice(0, config.otpLength) : generateOtp());
-    const expires = new Date(Date.now() + config.otpTtlMinutes * 60_000);
-
-    // Un seul code actif à la fois : les précédents sont invalidés
-    await query(
-      `update public.otp_codes set consumed_at = now()
-        where phone = $1 and consumed_at is null`,
-      [phone]
-    );
-    await query(
-      `insert into public.otp_codes (phone, code_hash, expires_at) values ($1, $2, $3)`,
-      [phone, hashOtp(code), expires]
-    );
-
-    await sendSms(phone, `Viens chop : ton code est ${code}. Il expire dans ${config.otpTtlMinutes} min.`);
-
-    res.json({
-      ok: true,
-      expires_in: config.otpTtlMinutes * 60,
-      // Jamais renvoyé en production : seulement en développement ou en mode bêta explicite
-      ...(config.devOtpBypass ? { dev_code: code } : {}),
-      ...(config.betaOtp ? { mode_beta: true } : {})
-    });
-  } catch (err) { next(err); }
-});
-
-/* ---------------------------------------------------------------------------
-   POST /api/auth/verify — vérifie le code, crée la session
-   Retourne : access_token, refresh_token, et l'état du compte
-   (is_new = true si l'inscription n'est pas terminée)
-   --------------------------------------------------------------------------- */
-authRouter.post('/verify', async (req, res, next) => {
-  try {
-    const phone = normalizePhone(req.body?.phone);
-    const code = String(req.body?.code || '').trim();
-    if (!phone) throw new AppError(400, 'TELEPHONE_INVALIDE', 'Numéro de téléphone invalide.');
-    if (!new RegExp(`^\\d{${config.otpLength}}$`).test(code)) {
-      throw new AppError(400, 'CODE_INVALIDE', `Le code doit contenir ${config.otpLength} chiffres.`);
-    }
-
-    const { rows } = await query(
-      `select id, code_hash, attempts, expires_at
-         from public.otp_codes
-        where phone = $1 and consumed_at is null
-        order by created_at desc limit 1`,
-      [phone]
-    );
-    if (!rows.length) throw new AppError(400, 'AUCUN_CODE', 'Aucun code en cours. Demande-en un nouveau.');
-
-    const otp = rows[0];
-    if (new Date(otp.expires_at) < new Date()) {
-      throw new AppError(400, 'CODE_EXPIRE', 'Ce code a expiré. Demande-en un nouveau.');
-    }
-    if (otp.attempts >= 5) {
-      throw new AppError(429, 'TROP_D_ESSAIS', 'Trop de tentatives. Demande un nouveau code.');
-    }
-    if (hashOtp(code) !== otp.code_hash) {
-      await query('update public.otp_codes set attempts = attempts + 1 where id = $1', [otp.id]);
-      throw new AppError(400, 'CODE_INCORRECT', 'Code incorrect.');
-    }
-
-    await query('update public.otp_codes set consumed_at = now() where id = $1', [otp.id]);
-
-    const userRes = await query(
-      `select id, pseudo, plan, plan_expires_at from public.users where phone = $1`,
-      [phone]
-    );
-
-    let user = userRes.rows[0];
-    const isNew = !user;
-
-    if (!user) {
-      // Compte créé immédiatement : la confirmation est automatique,
-      // aucune validation par lien. Le profil est complété à l'étape suivante.
-      const created = await query(
-        `insert into public.users (phone, pseudo, birth_date, commune, is_phone_verified)
-         values ($1, $2, $3, $4, true)
-         returning id, pseudo, plan, plan_expires_at`,
-        [phone, 'membre' + Math.floor(Math.random() * 9000 + 1000), '2000-01-01', 'Abidjan']
-      );
-      user = created.rows[0];
-      // Le pseudo/birth_date provisoires sont remplacés par POST /api/users/me
-    } else {
-      await query('update public.users set is_phone_verified = true, last_seen_at = now() where id = $1', [user.id]);
-    }
-
-    const accessToken = signAccessToken(user);
-    const refreshToken = await createSession(user.id, req.headers['user-agent']);
-
-    res.json({
-      ok: true,
-      is_new: isNew,
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      user: { id: user.id, pseudo: user.pseudo, plan: user.plan }
-    });
-  } catch (err) { next(err); }
-});
-
 
 /* ---------------------------------------------------------------------------
    POST /api/auth/register — inscription par mot de passe (sans SMS)

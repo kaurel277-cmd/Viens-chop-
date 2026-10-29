@@ -8,7 +8,7 @@
 --    tables, vues, fonctions, triggers. Données comprises.
 --
 -- Utilisable sans risque tant que l'inscription n'a jamais fonctionné :
--- s'il n'y a pas de table otp_codes, alors aucun compte réel n'a pu être créé.
+-- s'il n'y a aucun compte dans public.users, rien ne peut être perdu.
 --
 -- Marche à suivre :
 --   1. Coller CE fichier dans Neon → SQL Editor, puis Run.
@@ -28,7 +28,7 @@ drop table if exists public.blocks        cascade;
 drop table if exists public.quiz_sessions cascade;
 drop table if exists public.payments      cascade;
 drop table if exists public.sessions      cascade;
-drop table if exists public.otp_codes     cascade;
+drop table if exists public.passes        cascade;
 drop table if exists public.users         cascade;
 
 -- 3. Schéma applicatif (fonctions et vues internes)
@@ -42,7 +42,7 @@ select
     'tables restantes : ' || count(*)::text as etat
 from information_schema.tables
 where table_schema = 'public'
-  and table_name in ('users','otp_codes','sessions','likes','matches',
+  and table_name in ('users','sessions','likes','matches','passes',
                      'messages','reports','blocks','quiz_sessions','payments');
 
 -- Attendu : "tables restantes : 0"

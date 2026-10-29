@@ -67,7 +67,6 @@ healthRouter.get('/db', async (_req, res) => {
     const { rows } = await query(`
       select
         to_regclass('public.users')      is not null as users,
-        to_regclass('public.otp_codes')  is not null as otp_codes,
         to_regclass('public.likes')      is not null as likes,
         to_regclass('public.matches')    is not null as matches,
         to_regclass('public.messages')   is not null as messages,
@@ -76,7 +75,7 @@ healthRouter.get('/db', async (_req, res) => {
     const t = rows[0];
     report.etapes.tables = t;
 
-    if (!t.users || !t.otp_codes) {
+    if (!t.users) {
       report.erreur = 'SCHEMA_ABSENT';
       report.conseils.push(
         'Les tables n\'existent pas : exécute database/neon-schema.sql dans Neon → SQL Editor, puis relance cette page.'
