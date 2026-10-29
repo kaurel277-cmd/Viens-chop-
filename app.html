@@ -1400,19 +1400,8 @@
         // ===== INIT : Auto go to splash =====
         goTo('splash');
 
-        // Déjà connecté : on saute l'écran de connexion
-        (function autoEnter() {
-            const C = window.VCCompte;
-            if (!C || !C.isLoggedIn()) return;
-            const me = C.current();
-            const tag = document.querySelector('#splash p');
-            if (tag && me && me.name) tag.textContent = 'Content de te revoir, ' + me.name + ' 👋';
-            // On ne bascule que si l'utilisateur n'a pas déjà bougé de l'accueil
-            setTimeout(() => {
-                const splash = document.getElementById('splash');
-                if (splash && splash.classList.contains('active')) goTo('discover');
-            }, 1100);
-        })();
+        // L'entrée automatique est gérée par le module média, une fois le
+        // serveur détecté (compte serveur ou compte de l'appareil).
     </script>
 
     <script>
@@ -1763,6 +1752,24 @@
 
             const me = C.current();
             const SERVEUR = C.mode === 'api';
+
+            /* ---------- Entrée directe ----------
+               Le compte n'est connu qu'après la détection du serveur (asynchrone).
+               On entre donc ici, et pas au chargement de la page : sinon
+               l'app resterait bloquée sur l'écran d'accueil. */
+            (function entrer() {
+                const accueil = document.getElementById('splash');
+                const surAccueil = accueil && accueil.classList.contains('active');
+                if (!surAccueil) return;                    // l'utilisateur a déjà bougé
+                const compte = C.current();
+                if (!compte) return;
+                const sousTitre = accueil.querySelector('p');
+                if (sousTitre && compte.name) sousTitre.textContent = 'Content de te revoir, ' + compte.name + ' 👋';
+                setTimeout(() => {
+                    const encoreLa = accueil.classList.contains('active');
+                    if (encoreLa) goTo('discover');
+                }, 600);
+            })();
 
             /* ---------- Profils réels : les autres comptes de l'appareil ---- */
             function realProfiles() {

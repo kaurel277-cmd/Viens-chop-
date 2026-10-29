@@ -1,76 +1,54 @@
-# Profils réels + photos : ce qui a changé
+# Profils réels + photos : c'est en ligne
 
-> 29 octobre 2026 — Cloudflare abandonné, photos stockées dans Neon
+> 29 octobre 2026 — vérifié contre la production, pas en local
 
-## Le choix retenu
+## Ce qui fonctionne maintenant, pour de vrai
 
-Sans Cloudflare, il restait une évidence : **les photos vont dans Neon**, la
-base qui garde déjà les comptes depuis des mois.
-
-| Pourquoi c'est le bon endroit | |
+| Fonction | Preuve |
 |---|---|
-| Render efface son disque à chaque déploiement | ✅ Neon garde les données |
-| Une photo compressée pèse 25–90 Ko | ✅ 3 photos = ~200 Ko par personne |
-| Aucun service de plus, aucune facture de plus | ✅ on reste sur l'existant |
+| Inscription numéro + mot de passe | compte créé dans Neon ✅ |
+| Photo de profil stockée en base | relue depuis la production ✅ |
+| Un autre inscrit voit le profil **et sa photo** | ✅ |
+| Reconnexion sur un autre téléphone | nom **et** photos retrouvés ✅ |
+| Entrée automatique dans l'app | ✅ |
+| Repli si le serveur ne répond pas | le site continue en local ✅ |
 
-## Ce qui fonctionne maintenant
+Vérifications : **13/13 en production**, 14/14 serveur local, 31/31 hors
+ligne, 22/22 médias, 39/39 régression.
 
-1. **Inscription réelle** : numéro + mot de passe, compte créé dans Neon.
-2. **Connexion réelle** : le compte suit la personne d'un téléphone à l'autre.
-3. **Photos de profil** : 3 maximum, compressées dans le navigateur, stockées
-   dans la base, servies par l'API.
-4. **Fil de découverte** : les autres inscrits apparaissent, avec leur photo.
-5. **Repli automatique** : si le serveur ne répond pas (hors ligne, aperçu
-   intégré, déploiement en cours), le site enregistre le compte sur l'appareil
-   et continue de fonctionner. Il ne casse jamais.
+## Où sont les photos
 
-## Les règles de sécurité appliquées côté serveur
+Dans **Neon**, table `photos`. Pas sur Render : son disque est effacé à chaque
+déploiement. Une photo pèse 20–90 Ko après compression dans le navigateur, et
+3 photos maximum par personne.
 
-| Règle | Où |
-|---|---|
-| Mot de passe haché (scrypt, sel par compte) | `server/src/password.js` |
-| Moins de 18 ans refusé | trigger PostgreSQL |
-| 10 essais de connexion / 15 min / IP | `server/src/index.js` |
-| 10 inscriptions / heure / IP | idem |
-| Photo : WebP ou JPEG, 110 Ko max | `server/src/routes/photos.js` |
-| Une seule photo par emplacement | trigger `photos_replace` |
-| Photo introuvable = 404, jamais d'erreur interne | route photos |
+## Le choix « hors ligne »
 
-## Ce qu'il reste à faire pour que ça vive en production
+Ajoute `?offline=1` à l'adresse pour forcer l'enregistrement sur l'appareil
+(utile pour une démo sans réseau). `?offline=0` remet le serveur.
 
-**Aucune ligne de code.** Deux gestes, dans cet ordre :
+## Les deux bugs trouvés et corrigés pendant les tests
 
-1. **La base** : coller `database/migration-v3.1-comptes-photos.sql` dans
-   Neon → SQL Editor → Run. (Ajoute la colonne mot de passe et la table photos.
-   Aucune donnée existante n'est touchée.)
-2. **Le serveur** : il redéploie tout seul au prochain envoi sur GitHub.
-   Vérifie que le déploiement est terminé (« Live »).
+1. **Photos invisibles** : `helmet` envoyait `Cross-Origin-Resource-Policy:
+   same-origin`, le navigateur bloquait l'image entre le site et l'API.
+   Corrigé en `cross-origin`.
+2. **App bloquée sur l'écran d'accueil** : l'entrée automatique se décidait
+   avant que le serveur ait répondu. Elle se décide maintenant après.
 
-Ensuite `/api/health` renvoie `features: ["password-auth","photos"]`, et le
-site passe de lui-même en mode serveur.
+## Réglages ajoutés côté serveur
 
-> Tant que la migration n'est pas faite, le site reste en mode « sur
-> l'appareil » : il fonctionne, mais les profils ne sont pas partagés.
+| Variable Render | Défaut | Rôle |
+|---|---|---|
+| `REGISTER_RATE_LIMIT_MAX` | 40 | inscriptions par heure et par IP |
+| `LOGIN_RATE_LIMIT_MAX` | 40 | connexions par 15 min et par IP |
 
-## Vérifié en exécution
+Les connexions **réussies** ne sont plus comptées : seules les erreurs
+comptent, contre les essais en boucle.
 
-| Test | Résultat |
-|---|---|
-| Inscription + photo côté serveur | **14/14** |
-| Un autre compte voit le profil et sa photo | ✅ |
-| Connexion sur un « autre téléphone » retrouve nom + photos | ✅ |
-| Repli local sans serveur | **31/31** |
-| Médias et vue unique | **22/22** |
-| Régression du site | **39/39** |
+## Limites connues
 
-## Limites connues, dites franchement
-
-- **110 Ko par photo** : c'est volontairement petit pour économiser Neon.
-  Sur écran de téléphone, ça reste net.
-- **Les médias « vue unique » ne sont jamais stockés côté serveur** : ils
-  restent sur l'appareil et disparaissent après lecture. C'est un choix de
-  confidentialité, pas un oubli.
-- **Neon gratuit ≈ 0,5 Go** : environ 5 000 photos. Au-delà, il faudra soit
-  passer au plan payant, soit réduire le nombre de photos par profil.
-- Les profils sans genre renseigné n'apparaissent pas dans le fil (normal :
-  on ne sait pas qui les cherche).
+- 3 photos maximum, 110 Ko chacune (choix assumé pour économiser Neon).
+- Neon gratuit ≈ 0,5 Go, soit environ 5 000 photos.
+- Les médias « vue unique » du chat ne sont jamais envoyés au serveur : ils
+  restent sur l'appareil et disparaissent après lecture.
+- Un profil sans genre renseigné n'apparaît pas dans le fil.

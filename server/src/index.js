@@ -35,15 +35,16 @@ if (config.rateLimitEnabled) {
   // Anti force brute sur la connexion par mot de passe : 20 essais / 15 min / IP
   app.use('/api/auth/login', rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 20,
+    limit: config.loginRateLimitMax,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
+    skipSuccessfulRequests: true,
     message: { error: { code: 'TROP_D_ESSAIS', message: 'Trop d\'essais. Réessaie dans quelques minutes.' } }
   }));
   // Inscription : 10 comptes / heure / IP
   app.use('/api/auth/register', rateLimit({
     windowMs: 60 * 60 * 1000,
-    limit: 10,
+    limit: config.registerRateLimitMax,
     message: { error: { code: 'TROP_DE_COMPTES', message: 'Trop d\'inscriptions depuis ce réseau.' } }
   }));
 

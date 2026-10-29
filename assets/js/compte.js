@@ -24,6 +24,7 @@ window.VCCompte = (function () {
     const KEY_ACCOUNTS = 'vc_comptes_v1';
     const KEY_SESSION = 'vc_session_v1';
     const KEY_PROFIL = 'vc_profil_v1';
+    const KEY_OFFLINE = 'vc_offline';
     const ITERATIONS = 120000;
     const MIN_PASSWORD = 6;
 
@@ -250,8 +251,23 @@ window.VCCompte = (function () {
     /* ------------------------------------------------------------------ */
     /* API publique                                                       */
     /* ------------------------------------------------------------------ */
+    /* `?offline=1` force l'enregistrement sur l'appareil (utile pour tester
+       sans réseau, ou pour faire une démo sans serveur). Le choix est retenu
+       pour les pages suivantes ; `?offline=0` le désactive. */
+    function lireVœuHorsLigne() {
+        try {
+            const p = new URLSearchParams(location.search).get('offline');
+            if (p === '1') store.set(KEY_OFFLINE, '1');
+            if (p === '0') store.del(KEY_OFFLINE);
+            return store.get(KEY_OFFLINE) === '1';
+        } catch (e) {
+            return store.get(KEY_OFFLINE) === '1';
+        }
+    }
+
     async function configure({ api }) {
         API_BASE = api || '';
+        if (lireVœuHorsLigne()) { mode = 'local'; return mode; }
         if (API_BASE && window.VCAPI) {
             window.VCAPI.configure(API_BASE);
             mode = await detecter();
