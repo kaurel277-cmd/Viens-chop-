@@ -11,12 +11,16 @@ import { likesRouter } from './routes/likes.js';
 import { matchesRouter } from './routes/matches.js';
 import { safetyRouter } from './routes/safety.js';
 import { healthRouter } from './routes/health.js';
+import { photosRouter } from './routes/photos.js';
 
 export const app = express();
 
 app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({ origin: config.corsOrigin }));
+// Le reste de l'API reste à 100 Ko. Seule l'envoi de photo monte à 600 Ko
+// (une image de 110 Ko pèse ~147 Ko une fois encodée en base64).
+app.use('/api/photos', express.json({ limit: '600kb' }));
 app.use(express.json({ limit: '100kb' }));
 
 if (config.rateLimitEnabled) {
@@ -26,6 +30,21 @@ if (config.rateLimitEnabled) {
     limit: config.rateLimitMax,
     standardHeaders: 'draft-7',
     legacyHeaders: false
+  }));
+
+  // Anti force brute sur la connexion par mot de passe : 20 essais / 15 min / IP
+  app.use('/api/auth/login', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: { code: 'TROP_D_ESSAIS', message: 'Trop d\'essais. Réessaie dans quelques minutes.' } }
+  }));
+  // Inscription : 10 comptes / heure / IP
+  app.use('/api/auth/register', rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    message: { error: { code: 'TROP_DE_COMPTES', message: 'Trop d\'inscriptions depuis ce réseau.' } }
   }));
 
   // Plafond resserré sur l'envoi de SMS (coût réel par message)
@@ -45,6 +64,7 @@ app.use('/api/feed',    feedRouter);
 app.use('/api/likes',   likesRouter);
 app.use('/api/matches', matchesRouter);
 app.use('/api/safety',  safetyRouter);
+app.use('/api/photos',  photosRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: { code: 'ROUTE_INCONNUE', message: 'Route inconnue.' } });

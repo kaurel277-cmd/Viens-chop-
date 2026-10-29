@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/compte.js"></script>
     <script src="assets/js/media.js"></script>
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
@@ -641,9 +642,9 @@
                 <div style="height:8px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden;">
                     <div id="my-quota-bar" style="height:100%; width:0%; border-radius:99px; background:linear-gradient(135deg,#FF6B00,#FF1E56); transition:width .3s;"></div>
                 </div>
-                <p style="font-size:11px; color:rgba(255,255,255,.4); margin-top:10px; line-height:1.5;">
-                    Rien n'est stocké sur Render. Les photos vivent sur ton téléphone et partiront
-                    vers Cloudflare R2 (10 Go gratuits) dès que le serveur sera branché.
+                <p id="my-storage-note" style="font-size:11px; color:rgba(255,255,255,.4); margin-top:10px; line-height:1.5;">
+                    Tes photos sont enregistrées dans la base, en petit format (moins de 110 Ko).
+                    Rien ne passe par le disque de Render, qui est effacé à chaque déploiement.
                 </p>
             </div>
         </div>
@@ -1750,12 +1751,18 @@
            et médias « vue unique » dans le chat.
            S'appuie sur assets/js/media.js (stockage local, R2-ready).
            ================================================================== */
-        (function initMedia() {
+        (async function initMedia() {
             const C = window.VCCompte;
             const M = window.VCMedia;
-            if (!C || !M || !C.isLoggedIn()) return;
+            if (!C || !M) return;
+            // On tente le serveur ; s'il ne répond pas, on reste en local.
+            // ?api=... permet de viser un serveur local pendant les tests
+            const apiChoisie = new URLSearchParams(location.search).get('api');
+            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
+            if (!C.isLoggedIn()) return;
 
             const me = C.current();
+            const SERVEUR = C.mode === 'api';
 
             /* ---------- Profils réels : les autres comptes de l'appareil ---- */
             function realProfiles() {
@@ -1775,10 +1782,33 @@
                     }));
             }
 
-            const reels = realProfiles();
-            if (reels.length && typeof profiles !== 'undefined') {
-                // On place les vraies personnes devant les profils de démonstration
-                profiles.unshift(...reels);
+            if (SERVEUR) {
+                // Profils réels venus de la base Neon
+                try {
+                    const reponse = await window.VCAPI.feed.list(30);
+                    const vrais = (reponse.profiles || []).map(u => ({
+                        name: u.pseudo && !/^membre\d+$/i.test(u.pseudo) ? u.pseudo : 'Membre',
+                        age: u.age || '',
+                        city: u.commune || 'Abidjan',
+                        artists: (u.artists && u.artists.length) ? u.artists : ['Himra', 'Didi B'],
+                        color: 'linear-gradient(135deg,#2d1b4e,#1b3a4b)',
+                        userId: u.id,
+                        photoUrl: u.main_photo_id ? window.VCAPI.photos.url('/api/photos/' + u.main_photo_id) : null,
+                        real: true
+                    }));
+                    if (vrais.length && typeof profiles !== 'undefined') {
+                        profiles.length = 0;              // en mode serveur, uniquement de vraies personnes
+                        profiles.push(...vrais);
+                        document.getElementById('card-name').textContent = 'Personne pour le moment';
+                    }
+                } catch (e) {
+                    console.warn('fil indisponible :', e && e.code);
+                }
+            } else {
+                const reels = realProfiles();
+                if (reels.length && typeof profiles !== 'undefined') {
+                    profiles.unshift(...reels);
+                }
             }
 
             /* ---------- Photo sur la carte du fil ---------- */
@@ -1790,7 +1820,15 @@
                 const zone = document.getElementById('card-photo');
                 if (!zone) return;
                 zone.style.backgroundImage = '';
-                if (!p || !p.photoId) return;
+                if (!p) return;
+
+                if (p.photoUrl) {                      // photo servie par l'API
+                    const img = new Image();
+                    img.onload = () => { zone.style.backgroundImage = 'url(' + p.photoUrl + ')'; zone.style.backgroundSize = 'cover'; zone.style.backgroundPosition = 'center'; };
+                    img.src = p.photoUrl;
+                    return;
+                }
+                if (!p.photoId) return;
                 M.get(p.photoId).then(rec => {
                     if (!rec || !rec.blob) return;
                     zone.style.background = p.color;
@@ -1805,12 +1843,20 @@
                 const btn = document.getElementById('my-avatar');
                 const compte = C.current();
                 if (!btn || !compte) return;
-                const id = compte.photos && compte.photos[0];
-                if (!id) {
+                const premiere = compte.photos && compte.photos[0];
+                if (!premiere) {
                     btn.innerHTML = '<i class="fa-solid fa-user"></i>';
                     btn.style.backgroundImage = '';
                     return;
                 }
+                if (SERVEUR) {
+                    btn.innerHTML = '';
+                    btn.style.backgroundImage = 'url(' + window.VCAPI.photos.url(premiere) + ')';
+                    btn.style.backgroundSize = 'cover';
+                    btn.style.backgroundPosition = 'center';
+                    return;
+                }
+                const id = premiere;
                 M.get(id).then(rec => {
                     if (!rec || !rec.blob) return;
                     btn.innerHTML = '';
@@ -1848,9 +1894,13 @@
                         '<button type="button" aria-label="Retirer cette photo" style="position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; border:none; background:rgba(0,0,0,.55); color:#fff; font-size:11px; cursor:pointer;">✕</button>' +
                         (i === 0 ? '<span style="position:absolute; bottom:6px; left:6px; font-size:9px; font-weight:800; background:#FF6B00; color:#fff; padding:2px 6px; border-radius:6px;">PRINCIPALE</span>' : '');
                     cell.querySelector('button').onclick = () => removeMyPhoto(id);
-                    M.get(id).then(rec => {
-                        if (rec && rec.blob) cell.querySelector('[data-img]').style.backgroundImage = 'url(' + M.previewUrl(rec) + ')';
-                    });
+                    if (SERVEUR) {
+                        cell.querySelector('[data-img]').style.backgroundImage = 'url(' + window.VCAPI.photos.url(id) + ')';
+                    } else {
+                        M.get(id).then(rec => {
+                            if (rec && rec.blob) cell.querySelector('[data-img]').style.backgroundImage = 'url(' + M.previewUrl(rec) + ')';
+                        });
+                    }
                     grille.appendChild(cell);
                 });
 
@@ -1868,20 +1918,49 @@
                     ? (photos.length < 3 ? 'Tu peux ajouter ' + (3 - photos.length) + ' photo(s) de plus.' : 'Tu as mis 3 photos, le maximum.')
                     : 'Ajoute au moins une photo : sans photo, ton profil reste invisible pour les autres.';
 
-                M.stats().then(st => {
-                    document.getElementById('my-quota-label').textContent =
-                        M.humanBytes(st.bytes) + ' / ' + M.humanBytes(st.quota) + ' (' + st.count + ' élément' + (st.count > 1 ? 's' : '') + ')';
-                    document.getElementById('my-quota-bar').style.width = st.pct + '%';
-                });
+                if (SERVEUR) {
+                    const n = (C.current().photos || []).length;
+                    document.getElementById('my-quota-label').textContent = n + ' / 3 photos en ligne';
+                    document.getElementById('my-quota-bar').style.width = (n / 3 * 100) + '%';
+                } else {
+                    M.stats().then(st => {
+                        document.getElementById('my-quota-label').textContent =
+                            M.humanBytes(st.bytes) + ' / ' + M.humanBytes(st.quota) + ' (' + st.count + ' élément' + (st.count > 1 ? 's' : '') + ')';
+                        document.getElementById('my-quota-bar').style.width = st.pct + '%';
+                    });
+                }
             }
 
             window.addMyPhoto = async function () {
                 const compte = C.current();
                 if (!compte) return;
-                if ((compte.photos || []).length >= 3) {
+                const actuelles = compte.photos || [];
+                if (actuelles.length >= 3) {
                     alert('Trois photos maximum pour le moment.');
                     return;
                 }
+
+                if (SERVEUR) {
+                    const fichier = await M.pickFile({ kind: 'photo' });
+                    if (!fichier) return;
+                    try {
+                        // La base n'accepte que 110 Ko : on compresse plus fort.
+                        const c = await M.compressImage(fichier, { maxSide: 900, target: 85 * 1024 });
+                        await C.photos.add(c.blob, actuelles.length);
+                        renderMonProfil();
+                        refreshAvatar();
+                    } catch (err) {
+                        const messages = {
+                            PHOTO_TROP_LOURDE: 'Photo trop lourde. Réessaie avec une autre image.',
+                            FORMAT_INVALIDE: 'Format non accepté (WebP ou JPEG).',
+                            TROP_DE_PHOTOS: 'Trois photos maximum.',
+                            API_NON_CONFIGUREE: 'Le serveur ne répond pas. Réessaie dans un instant.'
+                        };
+                        alert(messages[err.code] || 'Photo impossible à envoyer pour le moment.');
+                    }
+                    return;
+                }
+
                 const rec = await M.pick({ kind: 'photo', ownerId: compte.id });
                 if (!rec) return;
                 if (rec.error) {
@@ -1896,6 +1975,13 @@
 
             window.removeMyPhoto = async function (id) {
                 if (!confirm('Retirer cette photo ?')) return;
+                if (SERVEUR) {
+                    const identifiant = String(id).split('/').pop();
+                    try { await C.photos.remove(identifiant); } catch (e) { alert('Suppression impossible : ' + (e.message || '')); return; }
+                    renderMonProfil();
+                    refreshAvatar();
+                    return;
+                }
                 const photos = (C.current().photos || []).filter(x => x !== id);
                 C.update({ photos });
                 await M.remove(id);

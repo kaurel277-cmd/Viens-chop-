@@ -342,6 +342,7 @@
         </div>
     </footer>
 
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/compte.js"></script>
     <script>
         function toggleMobileMenu(force) {
@@ -386,11 +387,15 @@
            INSCRIPTION — formulaire unique, sans serveur ni SMS.
            Le compte est créé sur l'appareil par assets/js/compte.js.
            ================================================================== */
-        (function initSignup() {
+        (async function initSignup() {
             const $ = id => document.getElementById(id);
             const C = window.VCCompte;
             const form = $('signup');
             if (!form || !C) return;
+
+            // Serveur si disponible, sinon enregistrement sur l'appareil.
+            const apiChoisie = new URLSearchParams(location.search).get('api');
+            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
 
             const MIN = C.MIN_PASSWORD;
             let busy = false;

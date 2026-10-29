@@ -80,6 +80,11 @@
       throw new ApiError('RESEAU', 'Impossible de joindre le serveur. Vérifie ta connexion.');
     }
 
+    // Le serveur répond mais plante (base indisponible, migration manquante)
+    if (res.status >= 500) {
+      throw new ApiError('ERREUR_SERVEUR', 'Le serveur est momentanément indisponible.', 500);
+    }
+
     // Jeton expiré : on tente un rafraîchissement, puis on rejoue une fois.
     if (res.status === 401 && retry && state.refresh) {
       const refreshed = await tryRefresh();
@@ -116,6 +121,27 @@
   /* ------------------------------------------------------------------ */
 
   const auth = {
+    /* Inscription par mot de passe : le serveur hache avec scrypt. */
+    async register(phone, password, birthDate) {
+      const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
+      const d = await request('/api/auth/register', {
+        method: 'POST', auth: false,
+        body: { phone: local, password, birth_date: birthDate }
+      });
+      saveSession(d.access_token, d.refresh_token);
+      return d;
+    },
+
+    async login(phone, password) {
+      const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
+      const d = await request('/api/auth/login', {
+        method: 'POST', auth: false,
+        body: { phone: local, password }
+      });
+      saveSession(d.access_token, d.refresh_token);
+      return d;
+    },
+
     async sendCode(phone) {
       const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
       return request('/api/auth/otp', { method: 'POST', auth: false, body: { phone: local } });
@@ -152,6 +178,37 @@
       return request('/api/users/' + encodeURIComponent(id));
     }
   };
+
+  /* Photos de profil — stockées dans Neon, compressées côté navigateur. */
+  const photos = {
+    async upload(blob, position) {
+      const data = await blobToBase64(blob);
+      return request('/api/photos', {
+        method: 'POST',
+        body: { data, mime: blob.type || 'image/jpeg', position: position || 0 }
+      });
+    },
+    list() {
+      return request('/api/photos/me');
+    },
+    remove(id) {
+      return request('/api/photos/' + encodeURIComponent(id), { method: 'DELETE' });
+    },
+    url(idOrUrl) {
+      if (!idOrUrl) return '';
+      if (/^https?:/.test(idOrUrl)) return idOrUrl;
+      return state.base + idOrUrl;
+    }
+  };
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  }
 
   const feed = {
     list(limit) {
@@ -203,6 +260,6 @@
     isLoggedIn,
     clearSession,
     request,
-    auth, users, feed, likes, matches, safety
+    auth, users, feed, likes, matches, safety, photos
   };
 })();

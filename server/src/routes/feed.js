@@ -18,7 +18,8 @@ feedRouter.get('/', requireAuth, async (req, res, next) => {
 
     const { rows } = await query(
       `select u.id, u.pseudo, u.age, u.commune, u.artists, u.bio, u.is_certified,
-              u.last_seen_at,
+              u.last_seen_at, u.main_photo_id,
+              (u.main_photo_id is not null) as has_photo,
               (u.commune = $2) as same_commune,
               (select count(*) from public.likes l2
                 where l2.sender_id = u.id and l2.receiver_id = $1) > 0 as likes_me

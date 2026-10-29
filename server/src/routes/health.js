@@ -5,7 +5,14 @@ import { config } from '../config.js';
 export const healthRouter = Router();
 
 healthRouter.get('/', (_req, res) => {
-  res.json({ ok: true, service: 'viens-chop-api', time: new Date().toISOString() });
+  // `features` permet au site de savoir ce que ce déploiement sait faire.
+  // Sans ça, le navigateur essaie une route absente et reçoit une erreur.
+  res.json({
+    ok: true,
+    service: 'viens-chop-api',
+    features: ['password-auth', 'photos'],
+    time: new Date().toISOString()
+  });
 });
 
 /* ---------------------------------------------------------------------------

@@ -211,6 +211,28 @@ window.VCMedia = (function () {
     }
 
     /* ------------------------------------------------------------------ */
+    /* Sélecteur simple : rend le fichier brut (envoi serveur)             */
+    /* ------------------------------------------------------------------ */
+    function pickFile({ kind = 'photo', capture = false } = {}) {
+        return new Promise(resolve => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = kind === 'video' ? 'video/*' : 'image/*';
+            if (capture) input.capture = 'environment';
+            input.style.display = 'none';
+            document.body.appendChild(input);
+            let settled = false;
+            const done = f => { if (settled) return; settled = true; input.remove(); resolve(f || null); };
+            input.addEventListener('change', () => done(input.files && input.files[0]));
+            window.addEventListener('focus', function onFocus() {
+                window.removeEventListener('focus', onFocus);
+                setTimeout(() => { if (!settled) done(null); }, 800);
+            }, { once: true });
+            input.click();
+        });
+    }
+
+    /* ------------------------------------------------------------------ */
     /* Enregistrement                                                     */
     /* ------------------------------------------------------------------ */
     function fail(code, message) {
@@ -376,7 +398,7 @@ window.VCMedia = (function () {
 
     return {
         ready: openDb,
-        pick, save, get, list, listAll, remove, markViewed, purge, stats,
+        pick, pickFile, save, get, list, listAll, remove, markViewed, purge, stats,
         compressImage, probeVideo, previewUrl, humanBytes,
         setUploader: fn => { externalUploader = fn; },
         QUOTA_BYTES, PHOTO_TARGET, VIDEO_MAX_BYTES, VIDEO_MAX_SECONDS, DEFAULT_TTL
