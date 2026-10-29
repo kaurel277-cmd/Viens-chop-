@@ -51,6 +51,34 @@ likesRouter.post('/', requireAuth, async (req, res, next) => {
 });
 
 /* ---------------------------------------------------------------------------
+   POST /api/likes/pass — passer un profil (swipe à gauche)
+   La table public.passes peut ne pas encore exister sur une base ancienne :
+   dans ce cas on répond « enregistré : non » au lieu de planter, et le fil
+   continue de fonctionner comme avant.
+   --------------------------------------------------------------------------- */
+likesRouter.post('/pass', requireAuth, async (req, res, next) => {
+  try {
+    const { user_id } = req.body || {};
+    if (!user_id) throw new AppError(400, 'CIBLE_MANQUANTE', 'Profil ciblé manquant.');
+    if (user_id === req.user.id) throw new AppError(400, 'AUTO_PASS', 'Tu ne peux pas te passer toi-même.');
+
+    try {
+      await query(
+        `insert into public.passes (user_id, target_id) values ($1, $2)
+         on conflict (user_id, target_id) do nothing`,
+        [req.user.id, user_id]
+      );
+      return res.status(201).json({ ok: true, stored: true });
+    } catch (err) {
+      if (err.code === '42P01') {          // relation absente : base pas encore migrée
+        return res.json({ ok: true, stored: false });
+      }
+      throw err;
+    }
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
    DELETE /api/likes/:id — annuler un like (pas de match en cours)
    --------------------------------------------------------------------------- */
 likesRouter.delete('/:id', requireAuth, async (req, res, next) => {

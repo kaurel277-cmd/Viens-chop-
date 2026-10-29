@@ -230,6 +230,10 @@
     },
     whoLikedMe() {
       return request('/api/likes/who-liked-me');
+    },
+    /* Passer un profil : sans cela il réapparaît au rechargement du fil. */
+    pass(userId) {
+      return request('/api/likes/pass', { method: 'POST', body: { user_id: userId } });
     }
   };
 

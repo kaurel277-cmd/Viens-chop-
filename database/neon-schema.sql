@@ -198,6 +198,19 @@ create table if not exists public.likes (
 
 create index if not exists likes_receiver_idx on public.likes (receiver_id, created_at desc);
 
+-- --- 3.0 bis Profils passés (swipe à gauche) --------------------------------
+-- Sans cette table, un profil passé revient au rechargement du fil.
+create table if not exists public.passes (
+    user_id    uuid not null references public.users(id) on delete cascade,
+    target_id  uuid not null references public.users(id) on delete cascade,
+    created_at timestamptz not null default now(),
+
+    constraint no_self_pass check (user_id <> target_id),
+    primary key (user_id, target_id)
+);
+
+create index if not exists passes_target_idx on public.passes (target_id);
+
 -- --- 3.1 Quota : 3 likes/jour en gratuit, illimité en Debout ------------------
 create or replace function app.enforce_daily_like_quota()
 returns trigger

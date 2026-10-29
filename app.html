@@ -98,14 +98,6 @@
 
         /* ===== SCREEN 2: LOGIN ===== */
         #login { justify-content: center; padding: 24px; }
-        .otp-inputs { display: flex; gap: 10px; justify-content: center; }
-        .otp-inputs input {
-            width: 48px; height: 56px; text-align: center; font-size: 22px; font-weight: 700;
-            background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 12px; color: #fff; font-family: 'Outfit'; outline: none;
-        }
-        .otp-inputs input:focus { border-color: #FF6B00; }
-
         /* ===== SCREEN 3: PROFILE SETUP ===== */
         #profile-setup { padding: 24px; padding-top: 60px; overflow-y: auto; }
         .step-indicator {
@@ -635,9 +627,13 @@
                 <i class="fa-solid fa-camera"></i> Ajouter une photo
             </button>
 
+            <button class="btn-secondary" style="margin-top:12px; color:#FF6B6B; border-color:rgba(255,107,107,.35);" onclick="seDeconnecter()" type="button">
+                <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
+            </button>
+
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
                 <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:rgba(255,255,255,.6); margin-bottom:8px;">
-                    <span>Stockage de l'appareil</span>
+                    <span>Photos de profil en ligne</span>
                     <span id="my-quota-label">—</span>
                 </div>
                 <div style="height:8px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden;">
@@ -852,8 +848,8 @@
             <span>Mode Flirt</span>
         </div>
         <div class="nav-item" role="button" tabindex="0" onclick="triggerFakeCall()">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Sécurité</span>
+            <i class="fa-solid fa-phone-volume"></i>
+            <span>Faux Appel</span>
         </div>
     </div>
 
@@ -1257,6 +1253,20 @@
             if (av) av.style.filter = 'none';
         }
 
+        /* Déconnexion : on ferme la conversation, on efface le compte local et
+           les jetons du serveur, puis on revient sur l'écran de connexion. */
+        async function seDeconnecter() {
+            if (!confirm('Se déconnecter de ce compte ?')) return;
+            try { if (window.VCSo) VCSo.close(); } catch (e) {}
+            try { if (window.VCCompte) VCCompte.logout(); } catch (e) {}
+            try { if (window.VCAPI) await VCAPI.auth.logout(); } catch (e) {}
+            ['vc_access', 'vc_refresh', 'vc_user', 'vc_offline'].forEach(k => {
+                try { localStorage.removeItem(k); } catch (e) {}
+            });
+            if (window.profiles) profiles.length = 0;
+            goTo('login');
+        }
+
         // ===== MODE FLIRT QUIZ =====
         function showQuiz(el) {
             if(el && el.classList && el.classList.contains('nav-item')) {
@@ -1321,10 +1331,8 @@
 
         // ===== FAKE CALL =====
         function triggerFakeCall() {
-            if(!isVIP) {
-                showVipModal("Le Faux Appel d'urgence est réservé aux membres Debout. Protège-toi sans pression pour seulement 700F ! 📞👑");
-                return;
-            }
+            // Pas de contrôle d'abonnement ici : le quota (1 essai/semaine en
+            // gratuit, illimité en Debout) est appliqué par l'enveloppe plus bas.
             const name = callerNames[Math.floor(Math.random() * callerNames.length)];
             document.getElementById('caller-name').textContent = name;
             document.getElementById('fake-call-overlay').classList.add('active');
@@ -2268,6 +2276,36 @@
                 }
             };
 
+            /* ---------- 0. Faux Appel : le quota est tenu par la base ---------- */
+            const _fauxAppel = window.triggerFakeCall;
+            window.triggerFakeCall = async function () {
+                if (!isVIP) {
+                    try {
+                        await window.VCAPI.safety.fakeCall();
+                    } catch (err) {
+                        if (err.code === 'QUOTA_FAUX_APPEL') {
+                            showVipModal("Tu as utilisé ton essai gratuit de Faux Appel cette semaine. " +
+                                         "Passe en Debout pour un accès illimité 24/7 👑");
+                            return;
+                        }
+                    }
+                }
+                return _fauxAppel.apply(this, arguments);
+            };
+
+            /* ---------- 1 bis. Passer un profil ----------
+               Sans appel serveur, le profil repasserait au rechargement. */
+            const _swipePassLocal = window.swipePass;
+            window.swipePass = function () {
+                const profil = (typeof profiles !== 'undefined')
+                    ? profiles[typeof currentProfileIndex !== 'undefined' ? currentProfileIndex : 0]
+                    : null;
+                if (profil && profil.userId && window.VCAPI) {
+                    window.VCAPI.likes.pass(profil.userId).catch(() => {});
+                }
+                return _swipePassLocal.apply(this, arguments);
+            };
+
             /* ---------- 2. Recharger le fil depuis la base ---------- */
             let dernierFil = Date.now();
 
@@ -2456,7 +2494,14 @@
             /* ---------- 7. Démarrage ---------- */
             try {
                 const moi = C.current();
-                if (moi) afficherLikes(null);      // le décompte exact vient avec le premier like
+                if (moi) afficherLikes(3);         // Mode Coulé : 3 likes par jour
+                if (moi && VCSo.pret && window.VCAPI) {
+                    window.VCAPI.auth.me().then(rep => {
+                        const u = (rep && rep.user) || {};
+                        if (u.plan === 'debout') { isVIP = true; afficherLikes(null); }
+                        else if (typeof u.likes_left === 'number') afficherLikes(u.likes_left);
+                    }).catch(() => {});
+                }
             } catch (e) {}
         })();
     </script>

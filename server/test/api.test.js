@@ -165,6 +165,26 @@ test('fil de découverte : filtres respectés et photo exposée', async () => {
   ok('fil : photo exposée', `${feed.json.profiles.length} profils`);
 });
 
+test('passer un profil : il ne revient plus dans le fil', async () => {
+  const moi   = await signup('+2250701000015', 'PasseMe', { gender: 'M', commune: 'Abobo' });
+  const autre = await signup('+2250701000016', 'PasseLui', { gender: 'F', commune: 'Abobo' });
+
+  const avant = await api('/api/feed', { token: moi.token });
+  assert.ok(avant.json.profiles.some(p => p.id === autre.id), 'le profil doit être proposé au départ');
+
+  const p1 = await api('/api/likes/pass', { method: 'POST', token: moi.token, body: { user_id: autre.id } });
+  assert.equal(p1.status, 201);
+  assert.equal(p1.json.stored, true);
+
+  const apres = await api('/api/feed', { token: moi.token });
+  assert.ok(!apres.json.profiles.some(p => p.id === autre.id), 'le profil passé ne doit plus revenir');
+  ok('profil passé = définitivement écarté du fil');
+
+  const p2 = await api('/api/likes/pass', { method: 'POST', token: moi.token, body: { user_id: autre.id } });
+  assert.equal(p2.status, 201, 'passer deux fois ne doit pas planter');
+  ok('passer deux fois : sans erreur');
+});
+
 test('like réciproque -> match', async () => {
   const j1 = await signup('+2250701000020', 'J1', { gender: 'F' });
   const j2 = await signup('+2250701000021', 'J2', { gender: 'M' });

@@ -15,6 +15,7 @@ feedRouter.get('/', requireAuth, async (req, res, next) => {
   try {
     const limit = Math.min(Number(req.query.limit) || 20, 50);
     const me = req.user;
+    const passes = await tablePassesExiste();
 
     const { rows } = await query(
       `select u.id, u.pseudo, u.age, u.commune, u.artists, u.bio, u.is_certified,
@@ -32,6 +33,8 @@ feedRouter.get('/', requireAuth, async (req, res, next) => {
           and not exists (select 1 from public.blocks b
                            where (b.blocker_id = $1 and b.blocked_id = u.id)
                               or (b.blocker_id = u.id and b.blocked_id = $1))
+          ${passes ? `and not exists (select 1 from public.passes ps
+                                      where ps.user_id = $1 and ps.target_id = u.id)` : ''}
         order by (u.commune = $2) desc, u.last_seen_at desc nulls last, random()
         limit $4`,
       [me.id, me.commune, seekingFilter(me), limit]
@@ -40,6 +43,18 @@ feedRouter.get('/', requireAuth, async (req, res, next) => {
     res.json({ ok: true, profiles: rows });
   } catch (err) { next(err); }
 });
+
+/* La table public.passes n'existe pas sur les bases antérieures à cette
+   version : on vérifie une seule fois, puis on garde le résultat. */
+let _passes = null;
+async function tablePassesExiste() {
+  if (_passes !== null) return _passes;
+  try {
+    const { rows } = await query("select to_regclass('public.passes') is not null as ok");
+    _passes = !!rows[0].ok;
+  } catch { _passes = false; }
+  return _passes;
+}
 
 // 'A' = tout le monde ; 'F' = uniquement des femmes ; 'M' = uniquement des hommes
 function seekingFilter(user) {

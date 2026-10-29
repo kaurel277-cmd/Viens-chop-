@@ -29,3 +29,14 @@ create table if not exists public.schema_migrations (
   applied_at timestamptz not null default now()
 );
 insert into public.schema_migrations (version) values ('v3.1-comptes-photos') on conflict (version) do nothing;
+
+-- Profils passés (swipe à gauche) : sans ça, un profil passé revient.
+create table if not exists public.passes (
+  user_id    uuid not null references public.users(id) on delete cascade,
+  target_id  uuid not null references public.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  constraint no_self_pass check (user_id <> target_id),
+  primary key (user_id, target_id)
+);
+
+create index if not exists passes_target_idx on public.passes (target_id);

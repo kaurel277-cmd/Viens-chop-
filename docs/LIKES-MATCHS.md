@@ -12,6 +12,7 @@
 | Discussions | conversations inventées | **vrais matchs, vrais messages** |
 | Photo du profil | pas affichée sur la carte | **visible dès le fil : on voit qui on like** |
 | Nouveaux arrivants | jamais visibles | fil rafraîchi en revenant sur « Découvrir » |
+| Profil passé (swipe à gauche) | revenait après rechargement | **enregistré en base**, ne revient plus |
 | « Qui m'a aimé » | grille de démonstration inventée | **vraie liste** servie par l'API |
 | Photo dans « Qui m'a aimé » | floutée pour les comptes gratuits | **absente** en gratuit, **nette** en Mode Debout (jamais de flou) |
 
