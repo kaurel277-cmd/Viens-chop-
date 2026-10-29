@@ -42,7 +42,7 @@ et la texture reste visible. Le PNG d'origine (1,5 Mo) a été converti : **−8
 |---|---|---|
 | Likes / jour | 10 pour tous | 10 en gratuit, **illimités en VIP** ✅ |
 | **Faux Appel** | bloqué à 100 % en gratuit | **1 essai / semaine** en gratuit, **illimité 24/7** en VIP ✅ |
-| **Qui m'a aimé** | inexistant | liste complète en VIP, aperçu en gratuit ✅ |
+| **Qui m'a aimé** | inexistant | liste pour tous, **photos en VIP seulement** ✅ |
 
 Le quota est réel : après un essai, le prochain est bloqué 7 jours et le message indique
 le temps restant (« Prochain essai gratuit dans 7 jours »). L'état survit au rechargement.
