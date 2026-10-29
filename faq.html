@@ -96,7 +96,7 @@
             <div class="relative max-w-xl mx-auto">
                 <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input id="faq-search" type="search" autocomplete="off" aria-label="Rechercher dans la FAQ"
-                       placeholder="Cherche un mot : Boss, SMS, photos, SOS..."
+                       placeholder="Cherche un mot : Debout, photos, SOS..."
                        class="w-full bg-white text-slate-800 placeholder-slate-400 rounded-2xl pl-12 pr-12 py-4 text-sm shadow-xl focus:outline-none focus:ring-4 focus:ring-white/40">
                 <button id="faq-clear" type="button" onclick="setSearch('')" class="hidden absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-slate-400 hover:text-brandPink" aria-label="Effacer la recherche">
                     <i class="fa-solid fa-xmark"></i>
@@ -105,8 +105,8 @@
 
             <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
                 <span class="text-white/70 font-semibold">Souvent recherché :</span>
-                <button onclick="setSearch('Boss')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">Boss</button>
-                <button onclick="setSearch('SMS')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">SMS</button>
+                <button onclick="setSearch('inscription')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">Inscription</button>
+                <button onclick="setSearch('Debout')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">Debout</button>
                 <button onclick="setSearch('photos')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">Photos</button>
                 <button onclick="setSearch('paiement')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">Paiement</button>
                 <button onclick="setSearch('SOS')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-full font-bold transition" type="button">SOS</button>
@@ -308,7 +308,7 @@
             { cat: "start", q: `C'est quoi Viens chop ?`,
               a: `<strong>Viens chop</strong> est une application de rencontre pensée pour toi. Ici, on voit le <strong>profil et la photo</strong>, la sécurité est intégrée : SOS, Check-In et lieux certifiés pour les rancarts. ${a("comment-ca-marche.html", "Voir le parcours complet")}.` },
             { cat: "start", q: `Comment je m'inscris ?`,
-              a: `Tu entres juste ton <strong>numéro de téléphone</strong>, tu reçois un code par SMS, et c'est réglé en 2 minutes environ. Pas d'email, pas de mot de passe compliqué, pas de carte bancaire. ${a("inscription.html", "Je m'inscris maintenant")}.` },
+              a: `Tu entres ton <strong>numéro de téléphone</strong>, un mot de passe et ta date de naissance : ton compte est créé tout de suite, sans code à attendre. Pas d'email, pas de carte bancaire. ${a("inscription.html", "Je m'inscris maintenant")}.` },
             { cat: "start", q: `Faut-il avoir un âge minimum ?`,
               a: `Oui : Viens chop est <strong>réservée aux +18 ans</strong>. La vérification d'âge est stricte et les mineurs sont bloqués.` },
             { cat: "start", q: `Mon numéro de téléphone est-il visible par les autres ?`,
@@ -317,16 +317,12 @@
               a: `Non, c'est <strong>un seul compte par numéro</strong>. C'est une des façons de limiter les faux profils en double.` },
             { cat: "start", q: `L'application est-elle déjà disponible ?`,
               a: `Viens chop est en phase <strong>bêta</strong> : tu peux t'inscrire dès maintenant pour faire partie des premiers membres. Les 500 premiers inscrits reçoivent 1 mois de Mode Debout offert. Pour l'instant, l'inscription se fait avec un numéro de téléphone (+225).` },
-            { cat: "start", q: `Je ne reçois pas mon code SMS, que faire ?`,
-              a: `Vérifie que ton numéro est bien saisi (10 chiffres) et que tu as du réseau. Patiente une minute, puis redemande un code. Si ça ne marche toujours pas, ${a("#contact", "écris-nous")} et on t'aide.` },
 
             /* ---------- PROFIL & MATCHS ---------- */
-            { cat: "profil", q: `Pourquoi une note vocale ?`,
-              a: `Parce que la voix en dit plus qu'une photo. En 10 secondes, tu te présentes avec ton style, et c'est elle que ton crush écoute en premier. Les notes vocales sont <strong>illimitées</strong>, même en Mode Coulé.` },
             { cat: "profil", q: `Est-ce que je vois les photos des autres ?`,
               a: `Oui. Les photos sont visibles dès le fil de découverte : tu sais qui tu likes. Le profil affiche aussi les artistes et la commune, pour aller au-delà du physique. 📸` },
             { cat: "profil", q: `Comment fonctionne le match ?`,
-              a: `Tu écoutes les notes vocales des profils autour de toi et tu likes ceux dont la vibe te plaît. Si c'est réciproque, c'est un <strong>match</strong> : vous pouvez discuter.` },
+              a: `Tu parcours les profils autour de toi — photo, artistes, commune — et tu likes ceux dont la vibe te plaît : 3 likes par jour en gratuit, illimités en Mode Debout. Si c'est réciproque, c'est un <strong>match</strong> : la discussion s'ouvre tout de suite.` },
             { cat: "profil", q: `Combien de likes puis-je envoyer ?`,
               a: `<strong>3 likes par jour</strong> en Mode Coulé (gratuit) et <strong>likes & swipes illimités</strong> en Mode Debout. ${a("tarifs.html", "Voir les tarifs")}.` },
             { cat: "profil", q: `À quoi servent mes artistes préférés et ma commune ?`,
