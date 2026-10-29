@@ -1,0 +1,84 @@
+# Est-ce que le site est opérationnel ?
+
+> Vérifié le 29 octobre 2026, en exécution — pas de mémoire.
+
+## Réponse courte
+
+**Le site vitrine : oui, il est opérationnel.** 10 pages, toutes en ligne,
+aucune erreur.
+
+**L'application de rencontre : non, pas encore.** `app.html` est une
+**démonstration** : les profils sont inventés, le chat parle à personne.
+
+**Tous les bugs sont corrigés ?** Tous ceux qu'on a trouvés : oui. Mais dire
+« aucun bug » serait faux — un logiciel de cette taille en cache toujours.
+
+---
+
+## 1. Ce qui marche vraiment
+
+| Élément | État | Preuve |
+|---|---|---|
+| 10 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `outil-test`, `app` |
+| Erreurs JavaScript | ✅ **0** sur les 10 pages | parcours automatisé |
+| Ressources manquantes (404, images cassées) | ✅ **0** | idem |
+| Liens internes (9 cibles distinctes) | ✅ **0 lien mort** | idem |
+| Titres d'onglet (ta consigne : juste le nom) | ✅ conformes | idem |
+| Inscription numéro + mot de passe | ✅ fonctionne | 31/31 vérifications |
+| Enregistrement du compte | ✅ survit au rechargement | testé en `http://` **et** en `file://` |
+| Mot de passe | ✅ jamais en clair (PBKDF2) | vérifié dans le stockage |
+| Moins de 18 ans | ✅ bloqué | testé |
+| Numéro déjà utilisé | ✅ refusé avec message clair | testé |
+| Régression complète du site | ✅ **39/39** | `audit/regression.js` |
+| Backend Neon (base + API) | ✅ `ok:true`, 6 tables | `/api/health/db` en production |
+| Mobile | ✅ testé en 390 × 844 | captures |
+
+## 2. Ce qui n'est PAS encore la vraie application
+
+C'est la partie importante, et je ne veux pas te la vendre comme finie.
+
+| Limite | Ce que ça veut dire concrètement |
+|---|---|
+| **Les profils sont fictifs** | `app.html` contient 6 profils écrits en dur (Awa, Prisca, Fatou…). Tu ne vois pas de vraies personnes. |
+| **Pas de photos** | Aucun profil n'a d'image : ce sont des dégradés de couleur. |
+| **Les conversations sont inventées** | Le chat démarre avec de faux messages pré-remplis. Écrire ne joint personne. |
+| **Aucune donnée partagée** | Deux personnes qui s'inscrivent ne se voient pas. Chacune reste seule sur son téléphone. |
+| **Le compte ne suit pas d'un appareil à l'autre** | C'est la contrepartie du « sans API ». |
+| **Mot de passe non récupérable** | Oublié = perdu, il faut écrire au support. |
+| **Pas de paiement** | Les écrans Wave / Orange Money sont des maquettes. |
+| **`outil-test.html` est public** | C'est un outil de développement, à retirer de la version publique. |
+
+## 3. Les bugs corrigés jusqu'ici
+
+Tous trouvés **en exécution**, pas en théorie. Les plus notables :
+
+1. Boucle de re-vérification du code SMS qui brûlait les 5 essais.
+2. Message d'erreur effacé par le nettoyage du formulaire.
+3. Bouton « Commencer » qui sautait l'écran de connexion.
+4. Le fil de découverte s'ouvrait par-dessus un écran de connexion encore actif.
+5. Problème SSL de connexion à Neon (avertissement `pg`).
+6. Code SMS illisible dans les logs Render.
+7. 4 tests de régression faux (ils testaient un parcours supprimé).
+
+## 4. Verdict honnête
+
+- **À montrer à quelqu'un aujourd'hui** : oui. Le site est propre, rapide,
+  sans erreur, l'inscription fonctionne.
+- **À mettre entre les mains de vrais utilisateurs comme app de rencontre** :
+  pas encore. Il manque le cœur : de vraies personnes, de vraies photos, de
+  vrais messages.
+
+## 5. Pour rendre l'app réellement opérationnelle
+
+Dans cet ordre, et c'est ce que je propose d'attaquer :
+
+1. **Profils réels** : les inscrits deviennent visibles les uns des autres.
+2. **Photos** : envoi depuis le téléphone, stockage Cloudflare R2.
+3. **Likes / matchs réels** : réciprocité, quota de 3 par jour côté serveur.
+4. **Chat réel** : messages enregistrés, rafraîchis toutes les 3 s.
+5. **Retour aux comptes serveur** pour que la donnée soit partagée.
+6. Paiement Wave / Orange Money en dernier.
+
+Le serveur nécessaire à tout ça **existe déjà** (Neon + Render, 11 tables,
+9 triggers, 31 vérifications). Il n'est simplement pas encore branché à
+l'interface.
