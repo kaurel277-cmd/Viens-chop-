@@ -265,14 +265,22 @@ window.VCCompte = (function () {
         }
     }
 
-    async function configure({ api }) {
-        API_BASE = api || '';
-        if (lireVœuHorsLigne()) { mode = 'local'; return mode; }
-        if (API_BASE && window.VCAPI) {
-            window.VCAPI.configure(API_BASE);
-            mode = await detecter();
+    let configEnCours = null;
+
+    /* Appelée par plusieurs modules : la détection n'est faite qu'une fois. */
+    function configure(options) {
+        if (!configEnCours) {
+            configEnCours = (async () => {
+                API_BASE = (options && options.api) || '';
+                if (lireVœuHorsLigne()) { mode = 'local'; return mode; }
+                if (API_BASE && window.VCAPI) {
+                    window.VCAPI.configure(API_BASE);
+                    mode = await detecter();
+                }
+                return mode;
+            })();
         }
-        return mode;
+        return configEnCours;
     }
 
     /* Si le serveur répond mais ne connaît pas encore les nouvelles routes

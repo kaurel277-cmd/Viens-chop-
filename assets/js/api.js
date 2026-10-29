@@ -95,7 +95,15 @@
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       const e = data.error || {};
-      throw new ApiError(e.code, e.message, res.status);
+      // Certaines réponses (plafond de requêtes) ne sont pas du JSON :
+      // on donne quand même un code compréhensible à l'interface.
+      const code = e.code || (res.status === 429 ? 'TROP_DE_DEMANDES'
+                   : res.status === 404 ? 'ROUTE_INCONNUE'
+                   : 'ERREUR_' + res.status);
+      const message = e.message || (res.status === 429
+        ? 'Trop de requêtes en peu de temps. Patiente une minute.'
+        : 'Le serveur a refusé la demande.');
+      throw new ApiError(code, message, res.status);
     }
     return data;
   }

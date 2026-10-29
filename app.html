@@ -15,6 +15,7 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/compte.js"></script>
     <script src="assets/js/media.js"></script>
+    <script src="assets/js/social.js"></script>
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -738,7 +739,7 @@
             <div id="chat-avatar" style="width:44px; height:44px; font-size:24px; line-height:1; border-radius:50%; background:linear-gradient(135deg,#2d1b4e,#1b3a4b); display:flex; align-items:center; justify-content:center; filter:blur(3px); transition:filter .4s ease;">👤</div>
             <div style="flex:1;">
                 <h3 style="font-size:15px; font-weight:700;" id="chat-name">Awa</h3>
-                <p style="font-size:11px; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <p id="chat-sub" style="font-size:11px; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     <span id="chat-status"><span style="color:#25D366;">● En ligne</span></span>
                     • photo après <span id="msg-countdown">5</span> msg
                 </p>
@@ -2127,5 +2128,317 @@
             try { if (typeof loadProfile === 'function') loadProfile(0); } catch (e) {}
         })();
     </script>
+    <!-- ==================== LIKES, MATCHS ET MESSAGES RÉELS ==================== -->
+    <script>
+        /* ==================================================================
+           Branchement de l'interface sur l'API.
+           En mode appareil (hors ligne), ces remplacements ne sont pas faits :
+           la démonstration d'origine continue de fonctionner.
+           ================================================================== */
+        (async function initSocial() {
+            const C = window.VCCompte;
+            const S = window.VCSo;
+            if (!C || !S) return;
+
+            const apiChoisie = new URLSearchParams(location.search).get('api');
+            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
+            if (C.mode !== 'api' || !C.isLoggedIn()) return;
+
+            S.brancher(window.VCAPI);
+            document.body.dataset.mode = 'serveur';
+
+            /* ---------- Petits utilitaires ---------- */
+            const $ = id => document.getElementById(id);
+            const echapper = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            function heure(iso) {
+                if (!iso) return '';
+                const d = new Date(iso);
+                const h = String(d.getHours()).padStart(2, '0');
+                const m = String(d.getMinutes()).padStart(2, '0');
+                const auj = new Date();
+                if (d.toDateString() === auj.toDateString()) return h + ':' + m;
+                return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+            }
+
+            function afficherLikes(restants) {
+                if (restants === null || restants === undefined) {
+                    $('likes-left').textContent = '∞';
+                    return;
+                }
+                $('likes-left').textContent = restants;
+                if (typeof likesRemaining !== 'undefined') likesRemaining = restants;
+            }
+
+            /* ---------- 1. Liker un profil ---------- */
+            window.swipeLike = async function () {
+                const profil = (typeof profiles !== 'undefined') ? profiles[typeof currentProfileIndex !== 'undefined' ? currentProfileIndex : 0] : null;
+                if (!profil) return;
+
+                const marque = $('like-stamp');
+                marque.classList.add('show');
+                setTimeout(() => marque.classList.remove('show'), 600);
+
+                if (!profil.userId) {                 // profil de démonstration
+                    const carte = $('current-card');
+                    carte.classList.add('card-swipe-right');
+                    setTimeout(() => loadProfile(currentProfileIndex + 1), 500);
+                    return;
+                }
+
+                try {
+                    const r = await S.like(profil.userId);
+                    afficherLikes(r.likesLeft);
+                    $('current-card').classList.add('card-swipe-right');
+
+                    if (r.matched) {
+                        // Carte suivante prête, puis conversation du match
+                        setTimeout(() => {
+                            loadProfile(0);
+                            ouvrirMatch(r.matchId);
+                        }, 450);
+                    } else {
+                        setTimeout(() => {
+                            // Le profil liké disparaît : on recharge le fil
+                            rechargerFil();
+                        }, 450);
+                    }
+                } catch (err) {
+                    if (err.code === 'QUOTA_LIKES') {
+                        showVipModal("Tu as utilisé tes 3 Likes du jour ! Repasse demain ou débloque les Likes illimités 👑");
+                    } else if (err.code === 'LIKE_DEJA_ENVOYE') {
+                        rechargerFil();
+                    } else {
+                        alert("Like impossible pour le moment. Vérifie ta connexion.");
+                    }
+                }
+            };
+
+            /* ---------- 2. Recharger le fil depuis la base ---------- */
+            let dernierFil = Date.now();
+
+            async function rechargerFil() {
+                dernierFil = Date.now();
+                try {
+                    const rep = await window.VCAPI.feed.list(30);
+                    const vrais = (rep.profiles || []).map(u => ({
+                        name: u.pseudo && !/^membre\d+$/i.test(u.pseudo) ? u.pseudo : 'Membre',
+                        age: u.age || '',
+                        city: u.commune || 'Abidjan',
+                        artists: (u.artists && u.artists.length) ? u.artists : ['Himra', 'Didi B'],
+                        color: 'linear-gradient(135deg,#2d1b4e,#1b3a4b)',
+                        userId: u.id,
+                        photoUrl: u.main_photo_id ? window.VCAPI.photos.url('/api/photos/' + u.main_photo_id) : null,
+                        real: true
+                    }));
+                    if (typeof profiles !== 'undefined') {
+                        profiles.length = 0;
+                        profiles.push(...vrais);
+                    }
+                    if (!vrais.length) {
+                        $('card-name').textContent = 'Plus personne pour le moment';
+                        $('card-location').textContent = 'Reviens plus tard : de nouveaux profils arrivent';
+                        $('card-photo').style.backgroundImage = '';
+                        $('card-artists').innerHTML = '';
+                        return;
+                    }
+                    loadProfile(0);
+                } catch (e) { /* réseau : on garde l'affichage actuel */ }
+            }
+            window.rechargerFil = rechargerFil;
+
+            /* ---------- 3. Liste des discussions ========== */
+            window.renderConversations = async function () {
+                const liste = $('conv-list');
+                if (!liste) return;
+
+                let matchs = [];
+                try { matchs = await S.matches(); } catch (e) {
+                    liste.innerHTML = '<div class="conv-empty">Impossible de charger les discussions.<br>Vérifie ta connexion.</div>';
+                    return;
+                }
+
+                if (!matchs.length) {
+                    liste.innerHTML = '<div class="conv-empty"><i class="fa-solid fa-comments" style="font-size:40px; opacity:.3; display:block; margin-bottom:16px;"></i>' +
+                        "Aucun match pour l'instant.<br>Va dans <strong>Découvrir</strong> et like des profils :" +
+                        ' quand deux personnes se likent, la discussion s\'ouvre ici.</div>';
+                    return;
+                }
+
+                liste.innerHTML = matchs.map(m => {
+                    const apercu = m.dernier
+                        ? echapper(m.dernier)
+                        : '<em style="opacity:.6">Vous vous êtes likés — dis bonjour !</em>';
+                    const avatar = m.photo && m.photoDebloquee
+                        ? '<div class="conv-avatar" style="background-image:url(' + m.photo + '); background-size:cover; background-position:center;"></div>'
+                        : '<div class="conv-avatar" style="background:linear-gradient(135deg,#2d1b4e,#1b3a4b); filter:blur(2px);">👤</div>';
+                    return '<button class="conv-item" onclick="ouvrirMatch(\'' + m.id + '\')" aria-label="Ouvrir la discussion avec ' + echapper(m.nom) + '" type="button">' +
+                        avatar +
+                        '<div class="conv-body">' +
+                            '<div class="conv-top"><span class="conv-name">' + echapper(m.nom) + (m.age ? ', ' + m.age : '') + '</span>' +
+                                '<span class="conv-time">' + heure(m.dernierAt) + '</span></div>' +
+                            '<div class="conv-bottom"><span class="conv-preview">' + apercu + '</span>' +
+                                (m.nonLus > 0 ? '<span class="conv-badge">' + m.nonLus + '</span>' : '') +
+                            '</div>' +
+                        '</div></button>';
+                }).join('');
+            };
+
+            /* ---------- 4. Ouvrir une conversation réelle ---------- */
+            let matchCourant = null;
+            const vus = new Set();          // identifiants de messages déjà affichés
+
+            window.ouvrirMatch = async function (matchId) {
+                let infos;
+                try {
+                    infos = await S.matches();
+                } catch (e) { alert('Conversation indisponible.'); return; }
+
+                matchCourant = infos.find(m => m.id === matchId) || null;
+                if (!matchCourant) { alert('Match introuvable.'); return; }
+
+                let conv;
+                try { conv = await S.open(matchId); } catch (e) { alert('Conversation impossible à ouvrir.'); return; }
+
+                $('chat-name').textContent = matchCourant.nom;
+                majEntete(conv.photoDebloquee);
+
+                const zone = $('chat-messages');
+                zone.innerHTML = '<div class="msg system">🎉 Vous vous êtes likés. À toi de jouer !</div>';
+                if (!conv.photoDebloquee) {
+                    zone.innerHTML += '<div class="msg system">🔒 Les photos se débloquent après 5 messages. Il en reste ' + conv.restants + '.</div>';
+                }
+                conv.messages.forEach(m => bulle(m.body, m.sender_id === (window.VCCompte.current() || {}).id ? 'sent' : 'received', m.created_at));
+
+                $('chat-notif').style.display = 'none';
+                goTo('chat');
+                zone.scrollTop = zone.scrollHeight;
+
+                // Suivi des réponses de l'autre personne.
+                // On retient les identifiants déjà affichés : sinon un message
+                // qu'on vient d'envoyer réapparaissait en double au tour suivant.
+                vus.clear();
+                conv.messages.forEach(m => vus.add(m.id));
+
+                S.suivre(matchId, (nouveaux, tout) => {
+                    const moi = (window.VCCompte.current() || {}).id;
+                    tout.forEach(m => {
+                        if (vus.has(m.id)) return;
+                        vus.add(m.id);
+                        bulle(m.body, m.sender_id === moi ? 'sent' : 'received', m.created_at);
+                    });
+                    zone.scrollTop = zone.scrollHeight;
+                }, async () => {
+                    bulle('🔓 Photos débloquées !', 'system');
+                    if (matchCourant) matchCourant.photoDebloquee = true;
+                    // L'URL de la photo n'est fournie par l'API qu'une fois le
+                    // match débloqué : on recharge la fiche pour l'afficher.
+                    try {
+                        const liste = await S.matches();
+                        const frais = liste.find(m => m.id === matchId);
+                        if (frais && matchCourant) matchCourant.photo = frais.photo;
+                    } catch (e) {}
+                    majEntete(true);
+                });
+            };
+
+            function majEntete(debloquee) {
+                const av = $('chat-avatar');
+                const sous = $('chat-sub');
+                const reste = S.ouvert ? S.ouvert.restants : 0;
+
+                if (debloquee) {
+                    av.style.filter = 'none';
+                    if (matchCourant && matchCourant.photo) {
+                        av.style.backgroundImage = 'url(' + matchCourant.photo + ')';
+                        av.style.backgroundSize = 'cover';
+                        av.style.backgroundPosition = 'center';
+                        av.textContent = '';
+                    } else {
+                        av.style.backgroundImage = 'linear-gradient(135deg,#FF6B00,#FF1E56)';
+                        av.textContent = (matchCourant && matchCourant.nom ? matchCourant.nom[0] : '?').toUpperCase();
+                    }
+                    if (sous) sous.innerHTML = '<span id="chat-status">🔓 Photos débloquées</span>';
+                } else {
+                    av.style.filter = 'blur(3px)';
+                    av.style.backgroundImage = 'linear-gradient(135deg,#2d1b4e,#1b3a4b)';
+                    av.textContent = '👤';
+                    // On reconstruit le sous-titre en entier : le remplacer par
+                    // textContent détruisait #msg-countdown utilisé ailleurs.
+                    if (sous) {
+                        sous.innerHTML = '<span id="chat-status">🔒 Photo</span> après ' +
+                            '<span id="msg-countdown">' + reste + '</span> message' + (reste > 1 ? 's' : '');
+                    }
+                }
+            }
+
+            /* La fonction d'origine suppose #msg-countdown toujours présent :
+               on la remplace par une version qui ne casse jamais. */
+            window.updatePhotoCountdown = function () {
+                const el = $('msg-countdown');
+                if (!el || !S.ouvert) return;
+                el.textContent = S.ouvert.restants;
+            };
+
+            function bulle(texte, sens, date) {
+                const zone = $('chat-messages');
+                const d = document.createElement('div');
+                d.className = 'msg ' + sens + ' anim-slide-up';
+                d.textContent = texte;
+                if (sens === 'system') d.className = 'msg system';
+                zone.appendChild(d);
+                zone.scrollTop = zone.scrollHeight;
+            }
+
+            /* ---------- 5. Envoyer un message ---------- */
+            window.sendMessage = async function () {
+                const champ = $('chat-input');
+                const texte = champ.value.trim();
+                if (!texte) return;
+                if (!matchCourant) { champ.value = ''; return; }
+
+                champ.value = '';
+                bulle(texte, 'sent');
+
+                try {
+                    const r = await S.send(matchCourant.id, texte);
+                    if (r.message && r.message.id) vus.add(r.message.id);
+                    if (r.photo_unlocked && !matchCourant.photoDebloquee) {
+                        matchCourant.photoDebloquee = true;
+                        majEntete(true);
+                        bulle('🔓 Photos débloquées !', 'system');
+                    } else {
+                        majEntete(matchCourant.photoDebloquee);
+                    }
+                    if (typeof messageCount !== 'undefined') messageCount++;
+                } catch (err) {
+                    const raisons = {
+                        CONVERSATION_BLOQUEE: 'cette conversation est fermée',
+                        TROP_DE_DEMANDES: 'trop de messages d\'un coup, attends une minute',
+                        MESSAGE_TROP_LONG: 'message trop long (1000 caractères maximum)',
+                        RESEAU: 'pas de connexion'
+                    };
+                    bulle('Message non envoyé : ' + (raisons[err.code] || 'réessaie dans un instant'), 'system');
+                }
+            };
+
+            /* ---------- 6. Nettoyage et rafraîchissement ----------
+               Sans ça, une personne qui s'inscrit après toi n'apparaîtrait
+               jamais dans ton fil tant que tu ne recharges pas la page. */
+            const _goTo = window.goTo;
+            window.goTo = function (ecran) {
+                if (ecran !== 'chat') S.close();
+                if (ecran === 'discover' && Date.now() - dernierFil > 60000) rechargerFil();
+                return _goTo(ecran);
+            };
+
+            /* ---------- 7. Démarrage ---------- */
+            try {
+                const moi = C.current();
+                if (moi) afficherLikes(null);      // le décompte exact vient avec le premier like
+            } catch (e) {}
+        })();
+    </script>
+
 </body>
 </html>

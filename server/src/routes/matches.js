@@ -20,7 +20,10 @@ matchesRouter.get('/', requireAuth, async (req, res, next) => {
               o.age    as other_age,
               o.commune as other_commune,
               o.is_certified as other_certified,
-              case when m.unlocked_at is not null then o.photo_url end as other_photo_url,
+              -- Photo : débloquée seulement après 5 messages échangés
+              case when m.unlocked_at is not null and o.main_photo_id is not null
+                   then '/api/photos/' || o.main_photo_id::text end as other_photo_url,
+              o.main_photo_id as other_photo_id,
               (select count(*) from public.messages msg where msg.match_id = m.id) as message_count,
               (select count(*) from public.messages msg
                 where msg.match_id = m.id and msg.read_at is null and msg.sender_id <> $1) as unread,

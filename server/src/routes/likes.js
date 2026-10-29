@@ -69,23 +69,35 @@ likesRouter.delete('/:id', requireAuth, async (req, res, next) => {
    --------------------------------------------------------------------------- */
 likesRouter.get('/who-liked-me', requireAuth, async (req, res, next) => {
   try {
+    // Requête directe (au lieu de la vue who_liked_me) pour utiliser les
+    // photos stockées en base : main_photo_id -> /api/photos/<id>.
+    // La photo n'est révélée qu'en Mode Debout, comme prévu au cahier des charges.
     const { rows } = await query(
-      `select like_id, user_id, pseudo, age, commune, artists, is_certified,
-              case when $2 then (
-                select photo_url from public.users u where u.id = w.user_id
-              ) end as photo_url,
+      `select l.id              as like_id,
+              u.id              as user_id,
+              u.pseudo,
+              u.age,
+              u.commune,
+              u.artists,
+              u.is_certified,
+              case when $2 then u.main_photo_id end as photo_id,
               not $2 as is_blurred,
-              created_at
-         from public.who_liked_me w
-        where w.user_id is not null
-          and exists (
-            select 1 from public.likes l
-             where l.sender_id = w.user_id and l.receiver_id = $1
-          )
-        order by created_at desc
+              l.created_at
+         from public.likes l
+         join public.users u on u.id = l.sender_id
+        where l.receiver_id = $1
+        order by l.created_at desc
         limit 100`,
       [req.user.id, req.isDebout]
     );
-    res.json({ ok: true, is_debout: req.isDebout, likes: rows });
+
+    res.json({
+      ok: true,
+      is_debout: req.isDebout,
+      likes: rows.map(r => ({
+        ...r,
+        photo_url: r.photo_id ? `/api/photos/${r.photo_id}` : null
+      }))
+    });
   } catch (err) { next(err); }
 });
