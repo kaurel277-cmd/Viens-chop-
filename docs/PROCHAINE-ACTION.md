@@ -1,6 +1,6 @@
 # Une seule action, puis on avance
 
-> État au 28 octobre 2026, 11 h 45 (Abidjan)
+> État au 29 octobre 2026 — **inscription sans API ni SMS** (voir `INSCRIPTION-SIMPLE.md`)
 
 ---
 
@@ -28,7 +28,17 @@ Deux bugs réels ont été trouvés et corrigés au passage :
 
 ---
 
-## 👉 La seule chose qu'il te reste : 1 champ sur Render
+## 👉 Plus rien à faire pour tester l'inscription
+
+**L'inscription ne dépend plus de l'API.** Numéro + mot de passe, un seul
+formulaire, ça marche hors ligne. Tu ouvres `inscription.html`, tu remplis, tu
+entres dans l'app. Détail : `INSCRIPTION-SIMPLE.md`.
+
+---
+
+## Si un jour tu veux la version avec vrai SMS
+
+À ce moment-là seulement, il faudra ce champ sur Render :
 
 Aujourd'hui, sans opérateur SMS, le code n'existe que dans les logs — c'est
 pénible, et tu as raison de ne pas vouloir passer par là.

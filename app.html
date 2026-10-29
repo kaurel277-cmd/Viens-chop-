@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
+    <script src="assets/js/compte.js"></script>
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -367,7 +368,7 @@
                 <span class="gradient-text">Viens chop</span>
             </h1>
             <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:48px;">L'amour et le flirt sans pression</p>
-            <button class="btn-primary" onclick="goTo('login')" style="max-width:280px; margin:0 auto;" type="button">
+            <button class="btn-primary" onclick="startApp()" style="max-width:280px; margin:0 auto;" type="button">
                 Commencer <i class="vc vc-logo"></i>
             </button>
             <p style="color:rgba(255,255,255,0.3); font-size:11px; margin-top:16px;">Réservé aux +18 ans</p>
@@ -378,41 +379,37 @@
     <div id="login" class="screen">
         <div style="max-width:400px; margin:0 auto; width:100%;" class="anim-slide-up">
             <div style="text-align:center; margin-bottom:40px;">
-                <span style="font-size:48px;">📱</span>
-                <h2 style="font-size:24px; font-weight:800; margin-top:16px;">Ton numéro de téléphone</h2>
-                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-top:8px;">On t'envoie un code par SMS pour vérifier que c'est bien toi</p>
+                <span style="font-size:48px;">👋</span>
+                <h2 style="font-size:24px; font-weight:800; margin-top:16px;">Content de te revoir</h2>
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-top:8px;">Ton numéro et ton mot de passe, et c'est reparti.</p>
             </div>
 
-            <!-- Phone Input -->
+            <!-- Connexion par mot de passe -->
             <div id="phone-step">
-                <div style="display:flex; gap:10px; margin-bottom:16px;">
+                <div style="display:flex; gap:10px; margin-bottom:14px;">
                     <div style="padding:16px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap;">+225</div>
                     <input type="tel" id="phone-input" class="input-field" placeholder="07 XX XX XX XX" maxlength="14" inputmode="numeric" autocomplete="tel" aria-label="Numéro de téléphone">
                 </div>
-                <div style="text-align:right; margin:-8px 0 12px;">
+                <div style="text-align:right; margin:-8px 0 10px;">
                     <span id="phone-operator" style="display:none; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;"></span>
                 </div>
-                <button class="btn-primary" onclick="sendOTP()" type="button">
-                    Recevoir mon code SMS
-                </button>
-            </div>
 
-            <!-- OTP Input -->
-            <div id="otp-step" style="display:none;">
-                <p style="text-align:center; color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:20px;">
-                    Code envoyé au <span id="phone-display" style="color:#FF6B00; font-weight:700;"></span>
-                </p>
-                <div class="otp-inputs" style="margin-bottom:24px;">
-                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" aria-label="Chiffre 1 du code" oninput="otpNext(this,1)">
-                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 2 du code" oninput="otpNext(this,2)">
-                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 3 du code" oninput="otpNext(this,3)">
-                    <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Chiffre 4 du code" oninput="otpNext(this,4)">
+                <div style="position:relative; margin-bottom:8px;">
+                    <input type="password" id="password-input" class="input-field" placeholder="Ton mot de passe" autocomplete="current-password" aria-label="Mot de passe" style="padding-right:48px;">
+                    <button type="button" id="eye-login" aria-label="Afficher le mot de passe" aria-pressed="false"
+                            style="position:absolute; right:8px; top:50%; transform:translateY(-50%); width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:rgba(255,255,255,0.5); font-size:16px; cursor:pointer;">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
-                <button class="btn-primary" onclick="verifyOTP()" type="button">
-                    Vérifier ✓
-                </button>
-                <p style="text-align:center; margin-top:16px;">
-                    <button style="background:none; border:none; color:#FF6B00; font-weight:600; font-size:13px; cursor:pointer;" onclick="sendOTP()" type="button">Renvoyer le code</button>
+
+                <p id="login-error" role="alert" aria-live="polite"
+                   style="display:none; color:#fca5a5; font-size:13px; font-weight:600; margin:4px 0 12px;"></p>
+
+                <button class="btn-primary" onclick="loginCompte()" type="button">Se connecter</button>
+
+                <p style="text-align:center; margin-top:18px; color:rgba(255,255,255,0.5); font-size:13px;">
+                    Pas encore de compte ?
+                    <a href="inscription.html" style="color:#FF6B00; font-weight:700; text-decoration:none;">S'inscrire</a>
                 </p>
             </div>
         </div>
@@ -878,47 +875,59 @@
             if(tab === 'chat') document.getElementById('chat-notif').style.display = 'none';
         }
 
-        // ===== LOGIN =====
-        function sendOTP() {
-            const phone = document.getElementById('phone-input').value.trim();
-            if(phone.length < 8) { alert("Entre un numéro valide !"); return; }
-            document.getElementById('phone-display').textContent = "+225 " + phone;
-            document.getElementById('phone-step').style.display = 'none';
-            document.getElementById('otp-step').style.display = 'block';
-            document.getElementById('otp-step').classList.add('anim-slide-up');
-            // Focus first OTP input
-            setTimeout(() => document.querySelector('.otp-inputs input').focus(), 300);
+        // ===== LOGIN (comptes enregistrés sur l'appareil) =====
+        function loginError(msg) {
+            const el = document.getElementById('login-error');
+            if (!el) return;
+            el.textContent = msg || '';
+            el.style.display = msg ? 'block' : 'none';
         }
 
-        function otpNext(el, nextIdx) {
-            const inputs = [...document.querySelectorAll('.otp-inputs input')];
-            const idx = inputs.indexOf(el);
-            // n'accepte qu'un chiffre par case, même en cas de collage
-            const digits = (el.value || '').replace(/\D/g, '');
-            el.value = digits.slice(0, 1);
-            if (digits.length > 1) {
-                digits.split('').slice(0, inputs.length - idx).forEach((c, k) => { inputs[idx + k].value = c; });
-                inputs[Math.min(idx + digits.length, inputs.length - 1)].focus();
-                return;
-            }
-            if (el.value && idx < inputs.length - 1) inputs[idx + 1].focus();
-        }
+        function loginCompte() {
+            const C = window.VCCompte;
+            if (!C) { loginError("Le module de compte n'a pas pu se charger. Recharge la page."); return; }
+            const phone = document.getElementById('phone-input').value;
+            const pwd = document.getElementById('password-input').value;
+            loginError('');
 
-        // Retour arrière : remonte à la case précédente quand la case est vide
-        document.querySelectorAll('.otp-inputs input').forEach((inp, i, arr) => {
-            inp.addEventListener('keydown', e => {
-                if (e.key === 'Backspace' && !inp.value && i > 0) { arr[i - 1].focus(); arr[i - 1].value = ''; }
+            if (!C.isValidPhone(phone)) { loginError('Entre tes 10 chiffres, par exemple 07 00 00 00 00.'); return; }
+            if (!pwd) { loginError('Entre ton mot de passe.'); return; }
+
+            C.login(phone, pwd).then(me => {
+                if (me && me.name) {
+                    const el = document.getElementById('setup-name');
+                    if (el) el.value = me.name;
+                }
+                goTo('discover');
+            }).catch(err => {
+                const messages = {
+                    COMPTE_INTROUVABLE: "Aucun compte avec ce numéro. Inscris-toi d'abord.",
+                    MOT_DE_PASSE_INCORRECT: 'Mot de passe incorrect.'
+                };
+                loginError(messages[err.code] || 'Connexion impossible. Réessaie.');
             });
-        });
-
-        function verifyOTP() {
-            const inputs = document.querySelectorAll('.otp-inputs input');
-            let code = '';
-            inputs.forEach(i => code += i.value);
-            if(code.length < 4) { alert("Entre le code complet !"); return; }
-            // Simulate success
-            goTo('profile-setup');
         }
+
+        function startApp() {
+            const C = window.VCCompte;
+            if (C && C.isLoggedIn()) { goTo('discover'); return; }
+            goTo('login');
+        }
+
+        // Voir / cacher le mot de passe à la connexion
+        (function initEye() {
+            const btn = document.getElementById('eye-login');
+            const input = document.getElementById('password-input');
+            if (!btn || !input) return;
+            btn.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.setAttribute('aria-pressed', String(show));
+                btn.setAttribute('aria-label', show ? 'Cacher le mot de passe' : 'Afficher le mot de passe');
+                btn.innerHTML = '<i class="fa-solid fa-eye' + (show ? '-slash' : '') + '"></i>';
+            });
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') loginCompte(); });
+        })();
 
         // ===== PROFILE SETUP =====
         let selectedGender = '';
@@ -1038,6 +1047,16 @@
         }
 
         function finishProfile() {
+            // On garde le profil dans le compte local : il sera rechargé au prochain passage.
+            const C = window.VCCompte;
+            if (C && C.isLoggedIn() && typeof userProfile !== 'undefined' && userProfile) {
+                C.update({
+                    name: userProfile.name,
+                    gender: userProfile.gender,
+                    seeking: userProfile.seeking,
+                    commune: userProfile.city
+                });
+            }
             loadProfile(0);
             goTo('discover');
         }
@@ -1305,8 +1324,38 @@
             setTimeout(() => successMsg.remove(), 4000);
         }
 
+        // Pré-remplit l'écran de profil avec les infos du compte local
+        (function prefillProfile() {
+            const C = window.VCCompte;
+            if (!C || !C.isLoggedIn()) return;
+            const me = C.current();
+            if (!me) return;
+            const nameEl = document.getElementById('setup-name');
+            if (nameEl && me.name) nameEl.value = me.name;
+            const birthEl = document.getElementById('setup-birth');
+            if (birthEl && me.birth) birthEl.value = me.birth;
+            const cityEl = document.getElementById('setup-city');
+            if (cityEl && me.commune) {
+                [...cityEl.options].forEach(o => { if (o.text === me.commune || o.value === me.commune) cityEl.value = o.value || o.text; });
+            }
+        })();
+
         // ===== INIT : Auto go to splash =====
         goTo('splash');
+
+        // Déjà connecté : on saute l'écran de connexion
+        (function autoEnter() {
+            const C = window.VCCompte;
+            if (!C || !C.isLoggedIn()) return;
+            const me = C.current();
+            const tag = document.querySelector('#splash p');
+            if (tag && me && me.name) tag.textContent = 'Content de te revoir, ' + me.name + ' 👋';
+            // On ne bascule que si l'utilisateur n'a pas déjà bougé de l'accueil
+            setTimeout(() => {
+                const splash = document.getElementById('splash');
+                if (splash && splash.classList.contains('active')) goTo('discover');
+            }, 1100);
+        })();
     </script>
 
     <script>

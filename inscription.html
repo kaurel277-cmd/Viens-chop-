@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
-    <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro de téléphone. Un code SMS, et tu peux commencer à matcher.">
+    <meta name="description" content="Inscris-toi gratuitement sur Viens chop avec ton numéro de téléphone et un mot de passe. Trente secondes, et tu peux commencer à matcher.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -31,9 +31,9 @@
         .field { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .75rem; padding: .8rem 1rem; font-size: .875rem; color: #1e293b; transition: border-color .15s, box-shadow .15s; }
         .field:focus { outline: none; border-color: #FF1E56; box-shadow: 0 0 0 3px rgba(255, 30, 86, .12); }
         .field.invalid { border-color: #ef4444; }
-        .otp { width: 3.25rem; height: 3.5rem; text-align: center; font-size: 1.5rem; font-weight: 800; background: #fff; border: 2px solid #FF5E1A; border-radius: .75rem; color: #1e293b; }
-        .otp:focus { outline: none; box-shadow: 0 0 0 3px rgba(255, 94, 26, .2); }
-        .otp.invalid { border-color: #ef4444; }
+        .eye { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; color: #94a3b8; border-radius: .5rem; background: none; border: none; cursor: pointer; transition: color .15s, background .15s; }
+        .eye:hover { color: #FF1E56; background: #fff1f2; }
+        .eye:focus-visible { outline: 2px solid #FF1E56; outline-offset: 2px; }
         .panel-in { animation: panelIn .25s ease; }
         @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         .shake { animation: shake .35s ease; }
@@ -93,13 +93,13 @@
 
     <!-- ===== HERO + FORMULAIRE ===== -->
     <header class="pt-28 pb-16 hero-bg text-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
             <!-- Colonne texte -->
             <div class="text-center lg:text-left">
                 <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Inscription bêta</span>
                 <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Rejoins Viens chop <i class="vc vc-logo"></i></h1>
-                <p class="text-lg text-white/90 mb-8">Un numéro, un code SMS, et c'est parti. Pas d'email, pas de mot de passe, pas de carte bancaire.</p>
+                <p class="text-lg text-white/90 mb-8">Un numéro, un mot de passe, et c'est parti. Pas d'email, pas de carte bancaire, rien à installer.</p>
 
                 <div class="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl p-5 text-left mb-8">
                     <p class="font-extrabold text-lg mb-1">🎁 Les 500 premiers inscrits</p>
@@ -124,148 +124,107 @@
             <!-- Carte formulaire -->
             <div class="bg-white text-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8">
 
-                <div id="stepper" class="mb-6">
-                    <div class="flex gap-2 mb-2">
-                        <div id="bar-1" class="h-1.5 flex-1 rounded-full bg-brand-gradient"></div>
-                        <div id="bar-2" class="h-1.5 flex-1 rounded-full bg-slate-200"></div>
-                        <div id="bar-3" class="h-1.5 flex-1 rounded-full bg-slate-200"></div>
-                    </div>
-                    <p id="step-label" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Étape 1 sur 3 — Ton numéro</p>
-                </div>
+                <h2 class="text-2xl font-extrabold mb-1">Crée ton compte <i class="vc vc-logo"></i></h2>
+                <p class="text-sm text-slate-500 mb-6">Un numéro, un mot de passe, et c'est parti.</p>
 
-                <!-- ÉTAPE 1 : NUMÉRO -->
-                <form id="step-1" class="step-panel panel-in" novalidate>
-                    <h2 class="text-2xl font-extrabold mb-1">Ton numéro de téléphone 📱</h2>
-                    <p class="text-sm text-slate-500 mb-5">On t'envoie un code par SMS pour vérifier que c'est bien toi.</p>
+                <form id="signup" novalidate class="space-y-5">
 
-                    <label for="phone" class="block text-xs font-bold text-slate-500 uppercase mb-1">Numéro de téléphone</label>
-                    <div class="flex gap-2">
-                        <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm">+225</span>
-                        <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" aria-describedby="err-1" placeholder="07 XX XX XX XX" class="field flex-1">
-                    </div>
-                    <div class="text-right mt-1">
-                        <span id="operator-badge" style="display:none; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;"></span>
-                    </div>
-                    <p id="err-1" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
-
-                    <button id="btn-phone" type="submit" class="mt-5 w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
-                        Recevoir mon code par SMS
-                    </button>
-                    <p class="text-[11px] text-center text-slate-400 mt-3"><i class="fa-solid fa-lock mr-1"></i> Ton numéro ne sera jamais affiché sur ton profil.</p>
-                </form>
-
-                <!-- ÉTAPE 2 : CODE SMS -->
-                <form id="step-2" class="step-panel panel-in hidden" novalidate>
-                    <h2 class="text-2xl font-extrabold mb-1">Entre ton code 🔐</h2>
-                    <p class="text-sm text-slate-500 mb-5">Code envoyé au <strong id="otp-phone" class="text-slate-800"></strong></p>
-
-                    <div id="demo-hint" class="hidden bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl px-4 py-3 mb-4">
-                        🧪 <strong>Mode démo</strong> : aucun SMS n'est envoyé. Utilise le code <strong id="demo-code"></strong>.
-                    </div>
-
-                    <div id="otp-row" class="flex justify-center gap-3 mb-3">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="one-time-code" aria-label="Chiffre 1 du code">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 2 du code">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 3 du code">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 4 du code">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 5 du code">
-                        <input class="otp" type="text" inputmode="numeric" autocomplete="off" aria-label="Chiffre 6 du code">
-                    </div>
-                    <p id="err-2" role="alert" class="hidden text-xs font-semibold text-red-500 text-center mb-2"></p>
-
-                    <button id="btn-otp" type="submit" class="mt-3 w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
-                        Valider le code
-                    </button>
-
-                    <div class="flex items-center justify-between mt-4 text-xs">
-                        <button type="button" id="btn-change" class="font-bold text-slate-500 hover:text-brandPink transition"><i class="fa-solid fa-arrow-left mr-1"></i> Changer de numéro</button>
-                        <button type="button" id="btn-resend" class="font-bold text-brandPink disabled:text-slate-400 disabled:cursor-not-allowed transition">Renvoyer le code</button>
-                    </div>
-                </form>
-
-                <!-- ÉTAPE 3 : PROFIL -->
-                <form id="step-3" class="step-panel panel-in hidden" novalidate>
-                    <h2 class="text-2xl font-extrabold mb-1">Un peu sur toi 😎</h2>
-                    <p class="text-sm text-slate-500 mb-5">Dernière étape. Ta note vocale et tes artistes viendront ensuite, dans l'appli.</p>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="pseudo" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ton pseudo</label>
-                            <input id="pseudo" type="text" maxlength="20" autocomplete="nickname" placeholder="Ex : Awa, Kevin225..." class="field">
+                    <!-- Téléphone -->
+                    <div>
+                        <label for="phone" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Numéro de téléphone</label>
+                        <div class="flex gap-2">
+                            <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm text-slate-600">+225</span>
+                            <input id="phone" name="tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07 XX XX XX XX" class="field flex-1" aria-describedby="err-phone operator-line">
                         </div>
-
-                        <div>
-                            <label for="birth" class="block text-xs font-bold text-slate-500 uppercase mb-1">Date de naissance <span class="normal-case font-semibold text-slate-400">(+18 ans)</span></label>
-                            <input id="birth" type="date" autocomplete="bday" class="field">
+                        <div id="operator-line" class="text-right mt-1 h-5">
+                            <span id="operator-badge" class="hidden text-[11px] font-bold px-2.5 py-0.5 rounded-full"></span>
                         </div>
+                        <p id="err-phone" role="alert" class="hidden text-xs font-semibold text-red-500 mt-1"></p>
+                    </div>
 
-                        <fieldset>
-                            <legend class="block text-xs font-bold text-slate-500 uppercase mb-1">Je suis</legend>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="gender" value="F" class="peer sr-only">
-                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">👩🏾 Une femme</span>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="gender" value="M" class="peer sr-only">
-                                    <span class="block text-center text-sm font-bold border-2 border-slate-200 rounded-xl py-3 transition peer-checked:border-brandPink peer-checked:bg-orange-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brandPink">👨🏾 Un homme</span>
-                                </label>
+                    <!-- Mot de passe -->
+                    <div>
+                        <label for="password" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Mot de passe</label>
+                        <div class="relative">
+                            <input id="password" name="new-password" type="password" autocomplete="new-password" placeholder="6 caractères minimum" class="field pr-12" aria-describedby="strength-label err-password">
+                            <button type="button" class="eye" data-target="password" aria-label="Afficher le mot de passe" aria-pressed="false" tabindex="0">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="h-1.5 flex-1 bg-slate-100 rounded-full overflow-hidden">
+                                <div id="strength-bar" class="h-full w-0 rounded-full transition-all duration-300"></div>
                             </div>
-                            <!-- Information automatique (pas un choix) -->
-                            <p id="seeking-hint" class="hidden text-[11px] font-semibold text-slate-500 mt-2"></p>
-                        </fieldset>
-
-                        <div>
-                            <label for="city" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ta commune ou ta ville</label>
-                            <select id="city" class="field">
-                                <option value="">Choisis ta commune...</option>
-                                <optgroup label="Abidjan">
-                                    <option>Abobo</option><option>Adjamé</option><option>Anyama</option><option>Attécoubé</option>
-                                    <option>Bingerville</option><option>Cocody</option><option>Koumassi</option><option>Marcory</option>
-                                    <option>Plateau</option><option>Port-Bouët</option><option>Songon</option><option>Treichville</option><option>Yopougon</option>
-                                </optgroup>
-                                <optgroup label="Autres villes">
-                                    <option>Abengourou</option><option>Bouaké</option><option>Daloa</option><option>Divo</option>
-                                    <option>Gagnoa</option><option>Grand-Bassam</option><option>Korhogo</option><option>Man</option>
-                                    <option>San-Pédro</option><option>Yamoussoukro</option><option>Autre ville</option>
-                                </optgroup>
-                            </select>
+                            <span id="strength-label" class="text-[11px] font-semibold text-slate-400 whitespace-nowrap">6 caractères min.</span>
                         </div>
+                        <p id="err-password" role="alert" class="hidden text-xs font-semibold text-red-500 mt-1"></p>
+                    </div>
 
+                    <!-- Confirmation -->
+                    <div>
+                        <label for="password2" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Confirme le mot de passe</label>
+                        <div class="relative">
+                            <input id="password2" name="confirm-password" type="password" autocomplete="new-password" placeholder="Retape le même mot de passe" class="field pr-12" aria-describedby="err-password2">
+                            <button type="button" class="eye" data-target="password2" aria-label="Afficher le mot de passe" aria-pressed="false" tabindex="0">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <p id="match-hint" class="hidden text-[11px] font-semibold mt-1"></p>
+                        <p id="err-password2" role="alert" class="hidden text-xs font-semibold text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- Date de naissance -->
+                    <div>
+                        <label for="birth" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                            Date de naissance <span class="normal-case font-semibold text-slate-400">(+18 ans)</span>
+                        </label>
+                        <input id="birth" name="bday" type="date" autocomplete="bday" class="field" aria-describedby="err-birth">
+                        <p id="age-hint" class="hidden text-[11px] font-semibold text-slate-500 mt-1"></p>
+                        <p id="err-birth" role="alert" class="hidden text-xs font-semibold text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- Invitation -->
+                    <div>
+                        <label for="invitation" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                            Code d'invitation <span class="normal-case font-semibold text-slate-400">(facultatif)</span>
+                        </label>
+                        <input id="invitation" name="invitation" type="text" maxlength="12" placeholder="Ex : AWA225" class="field uppercase tracking-wider" aria-describedby="err-invitation">
+                        <p id="err-invitation" role="alert" class="hidden text-xs font-semibold text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- CGU -->
+                    <div>
                         <label class="flex items-start gap-3 cursor-pointer text-xs text-slate-600 leading-relaxed">
-                            <input id="terms" type="checkbox" class="mt-0.5 w-4 h-4 accent-brandPink shrink-0">
+                            <input id="terms" type="checkbox" class="mt-0.5 w-4 h-4 accent-brandPink shrink-0" aria-describedby="err-form">
                             <span>Je confirme avoir <strong>18 ans ou plus</strong> et j'accepte les <a href="mentions-legales.html" target="_blank" class="text-brandPink font-bold hover:underline">Mentions légales &amp; CGU</a>.</span>
                         </label>
                     </div>
 
-                    <p id="err-3" role="alert" class="hidden text-xs font-semibold text-red-500 mt-3"></p>
+                    <p id="err-form" role="alert" aria-live="polite" class="hidden text-sm font-semibold text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-3"></p>
 
-                    <button id="btn-register" type="submit" class="mt-5 w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
-                        Créer mon compte <i class="vc vc-logo"></i>
+                    <button id="btn-submit" type="submit" class="w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
+                        Créer mon compte 🚀
                     </button>
                 </form>
 
-                <!-- SUCCÈS -->
-                <div id="step-done" class="step-panel panel-in hidden text-center">
-                    <p class="text-6xl mb-4">🎉</p>
-                    <h2 class="text-2xl font-extrabold mb-2">Bienvenue, <span id="done-name" class="text-brand-gradient"></span> !</h2>
-                    <p class="text-sm text-slate-600 mb-5">Ton compte est <strong>activé tout de suite</strong>. Si tu fais partie des <strong>500 premiers inscrits</strong>, ton mois de Mode Debout 👑 s'ajoute automatiquement.</p>
-
-                    <div class="bg-slate-50 rounded-2xl p-5 text-left mb-5">
-                        <p class="text-xs font-bold text-slate-400 uppercase mb-3">Ce qui t'attend dans l'appli</p>
-                        <ol class="space-y-3 text-sm text-slate-700">
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">1</span><span>Complète ton <strong>profil</strong> en 30 secondes 🎨</span></li>
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">2</span><span>Choisis tes <strong>artistes préférés</strong> 🎵</span></li>
-                            <li class="flex gap-3"><span class="w-6 h-6 shrink-0 bg-brand-gradient text-white rounded-lg flex items-center justify-center font-extrabold text-xs">3</span><span>Fais ton <strong>selfie de vérification</strong> pour le badge ✅</span></li>
-                        </ol>
-                    </div>
-
-                    <!-- Confirmation AUTOMATIQUE : l'accès est ouvert tout de suite, aucun lien à attendre -->
-                    <a id="app-link" href="app.html" class="block bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
+                <!-- Succès : remplace le formulaire -->
+                <div id="signup-done" class="hidden text-center py-6">
+                    <p class="text-5xl mb-3">🎉</p>
+                    <h3 class="text-xl font-extrabold mb-1">Bienvenue, <span id="done-name" class="text-brand-gradient"></span> !</h3>
+                    <p class="text-sm text-slate-500 mb-5">Ton compte est prêt. Direction l'application.</p>
+                    <a id="done-link" href="app.html" class="inline-block w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
                         Entrer dans l'application 🚀
                     </a>
-                    <p class="text-xs text-slate-500 mt-3">✅ Compte activé automatiquement. Aucune validation à attendre.</p>
+                    <p class="text-[11px] text-slate-400 mt-3">Tu peux fermer la page : ton compte reste enregistré.</p>
                 </div>
+
+                <p class="text-center text-sm text-slate-500 mt-6">
+                    Déjà un compte ? <a href="app.html" class="text-brandPink font-bold hover:underline">Se connecter</a>
+                </p>
+
+                <p class="text-[11px] text-center text-slate-400 mt-4 leading-relaxed">
+                    <i class="fa-solid fa-lock mr-1"></i> Version bêta : ton compte est enregistré sur cet appareil, sans SMS ni carte bancaire.
+                </p>
             </div>
         </div>
     </header>
@@ -322,10 +281,10 @@
                 </details>
                 <details class="bg-slate-50 rounded-2xl border border-slate-200 p-5 group">
                     <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
-                        Je ne reçois pas mon code SMS, que faire ?
+                        J'ai oublié mon mot de passe, que faire ?
                         <i class="fa-solid fa-chevron-down text-slate-400 text-xs group-open:rotate-180 transition"></i>
                     </summary>
-                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">Vérifie que ton numéro a bien 10 chiffres et que tu as du réseau. Attends une minute, puis clique sur « Renvoyer le code ». Toujours rien ? <a href="faq.html#contact" class="text-brandPink font-bold hover:underline">Écris-nous</a>.</p>
+                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">Ta date de naissance et ton numéro restent enregistrés sur ton téléphone. Si tu ne peux plus entrer, <a href="faq.html#contact" class="text-brandPink font-bold hover:underline">écris-nous</a> : on réactive ton accès. La vraie récupération automatique arrive avec les comptes en ligne.</p>
                 </details>
                 <details class="bg-slate-50 rounded-2xl border border-slate-200 p-5 group">
                     <summary class="font-bold cursor-pointer flex justify-between items-center gap-3">
@@ -383,7 +342,7 @@
         </div>
     </footer>
 
-    <script src="assets/js/api.js"></script>
+    <script src="assets/js/compte.js"></script>
     <script>
         function toggleMobileMenu(force) {
             const menu = document.getElementById('mobile-menu');
@@ -423,408 +382,251 @@
             });
         })();
 
-        /* ------------------------------------------------------------
-           CONFIG — ⚠️ à régler avant la mise en ligne
-           DEMO_MODE  : true = aucun SMS réel, le code DEMO_CODE est accepté.
-                        À passer à false une fois l'API branchée !
-           VIP_TAKEN  : nombre d'inscrits déjà comptés (null = jauge masquée)
-           APP_LINK   : lien optionnel vers l'appli (vide = on garde le bouton interne app.html)
-           ------------------------------------------------------------ */
-        const CONFIG = {
-            /* Adresse de l'API. Mettre "" pour revenir au mode démonstration
-               (aucun appel réseau, code 123456 accepté). */
-            API_BASE: "https://viens-chop-api.onrender.com",
-            DEMO_MODE: false,
-            DEMO_CODE: "123456",
-            OTP_LENGTH: 6,
-            RESEND_SECONDS: 30,
-            VIP_TOTAL: 500,
-            VIP_TAKEN: null,
-            APP_LINK: "app.html"
-        };
+        /* ==================================================================
+           INSCRIPTION — formulaire unique, sans serveur ni SMS.
+           Le compte est créé sur l'appareil par assets/js/compte.js.
+           ================================================================== */
+        (function initSignup() {
+            const $ = id => document.getElementById(id);
+            const C = window.VCCompte;
+            const form = $('signup');
+            if (!form || !C) return;
 
-        /* Bascule automatique : si une API est configurée, on quitte la démo. */
-        if (CONFIG.API_BASE) {
-            CONFIG.DEMO_MODE = false;
-            VCAPI.configure(CONFIG.API_BASE);
-        }
+            const MIN = C.MIN_PASSWORD;
+            let busy = false;
 
-        /* ------------------------------------------------------------
-           RÈGLE AUTOMATIQUE « JE VEUX RENCONTRER »
-           Plus aucun choix pour l'utilisateur : c'est le site qui décide.
-           Valeurs : 'F' = des femmes | 'M' = des hommes | 'A' = hommes et femmes
-           ⚠️ Pour qu'une femme voie seulement des hommes : F: 'M'
-           ------------------------------------------------------------ */
-        const SEEKING_RULE = { M: 'F', F: 'A' };
-        const SEEKING_HINT = {
-            M: "Tu verras des profils de femmes. 💘",
-            F: "Tu verras des profils d'hommes et de femmes. 💘"
-        };
-
-        /* ------------------------------------------------------------
-           COMMUNES — liste utilisée à l'étape 3 (CDC §5)
-           ------------------------------------------------------------ */
-        const COMMUNES = {
-            abidjan: ['Abobo', 'Adjamé', 'Anyama', 'Attécoubé', 'Bingerville', 'Cocody', 'Koumassi',
-                      'Marcory', 'Plateau', 'Port-Bouët', 'Songon', 'Treichville', 'Yopougon'],
-            villes: ['Abengourou', 'Aboisso', 'Adiaké', 'Adzopé', 'Agboville', 'Agnibilékrou', 'Akoupé', 'Alepe', 'Assinie', 'Bangolo', 'Béoumi', 'Biankouma', 'Bondoukou', 'Bongouanou', 'Bonoua', 'Bouaflé', 'Bouaké', 'Bouna', 'Boundiali', 'Dabakala', 'Dabou', 'Daloa', 'Danané', 'Daoukro', 'Dimbokro', 'Divo', 'Duékoué', 'Ferkessédougou', 'Fresco', 'Gagnoa', 'Grand-Bassam', 'Grand-Béréby', 'Grand-Lahou', 'Guiglo', 'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota', 'Man', 'Mankono', 'M\'Bahiakro', 'Odienné', 'Oumé', 'Sakassou', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra', 'Soubré', 'Tabou', 'Tanda', 'Tiassalé', 'Tingréla', 'Touba', 'Toulepleu', 'Toumodi', 'Vavoua', 'Yamoussoukro', 'Zuénoula']
-        };
-
-        function fillCities() {
-            const sel = $('city');
-            if (!sel || sel.dataset.filled === '1') return;
-            // la liste de COMMUNES fait foi : on repart du seul placeholder
-            while (sel.options.length > 1) sel.remove(1);
-            sel.querySelectorAll('optgroup').forEach(g => { if (g.children.length === 0) g.remove(); });
-            sel.dataset.filled = '1';
-            const mk = (label, list) => {
-                const g = document.createElement('optgroup');
-                g.label = label;
-                list.forEach(c => {
-                    const o = document.createElement('option');
-                    o.textContent = c;
-                    g.appendChild(o);
-                });
-                return g;
-            };
-            sel.appendChild(mk('📍 Grand Abidjan', COMMUNES.abidjan));
-            sel.appendChild(mk("Villes de Côte d'Ivoire", COMMUNES.villes));
-        }
-
-        /* ------------------------------------------------------------
-           API — à remplacer par tes vrais appels serveur
-           ------------------------------------------------------------ */
-        const wait = ms => new Promise(r => setTimeout(r, ms));
-
-        /* Réponse unique face aux erreurs de l'API : on affiche le message du
-           serveur (il est déjà rédigé en français et orienté utilisateur). */
-        function apiMessage(err) {
-            const m = {
-                TROP_DE_DEMANDES: "Trop de demandes de code pour ce numéro. Réessaie dans une heure.",
-                CODE_INCORRECT: "Ce code n'est pas le bon.",
-                CODE_EXPIRE: "Ce code a expiré. Demande-en un nouveau.",
-                AUCUN_CODE: "Aucun code en cours. Clique d'abord sur « Recevoir mon code ».",
-                TROP_D_ESSAIS: "Trop de tentatives. Demande un nouveau code.",
-                TELEPHONE_DEJA_UTILISE: "Ce numéro a déjà un compte.",
-                MINEUR_INTERDIT: "Viens chop est réservé aux personnes de 18 ans et plus.",
-                RESEAU: "Impossible de joindre le serveur. Vérifie ta connexion.",
-                TELEPHONE_INVALIDE: "Ce numéro de téléphone n'est pas valide."
-            };
-            return m[err && err.code] || (err && err.message) || "Une erreur est survenue.";
-        }
-
-        async function sendOtp(phone) {
-            if (CONFIG.DEMO_MODE) { await wait(700); return true; }
-            await VCAPI.auth.sendCode(phone);
-            return true;
-        }
-
-        async function verifyOtp(phone, code) {
-            if (CONFIG.DEMO_MODE) { await wait(600); return code === CONFIG.DEMO_CODE; }
-            await VCAPI.auth.verify(phone, code);   // garde la session en mémoire
-            return true;
-        }
-
-        async function registerUser(payload) {
-            if (CONFIG.DEMO_MODE) { await wait(800); return true; }
-            /* Le serveur recalcule lui-même l'âge, la majorité et le champ
-               « seeking » : on ne lui fait pas confiance sur ces valeurs. */
-            await VCAPI.users.updateProfile({
-                pseudo: payload.pseudo,
-                birth_date: payload.birthDate,
-                gender: payload.gender,
-                commune: payload.commune,
-                artists: payload.artists || []
-            });
-            return true;
-        }
-
-        /* ---------- Helpers ---------- */
-        const $ = id => document.getElementById(id);
-        const state = { phone: "", pseudo: "" };
-
-        function showError(id, msg) { const el = $(id); el.textContent = msg; el.classList.remove('hidden'); }
-        function hideError(id) { $(id).classList.add('hidden'); }
-
-        function setLoading(btn, loading, text) {
-            if (loading) { btn.dataset.label = btn.textContent; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>' + (text || 'Un instant...'); }
-            else { btn.disabled = false; btn.textContent = btn.dataset.label || btn.textContent; }
-        }
-
-        const stepTitles = ["Ton numéro", "Le code SMS", "Ton profil"];
-        function goStep(n, focus = true) {
-            document.querySelectorAll('.step-panel').forEach(p => p.classList.add('hidden'));
-            const panel = $('step-' + n);
-            panel.classList.remove('hidden');
-            for (let i = 1; i <= 3; i++) {
-                $('bar-' + i).className = 'h-1.5 flex-1 rounded-full ' + (i <= n ? 'bg-brand-gradient' : 'bg-slate-200');
+            /* ---------- Messages ---------- */
+            function showError(id, msg) {
+                const el = $(id);
+                if (!el) return;
+                el.textContent = msg;
+                el.classList.remove('hidden');
             }
-            $('step-label').textContent = 'Étape ' + n + ' sur 3 — ' + stepTitles[n - 1];
-            if (focus) {
-                const first = panel.querySelector('input:not([type=radio]):not([type=checkbox])');
-                if (first) first.focus();
+            function hideError(id) {
+                const el = $(id);
+                if (el) el.classList.add('hidden');
             }
-        }
+            function fail(id, msg, field) {
+                showError(id, msg);
+                const input = $(field || id.replace('err-', ''));
+                if (input && input.classList) {
+                    input.classList.add('invalid');
+                    if (input.focus) input.focus({ preventScroll: false });
+                }
+                return false;
+            }
+            function clearFail(id, field) {
+                hideError(id);
+                const input = $(field || id.replace('err-', ''));
+                if (input && input.classList) input.classList.remove('invalid');
+            }
 
-        /* ---------- Étape 1 : numéro ---------- */
-        function cleanPhone(raw) {
-            let d = raw.replace(/\D/g, '');
-            if (d.startsWith('225') && d.length > 10) d = d.slice(3);
-            return d.slice(0, 10);
-        }
-        function formatPhone(d) { return d.replace(/(\d{2})(?=\d)/g, '$1 '); }
-
-        /* CDC §2 — détection automatique de l'opérateur (07 / 05 / 01) */
-        const OPERATORS = {
-            '07': { name: 'Orange CI', color: '#FF7900' },
-            '05': { name: 'MTN CI',    color: '#FFCC00' },
-            '01': { name: 'Moov Africa', color: '#009CDE' }
-        };
-
-        function updateOperator(raw) {
+            /* ---------- Téléphone ---------- */
+            const phone = $('phone');
             const badge = $('operator-badge');
-            if (!badge) return;
-            const prefix = raw.replace(/\D/g, '').slice(0, 2);
-            const op = OPERATORS[prefix];
-            if (op) {
-                badge.textContent = op.name;
-                badge.style.background = op.color + '22';
-                badge.style.color = op.color;
-                badge.style.border = '1px solid ' + op.color + '55';
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
 
-        $('phone').addEventListener('input', e => {
-            e.target.value = formatPhone(cleanPhone(e.target.value));
-            e.target.classList.remove('invalid');
-            hideError('err-1');
-            updateOperator(e.target.value);
-        });
-
-        $('step-1').addEventListener('submit', async e => {
-            e.preventDefault();
-            hideError('err-1');
-            const phone = cleanPhone($('phone').value);
-            if (!/^0[1-9]\d{8}$/.test(phone)) {
-                $('phone').classList.add('invalid');
-                showError('err-1', "Numéro invalide : il doit contenir 10 chiffres (ex : 07 XX XX XX XX).");
-                return;
-            }
-            const btn = $('btn-phone');
-            setLoading(btn, true, 'Envoi du SMS...');
-            try {
-                await sendOtp(phone);
-                state.phone = phone;
-                $('otp-phone').textContent = '+225 ' + formatPhone(phone);
-                resetOtp();
-                goStep(2);
-                startResendTimer();
-            } catch (err) {
-                showError('err-1', "Impossible d'envoyer le SMS pour le moment. Réessaie dans un instant.");
-            } finally {
-                setLoading(btn, false);
-            }
-        });
-
-        /* ---------- Étape 2 : code SMS ---------- */
-        const otpInputs = [...document.querySelectorAll('.otp')];
-        let verifying = false;
-
-        const getOtp = () => otpInputs.map(i => i.value).join('');
-
-        function fillFrom(start, digits) {
-            digits.split('').slice(0, otpInputs.length - start).forEach((c, k) => { otpInputs[start + k].value = c; });
-            const next = Math.min(start + digits.length, otpInputs.length - 1);
-            otpInputs[next].focus();
-        }
-
-        function resetOtp() {
-            otpInputs.forEach(i => { i.value = ''; i.classList.remove('invalid'); });
-            hideError('err-2');
-        }
-
-        otpInputs.forEach((inp, i) => {
-            inp.addEventListener('input', () => {
-                const digits = inp.value.replace(/\D/g, '');
-                inp.classList.remove('invalid');
-                hideError('err-2');
-                if (digits.length > 1) { fillFrom(i, digits); }              // collage ou remplissage auto SMS
-                else {
-                    inp.value = digits;
-                    if (digits && i < otpInputs.length - 1) otpInputs[i + 1].focus();
+            phone.addEventListener('input', () => {
+                phone.value = C.formatPhone(phone.value);
+                phone.classList.remove('invalid');
+                hideError('err-phone');
+                const op = C.operatorOf(phone.value);
+                if (op) {
+                    badge.textContent = op.name;
+                    badge.style.background = op.color + '1f';
+                    badge.style.color = op.color;
+                    badge.style.border = '1px solid ' + op.color + '55';
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
                 }
-                if (getOtp().length === CONFIG.OTP_LENGTH) verify();
             });
-            inp.addEventListener('keydown', e => {
-                if (e.key === 'Backspace' && !inp.value && i > 0) { otpInputs[i - 1].value = ''; otpInputs[i - 1].focus(); }
-            });
-            inp.addEventListener('focus', () => inp.select());
-        });
 
-        async function verify() {
-            if (verifying) return;
-            const code = getOtp();
-            if (code.length !== CONFIG.OTP_LENGTH) { showError('err-2', "Entre les " + CONFIG.OTP_LENGTH + " chiffres du code."); return; }
-            verifying = true;
-            hideError('err-2');
-            const btn = $('btn-otp');
-            setLoading(btn, true, 'Vérification...');
-            try {
-                const ok = await verifyOtp(state.phone, code);
-                if (ok) { clearInterval(resendTimer); goStep(3); }
-                else {
-                    /* On vide d'abord : sinon le code reste complet et la saisie
-                       automatique relance verify() en boucle, ce qui consomme
-                       les essais autorisés par le serveur.
-                       resetOtp() masque aussi le message d'erreur : on affiche
-                       donc le message APRÈS. */
-                    resetOtp();
-                    $('otp-row').classList.remove('shake'); void $('otp-row').offsetWidth; $('otp-row').classList.add('shake');
-                    showError('err-2', "Code incorrect. Vérifie ton SMS et réessaie.");
-                    otpInputs[0].focus();
-                }
-            } catch (err) {
-                showError('err-2', apiMessage(err));
-            } finally {
-                verifying = false;
-                setLoading(btn, false);
+            /* ---------- Voir / cacher le mot de passe ---------- */
+            document.querySelectorAll('.eye').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = $(btn.dataset.target);
+                    if (!input) return;
+                    const show = input.type === 'password';
+                    input.type = show ? 'text' : 'password';
+                    btn.setAttribute('aria-pressed', String(show));
+                    btn.setAttribute('aria-label', show ? 'Cacher le mot de passe' : 'Afficher le mot de passe');
+                    btn.innerHTML = '<i class="fa-solid fa-eye' + (show ? '-slash' : '') + '"></i>';
+                });
+            });
+
+            /* ---------- Robustesse du mot de passe ---------- */
+            const pwd = $('password');
+            const bar = $('strength-bar');
+            const label = $('strength-label');
+
+            function strength(v) {
+                let score = 0;
+                if (v.length >= MIN) score++;
+                if (v.length >= 10) score++;
+                if (/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+                if (/\d/.test(v)) score++;
+                if (/[^A-Za-z0-9]/.test(v)) score++;
+                return Math.min(score, 4);
             }
-        }
 
-        $('step-2').addEventListener('submit', e => { e.preventDefault(); verify(); });
+            pwd.addEventListener('input', () => {
+                pwd.classList.remove('invalid');
+                hideError('err-password');
+                const v = pwd.value;
+                const levels = [
+                    { w: '0%',   c: '#e2e8f0', t: MIN + ' caractères min.' },
+                    { w: '25%',  c: '#ef4444', t: 'Trop simple' },
+                    { w: '50%',  c: '#f59e0b', t: 'Moyen' },
+                    { w: '75%',  c: '#22c55e', t: 'Bien' },
+                    { w: '100%', c: '#16a34a', t: 'Solide' }
+                ];
+                const s = v.length === 0 ? 0 : strength(v);
+                bar.style.width = levels[s].w;
+                bar.style.background = levels[s].c;
+                label.textContent = levels[s].t;
+                label.style.color = s >= 3 ? '#16a34a' : (s === 0 ? '#94a3b8' : levels[s].c);
+                checkMatch();
+            });
 
-        $('btn-change').addEventListener('click', () => {
-            clearInterval(resendTimer);
-            resendTimer = null;
-            const r = $('btn-resend');
-            r.disabled = false;
-            r.textContent = 'Renvoyer le code';
-            goStep(1);
-        });
+            /* ---------- Confirmation ---------- */
+            const pwd2 = $('password2');
+            const matchHint = $('match-hint');
 
-        let resendTimer;
-        function startResendTimer() {
-            let s = CONFIG.RESEND_SECONDS;
-            const btn = $('btn-resend');
-            btn.disabled = true;
-            clearInterval(resendTimer);
-            const tick = () => {
-                if (s <= 0) {
-                    btn.textContent = 'Renvoyer le code';
-                    btn.disabled = false;
-                    clearInterval(resendTimer);
-                    resendTimer = null;
+            function checkMatch() {
+                if (!pwd2.value) {
+                    matchHint.classList.add('hidden');
+                    matchHint.classList.remove('text-green-600', 'text-red-500');
                     return;
                 }
-                btn.textContent = 'Renvoyer le code dans ' + s + 's';
-                s--;
-            };
-            tick();
-            resendTimer = setInterval(tick, 1000);
-        }
-
-        $('btn-resend').addEventListener('click', async () => {
-            const btn = $('btn-resend');
-            btn.disabled = true; btn.textContent = 'Envoi...';
-            try { await sendOtp(state.phone); resetOtp(); otpInputs[0].focus(); startResendTimer(); }
-            catch (err) { showError('err-2', "Impossible de renvoyer le SMS pour le moment."); btn.disabled = false; btn.textContent = 'Renvoyer le code'; }
-        });
-
-        /* ---------- Étape 3 : profil ---------- */
-        // Date de naissance : impossible de choisir une date < 18 ans
-        (function setBirthLimits() {
-            const t = new Date();
-            const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-            $('birth').max = fmt(new Date(t.getFullYear() - 18, t.getMonth(), t.getDate()));
-            $('birth').min = fmt(new Date(t.getFullYear() - 99, 0, 1));
-        })();
-
-        function ageFrom(dateStr) {
-            const [y, m, d] = dateStr.split('-').map(Number);
-            const check = new Date(y, m - 1, d);
-            if (isNaN(check) || check.getFullYear() !== y || check.getMonth() !== m - 1 || check.getDate() !== d) return null;
-            const t = new Date();
-            let age = t.getFullYear() - y;
-            if (t.getMonth() + 1 < m || (t.getMonth() + 1 === m && t.getDate() < d)) age--;
-            return age;
-        }
-
-        /* ---------- Genre → affichage de ce que l'utilisateur verra (automatique) ---------- */
-        document.querySelectorAll('input[name="gender"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                const hint = $('seeking-hint');
-                hint.textContent = SEEKING_HINT[radio.value];
-                hint.classList.remove('hidden');
-                hideError('err-3');
-            });
-        });
-
-        ['pseudo', 'birth', 'city'].forEach(id => $(id).addEventListener('input', () => { $(id).classList.remove('invalid'); hideError('err-3'); }));
-
-        $('step-3').addEventListener('submit', async e => {
-            e.preventDefault();
-            hideError('err-3');
-            ['pseudo', 'birth', 'city'].forEach(id => $(id).classList.remove('invalid'));
-
-            const pseudo = $('pseudo').value.trim();
-            const birth = $('birth').value;
-            const gender = (document.querySelector('input[name="gender"]:checked') || {}).value;
-            const seeking = SEEKING_RULE[gender];   // calculé automatiquement, jamais choisi par l'utilisateur
-            const city = $('city').value;
-
-            if (!/^[\p{L}\p{N} ._-]{2,20}$/u.test(pseudo)) { $('pseudo').classList.add('invalid'); return showError('err-3', "Choisis un pseudo de 2 à 20 caractères (lettres, chiffres, espaces, . _ -)."); }
-            if (!birth) { $('birth').classList.add('invalid'); return showError('err-3', "Indique ta date de naissance."); }
-            const age = ageFrom(birth);
-            if (age === null) { $('birth').classList.add('invalid'); return showError('err-3', "Cette date de naissance n'est pas valide."); }
-            if (age < 18) { $('birth').classList.add('invalid'); return showError('err-3', "Désolé, Viens chop est réservée aux +18 ans. Reviens le jour de tes 18 ans 😉"); }
-            if (age > 99) { $('birth').classList.add('invalid'); return showError('err-3', "Cette date de naissance n'est pas valide."); }
-            if (!gender) return showError('err-3', "Dis-nous si tu es une femme ou un homme.");
-            if (!city) { $('city').classList.add('invalid'); return showError('err-3', "Choisis ta commune ou ta ville."); }
-            if (!$('terms').checked) return showError('err-3', "Coche la case pour confirmer ton âge et accepter les CGU.");
-
-            const btn = $('btn-register');
-            setLoading(btn, true, 'Création du compte...');
-            try {
-                await registerUser({ phone: '+225' + state.phone, pseudo, birthDate: birth, gender, seeking, commune: city });
-                state.pseudo = pseudo;
-                showDone();
-            } catch (err) {
-                showError('err-3', apiMessage(err));
-            } finally {
-                setLoading(btn, false);
+                const same = pwd2.value === pwd.value;
+                matchHint.textContent = same ? '✓ Les deux mots de passe sont identiques' : 'Les mots de passe ne sont pas identiques';
+                matchHint.classList.remove('hidden', 'text-green-600', 'text-red-500');
+                matchHint.classList.add(same ? 'text-green-600' : 'text-red-500');
             }
-        });
 
-        /* ---------- Succès ---------- */
-        function showDone() {
-            document.querySelectorAll('.step-panel').forEach(p => p.classList.add('hidden'));
-            $('stepper').classList.add('hidden');
-            $('done-name').textContent = state.pseudo;
+            pwd2.addEventListener('input', () => {
+                pwd2.classList.remove('invalid');
+                hideError('err-password2');
+                checkMatch();
+            });
 
-            // Confirmation automatique : le bouton d'entrée est toujours actif, rien à attendre.
-            $('app-link').href = CONFIG.APP_LINK || 'app.html';
+            /* ---------- Date de naissance ---------- */
+            const birth = $('birth');
+            const ageHint = $('age-hint');
 
-            $('step-done').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            (function setBirthLimits() {
+                const today = new Date();
+                const max = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                const min = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+                birth.max = C.toISO(max);
+                birth.min = C.toISO(min);
+            })();
 
-        /* ---------- Init ---------- */
-        if (CONFIG.DEMO_MODE) {
-            $('demo-code').textContent = CONFIG.DEMO_CODE;
-            $('demo-hint').classList.remove('hidden');
-        }
-        if (typeof CONFIG.VIP_TAKEN === 'number') {
-            const taken = Math.min(CONFIG.VIP_TAKEN, CONFIG.VIP_TOTAL);
-            $('vip-taken-label').textContent = taken + ' / ' + CONFIG.VIP_TOTAL + ' places prises';
-            $('vip-left-label').textContent = (CONFIG.VIP_TOTAL - taken) + ' restantes';
-            $('vip-bar').style.width = (taken / CONFIG.VIP_TOTAL * 100) + '%';
-            $('vip-progress').classList.remove('hidden');
-        }
-        fillCities();
-        goStep(1, false);
+            birth.addEventListener('change', () => {
+                birth.classList.remove('invalid');
+                hideError('err-birth');
+                const age = C.ageFrom(birth.value);
+                if (age === null) {
+                    ageHint.classList.add('hidden');
+                    return;
+                }
+                ageHint.classList.remove('hidden');
+                if (age < 18) {
+                    ageHint.textContent = 'Tu as ' + age + ' ans : l\'inscription est réservée aux 18 ans et plus.';
+                    ageHint.className = 'text-[11px] font-semibold text-red-500 mt-1';
+                } else {
+                    ageHint.textContent = 'Tu as ' + age + ' ans ✓';
+                    ageHint.className = 'text-[11px] font-semibold text-green-600 mt-1';
+                }
+            });
+
+            /* ---------- Code d'invitation depuis un lien ---------- */
+            (function prefillInvitation() {
+                const params = new URLSearchParams(location.search);
+                const code = params.get('code') || params.get('invitation');
+                if (code) $('invitation').value = code.toUpperCase().slice(0, 12);
+            })();
+
+            $('invitation').addEventListener('input', e => {
+                e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+            });
+
+            /* ---------- Déjà connecté ? ---------- */
+            (function alreadyIn() {
+                const me = C.current();
+                if (!me) return;
+                const note = document.createElement('div');
+                note.className = 'mb-4 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-600 flex items-center justify-between gap-3';
+                note.innerHTML = '<span>Tu es déjà connecté' + (me.name ? ' en tant que <strong>' + me.name.replace(/[<>&]/g, '') + '</strong>' : '') + '.</span>' +
+                    '<a href="app.html" class="font-bold text-brandPink hover:underline whitespace-nowrap">Reprendre →</a>';
+                const card = form.parentElement;
+                card.insertBefore(note, card.firstChild);
+            })();
+
+            /* ---------- Bouton ---------- */
+            const submit = $('btn-submit');
+            function setLoading(on, text) {
+                busy = on;
+                submit.disabled = on;
+                submit.textContent = on ? (text || 'Un instant...') : 'Créer mon compte 🚀';
+            }
+
+            /* ---------- Envoi ---------- */
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                if (busy) return;
+                hideError('err-form');
+                ['err-phone', 'err-password', 'err-password2', 'err-birth', 'err-invitation'].forEach(hideError);
+                document.querySelectorAll('#signup .field').forEach(f => f.classList.remove('invalid'));
+
+                const tel = C.normalizePhone(phone.value);
+                if (!C.isValidPhone(tel)) {
+                    return fail('err-phone', 'Entre tes 10 chiffres, par exemple 07 00 00 00 00.', 'phone');
+                }
+                if (pwd.value.length < MIN) {
+                    return fail('err-password', 'Ton mot de passe doit faire au moins ' + MIN + ' caractères.', 'password');
+                }
+                if (pwd2.value !== pwd.value) {
+                    return fail('err-password2', 'Les deux mots de passe ne sont pas identiques.', 'password2');
+                }
+                const age = C.ageFrom(birth.value);
+                if (age === null) {
+                    return fail('err-birth', 'Choisis ta date de naissance.', 'birth');
+                }
+                if (age < 18) {
+                    return fail('err-birth', 'Désolé, l\'inscription est réservée aux 18 ans et plus.', 'birth');
+                }
+                if (!$('terms').checked) {
+                    showError('err-form', 'Coche la case pour confirmer tes 18 ans et accepter les CGU.');
+                    $('terms').focus();
+                    return false;
+                }
+
+                setLoading(true, 'Création du compte...');
+                try {
+                    const account = await C.create({
+                        phone: tel,
+                        password: pwd.value,
+                        birth: birth.value,
+                        invitation: $('invitation').value
+                    });
+                    form.classList.add('hidden');
+                    $('signup-done').classList.remove('hidden');
+                    $('done-name').textContent = account.name || ('+' + C.formatPhone(account.phone));
+                    setTimeout(() => { location.href = 'app.html'; }, 2600);
+                } catch (err) {
+                    setLoading(false);
+                    const messages = {
+                        TELEPHONE_DEJA_UTILISE: 'Ce numéro a déjà un compte. Connecte-toi plutôt.',
+                        MINEUR_INTERDIT: 'Désolé, l\'inscription est réservée aux 18 ans et plus.',
+                        MOT_DE_PASSE_COURT: 'Ton mot de passe doit faire au moins ' + MIN + ' caractères.',
+                        DATE_INVALIDE: 'Cette date de naissance n\'est pas valide.',
+                        TELEPHONE_INVALIDE: 'Entre tes 10 chiffres, par exemple 07 00 00 00 00.'
+                    };
+                    showError('err-form', messages[err.code] || 'Impossible de créer le compte : ' + (err.message || 'réessaie.'));
+                }
+            });
+        })();
     </script>
 </body>
 </html>
