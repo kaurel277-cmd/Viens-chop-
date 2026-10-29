@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
     <script src="assets/js/compte.js"></script>
+    <script src="assets/js/media.js"></script>
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -602,11 +603,62 @@
         </div>
     </div>
 
+    <!-- ==================== ÉCRAN : MON PROFIL (photos réelles) ==================== -->
+    <div id="mon-profil" class="screen">
+        <div class="wa-header">
+            <button class="wa-icon-btn" onclick="goTo('discover')" aria-label="Retour au fil" type="button">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h2>Mon profil</h2>
+            <div class="wa-actions">
+                <button class="wa-icon-btn" onclick="addMyPhoto()" aria-label="Ajouter une photo" title="Ajouter une photo" type="button">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div style="padding:20px 18px 120px; overflow-y:auto;">
+            <div style="text-align:center; margin-bottom:18px;">
+                <div id="my-name" style="font-size:20px; font-weight:800;">Mon profil</div>
+                <p id="my-sub" style="font-size:13px; color:rgba(255,255,255,.5); margin-top:4px;"></p>
+            </div>
+
+            <div id="my-photos" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;"></div>
+
+            <p id="my-photos-hint" style="font-size:12px; color:rgba(255,255,255,.45); text-align:center; margin-top:12px;">
+                Ta première photo est celle que les autres verront en premier.
+            </p>
+
+            <button class="btn-secondary" style="margin-top:16px;" onclick="addMyPhoto()" type="button">
+                <i class="fa-solid fa-camera"></i> Ajouter une photo
+            </button>
+
+            <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:rgba(255,255,255,.6); margin-bottom:8px;">
+                    <span>Stockage de l'appareil</span>
+                    <span id="my-quota-label">—</span>
+                </div>
+                <div style="height:8px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden;">
+                    <div id="my-quota-bar" style="height:100%; width:0%; border-radius:99px; background:linear-gradient(135deg,#FF6B00,#FF1E56); transition:width .3s;"></div>
+                </div>
+                <p style="font-size:11px; color:rgba(255,255,255,.4); margin-top:10px; line-height:1.5;">
+                    Rien n'est stocké sur Render. Les photos vivent sur ton téléphone et partiront
+                    vers Cloudflare R2 (10 Go gratuits) dès que le serveur sera branché.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== ÉCRAN 4: DÉCOUVERTE (SWIPE) ==================== -->
     <div id="discover" class="screen">
         <div class="discover-header">
             <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:22px;"><i class="vc vc-logo"></i></span>
+                <button id="my-avatar" onclick="openMonProfil()" aria-label="Mon profil" title="Mon profil" type="button"
+                        style="width:38px; height:38px; border-radius:50%; overflow:hidden; padding:0; cursor:pointer;
+                               border:2px solid rgba(255,255,255,.18); background:linear-gradient(135deg,#FF6B00,#FF1E56);
+                               color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-user"></i>
+                </button>
                 <span class="gradient-text" style="font-size:20px; font-weight:800;">Viens chop</span>
             </div>
             <div class="likes-counter glass">
@@ -723,6 +775,10 @@
         </div>
 
         <div class="chat-input-bar">
+            <button onclick="sendVueUnique('photo')" type="button" aria-label="Envoyer une photo en vue unique"
+                    title="Photo en vue unique" style="background:rgba(255,107,0,.15); color:#FF6B00;">
+                <i class="fa-solid fa-camera"></i>
+            </button>
             <input type="text" id="chat-input" placeholder="Écris ton message..." aria-label="Écrire un message" onkeypress="if(event.key==='Enter')sendMessage()">
             <button onclick="sendMessage()" type="button" aria-label="Envoyer le message"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
@@ -1685,6 +1741,297 @@
                 if (screenId === 'discover') renderFakeCallQuota();
                 return _goTo(screenId);
             };
+        })();
+    </script>
+    <!-- ==================== PHOTOS RÉELLES + VUE UNIQUE ==================== -->
+    <script>
+        /* ==================================================================
+           Couche média : photos du profil, profils réels de l'appareil,
+           et médias « vue unique » dans le chat.
+           S'appuie sur assets/js/media.js (stockage local, R2-ready).
+           ================================================================== */
+        (function initMedia() {
+            const C = window.VCCompte;
+            const M = window.VCMedia;
+            if (!C || !M || !C.isLoggedIn()) return;
+
+            const me = C.current();
+
+            /* ---------- Profils réels : les autres comptes de l'appareil ---- */
+            function realProfiles() {
+                const moi = C.current();
+                return C.all()
+                    // une personne est visible dès qu'elle a un prénom ou une photo
+                    .filter(a => a.id !== (moi && moi.id) && (a.name || (a.photos && a.photos.length)))
+                    .map(a => ({
+                        name: a.name || ('Membre ' + String(a.phone).slice(-4)),
+                        age: a.age || '',
+                        city: a.commune || 'Abidjan',
+                        artists: (a.artists && a.artists.length) ? a.artists : ['Himra', 'Didi B'],
+                        color: 'linear-gradient(135deg,#2d1b4e,#1b3a4b)',
+                        userId: a.id,
+                        photoId: a.photos && a.photos[0],
+                        real: true
+                    }));
+            }
+
+            const reels = realProfiles();
+            if (reels.length && typeof profiles !== 'undefined') {
+                // On place les vraies personnes devant les profils de démonstration
+                profiles.unshift(...reels);
+            }
+
+            /* ---------- Photo sur la carte du fil ---------- */
+            const _loadProfile = window.loadProfile;
+            window.loadProfile = function (index) {
+                _loadProfile(index);
+                const idx = (typeof index === 'number') ? index : 0;
+                const p = (typeof profiles !== 'undefined') ? profiles[idx] : null;
+                const zone = document.getElementById('card-photo');
+                if (!zone) return;
+                zone.style.backgroundImage = '';
+                if (!p || !p.photoId) return;
+                M.get(p.photoId).then(rec => {
+                    if (!rec || !rec.blob) return;
+                    zone.style.background = p.color;
+                    zone.style.backgroundImage = 'url(' + M.previewUrl(rec) + ')';
+                    zone.style.backgroundSize = 'cover';
+                    zone.style.backgroundPosition = 'center';
+                }).catch(() => {});
+            };
+
+            /* ---------- Avatar de l'en-tête ---------- */
+            function refreshAvatar() {
+                const btn = document.getElementById('my-avatar');
+                const compte = C.current();
+                if (!btn || !compte) return;
+                const id = compte.photos && compte.photos[0];
+                if (!id) {
+                    btn.innerHTML = '<i class="fa-solid fa-user"></i>';
+                    btn.style.backgroundImage = '';
+                    return;
+                }
+                M.get(id).then(rec => {
+                    if (!rec || !rec.blob) return;
+                    btn.innerHTML = '';
+                    btn.style.backgroundImage = 'url(' + M.previewUrl(rec) + ')';
+                    btn.style.backgroundSize = 'cover';
+                    btn.style.backgroundPosition = 'center';
+                }).catch(() => {});
+            }
+
+            /* ---------- Mon profil ---------- */
+            window.openMonProfil = function () {
+                renderMonProfil();
+                goTo('mon-profil');
+            };
+
+            function renderMonProfil() {
+                const compte = C.current();
+                const grille = document.getElementById('my-photos');
+                if (!compte || !grille) return;
+
+                document.getElementById('my-name').textContent = compte.name || 'Mon profil';
+                const sub = [];
+                if (compte.age) sub.push(compte.age + ' ans');
+                if (compte.commune) sub.push(compte.commune);
+                if (compte.phone) sub.push('+' + C.formatPhone(compte.phone));
+                document.getElementById('my-sub').textContent = sub.join(' · ');
+
+                const photos = compte.photos || [];
+                grille.innerHTML = '';
+
+                photos.forEach((id, i) => {
+                    const cell = document.createElement('div');
+                    cell.style.cssText = 'position:relative; aspect-ratio:3/4; border-radius:14px; overflow:hidden; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);';
+                    cell.innerHTML = '<div data-img style="position:absolute; inset:0; background-size:cover; background-position:center;"></div>' +
+                        '<button type="button" aria-label="Retirer cette photo" style="position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; border:none; background:rgba(0,0,0,.55); color:#fff; font-size:11px; cursor:pointer;">✕</button>' +
+                        (i === 0 ? '<span style="position:absolute; bottom:6px; left:6px; font-size:9px; font-weight:800; background:#FF6B00; color:#fff; padding:2px 6px; border-radius:6px;">PRINCIPALE</span>' : '');
+                    cell.querySelector('button').onclick = () => removeMyPhoto(id);
+                    M.get(id).then(rec => {
+                        if (rec && rec.blob) cell.querySelector('[data-img]').style.backgroundImage = 'url(' + M.previewUrl(rec) + ')';
+                    });
+                    grille.appendChild(cell);
+                });
+
+                for (let i = photos.length; i < 3; i++) {
+                    const vide = document.createElement('button');
+                    vide.type = 'button';
+                    vide.setAttribute('aria-label', 'Ajouter une photo');
+                    vide.style.cssText = 'aspect-ratio:3/4; border-radius:14px; border:2px dashed rgba(255,255,255,.15); background:rgba(255,255,255,.03); color:rgba(255,255,255,.35); font-size:22px; cursor:pointer;';
+                    vide.textContent = '+';
+                    vide.onclick = addMyPhoto;
+                    grille.appendChild(vide);
+                }
+
+                document.getElementById('my-photos-hint').textContent = photos.length
+                    ? (photos.length < 3 ? 'Tu peux ajouter ' + (3 - photos.length) + ' photo(s) de plus.' : 'Tu as mis 3 photos, le maximum.')
+                    : 'Ajoute au moins une photo : sans photo, ton profil reste invisible pour les autres.';
+
+                M.stats().then(st => {
+                    document.getElementById('my-quota-label').textContent =
+                        M.humanBytes(st.bytes) + ' / ' + M.humanBytes(st.quota) + ' (' + st.count + ' élément' + (st.count > 1 ? 's' : '') + ')';
+                    document.getElementById('my-quota-bar').style.width = st.pct + '%';
+                });
+            }
+
+            window.addMyPhoto = async function () {
+                const compte = C.current();
+                if (!compte) return;
+                if ((compte.photos || []).length >= 3) {
+                    alert('Trois photos maximum pour le moment.');
+                    return;
+                }
+                const rec = await M.pick({ kind: 'photo', ownerId: compte.id });
+                if (!rec) return;
+                if (rec.error) {
+                    alert(rec.code === 'COMPRESSION_ECHOUEE' ? "Cette image n'a pas pu être préparée." : 'Photo impossible à ajouter.');
+                    return;
+                }
+                const photos = (C.current().photos || []).concat(rec.id);
+                C.update({ photos });
+                renderMonProfil();
+                refreshAvatar();
+            };
+
+            window.removeMyPhoto = async function (id) {
+                if (!confirm('Retirer cette photo ?')) return;
+                const photos = (C.current().photos || []).filter(x => x !== id);
+                C.update({ photos });
+                await M.remove(id);
+                renderMonProfil();
+                refreshAvatar();
+            };
+
+            /* ---------- Vue unique dans le chat ---------- */
+            window.sendVueUnique = async function (kind) {
+                const rec = await M.pick({
+                    kind,
+                    viewOnce: true,
+                    ownerId: 'chat',
+                    ttlMs: 24 * 60 * 60 * 1000
+                });
+                if (!rec) return;
+                if (rec.error) {
+                    const messages = {
+                        VIDEO_TROP_LOURDE: 'Vidéo trop lourde (6 Mo maximum).',
+                        VIDEO_TROP_LONGUE: 'Vidéo trop longue (15 secondes maximum).',
+                        COMPRESSION_ECHOUEE: "Cette image n'a pas pu être préparée."
+                    };
+                    alert(messages[rec.code] || 'Envoi impossible.');
+                    return;
+                }
+                afficherMediaVueUnique(rec, 'sent');
+                messageCount++;
+                if (typeof updatePhotoCountdown === 'function') updatePhotoCountdown();
+            };
+
+            function afficherMediaVueUnique(rec, sens) {
+                const container = document.getElementById('chat-messages');
+                if (!container) return;
+
+                const bulle = document.createElement('div');
+                bulle.className = 'msg ' + sens + ' anim-slide-up';
+                bulle.dataset.mediaId = rec.id;
+                bulle.style.cssText = 'padding:0; overflow:hidden; cursor:pointer; max-width:220px;';
+
+                const etiquette = rec.kind === 'video' ? '🎬 Vidéo' : '📷 Photo';
+                bulle.innerHTML =
+                    '<div style="padding:12px 14px; display:flex; align-items:center; gap:10px;">' +
+                        '<span style="font-size:20px;">👁️</span>' +
+                        '<div>' +
+                            '<div style="font-weight:800; font-size:13px;">' + etiquette + ' en vue unique</div>' +
+                            '<div style="font-size:11px; opacity:.75;" data-etat>Appuie pour ouvrir · une seule fois</div>' +
+                        '</div>' +
+                    '</div>';
+
+                bulle.onclick = () => ouvrirVueUnique(rec.id, bulle);
+                container.appendChild(bulle);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            async function ouvrirVueUnique(id, bulle) {
+                const rec = await M.get(id);
+                if (!rec) {
+                    marquerConsomme(bulle);
+                    return;
+                }
+
+                const voile = document.createElement('div');
+                voile.setAttribute('role', 'dialog');
+                voile.setAttribute('aria-label', 'Média en vue unique');
+                voile.style.cssText = 'position:fixed; inset:0; background:#000; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
+
+                const entete = document.createElement('div');
+                entete.style.cssText = 'position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:18px 20px; color:#fff; font-size:12px; font-weight:700;';
+                const compte = document.createElement('span');
+                compte.textContent = '⏳ ' + 8 + ' s';
+                const fermer = document.createElement('button');
+                fermer.type = 'button';
+                fermer.setAttribute('aria-label', 'Fermer');
+                fermer.style.cssText = 'background:rgba(255,255,255,.15); border:none; color:#fff; width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer;';
+                fermer.textContent = '✕';
+                entete.append(compte, fermer);
+
+                let media;
+                const url = M.previewUrl(rec);
+                if (rec.kind === 'video') {
+                    media = document.createElement('video');
+                    media.src = url;
+                    media.controls = true;
+                    media.autoplay = true;
+                    media.playsInline = true;
+                    media.style.cssText = 'max-width:100%; max-height:78vh; border-radius:14px;';
+                } else {
+                    media = document.createElement('img');
+                    media.src = url;
+                    media.alt = 'Photo en vue unique';
+                    media.style.cssText = 'max-width:100%; max-height:78vh; border-radius:14px; object-fit:contain;';
+                }
+
+                const pied = document.createElement('p');
+                pied.style.cssText = 'position:absolute; bottom:22px; left:20px; right:20px; text-align:center; color:rgba(255,255,255,.6); font-size:12px;';
+                pied.textContent = 'Cette ' + (rec.kind === 'video' ? 'vidéo' : 'photo') + ' est supprimée définitivement à la fermeture.';
+
+                voile.append(entete, media, pied);
+                document.body.appendChild(voile);
+
+                let reste = 8;
+                const minuteur = setInterval(() => {
+                    reste--;
+                    compte.textContent = '⏳ ' + reste + ' s';
+                    if (reste <= 0) fin();
+                }, 1000);
+
+                async function fin() {
+                    clearInterval(minuteur);
+                    await M.markViewed(id);                  // suppression réelle du fichier
+                    voile.remove();
+                    marquerConsomme(bulle);
+                    if (typeof renderMonProfil === 'function') { /* quota mis à jour à la prochaine ouverture */ }
+                }
+
+                fermer.onclick = fin;
+                voile.addEventListener('click', e => { if (e.target === voile) fin(); });
+                document.addEventListener('keydown', function esc(e) {
+                    if (e.key === 'Escape') { document.removeEventListener('keydown', esc); fin(); }
+                });
+            }
+
+            function marquerConsomme(bulle) {
+                if (!bulle) return;
+                const etat = bulle.querySelector('[data-etat]');
+                if (etat) etat.textContent = 'Vue · média supprimé';
+                bulle.style.opacity = '.55';
+                bulle.onclick = () => alert('Ce média a déjà été vu et supprimé.');
+            }
+
+            /* ---------- Démarrage ---------- */
+            M.purge().catch(() => {});
+            refreshAvatar();
+            // La carte du fil doit être rendue dès l'ouverture (sinon elle garde
+            // le dégradé statique du HTML même si le profil a une photo).
+            try { if (typeof loadProfile === 'function') loadProfile(0); } catch (e) {}
         })();
     </script>
 </body>

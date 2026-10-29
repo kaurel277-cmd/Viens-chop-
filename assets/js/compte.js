@@ -188,6 +188,7 @@ window.VCCompte = (function () {
             seeking: '',
             commune: '',
             artists: [],
+            photos: [],
             invitation: String(invitation || '').trim().toUpperCase().slice(0, 12),
             plan: 'coude',
             likes_left: 3,
@@ -207,6 +208,10 @@ window.VCCompte = (function () {
         if (attempt !== a.hash) fail('MOT_DE_PASSE_INCORRECT', 'Mot de passe incorrect.');
         store.set(KEY_SESSION, a.id);
         return publicView(a);
+    }
+
+    function all() {
+        return readAll().map(publicView);
     }
 
     function current() {
@@ -229,7 +234,7 @@ window.VCCompte = (function () {
         const list = readAll();
         const i = list.findIndex(a => a.id === id);
         if (i === -1) return null;
-        const allowed = ['name', 'gender', 'seeking', 'commune', 'artists', 'verified'];
+        const allowed = ['name', 'gender', 'seeking', 'commune', 'artists', 'verified', 'photos'];
         allowed.forEach(k => { if (patch && k in patch) list[i][k] = patch[k]; });
         writeAll(list);
         return publicView(list[i]);
@@ -258,7 +263,7 @@ window.VCCompte = (function () {
         MIN_PASSWORD,
         normalizePhone, isValidPhone, formatPhone, operatorOf,
         ageFrom, lastBirthDate, toISO,
-        create, login, logout, current, isLoggedIn, update, remove, changePassword,
+        create, login, logout, current, all, isLoggedIn, update, remove, changePassword,
         exists: phone => !!find(phone),
         find: phone => publicView(find(phone)),
         storagePersistant: store.persistant

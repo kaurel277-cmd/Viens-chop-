@@ -14,3 +14,5 @@ coverage/
 
 # Fichiers de test locaux
 .env.test
+# médias locaux éventuels
+/media-local
