@@ -1,6 +1,12 @@
 # Est-ce que le site est opérationnel ?
 
 > Vérifié le 29 octobre 2026, en exécution — pas de mémoire.
+> **Mise à jour du 29/10/2026 :** l'application fonctionne maintenant en deux
+> modes, et le tableau des limites ci-dessous décrit **le mode local**.
+> En **mode serveur** (adresse de l'API renseignée), les comptes, les photos,
+> les likes, les matchs et les messages sont **réels et partagés** entre les
+> inscrits, et **les photos sont visibles dès le fil** — plus aucun flou,
+> plus de palier de 5 messages.
 
 ## Réponse courte
 
@@ -37,10 +43,10 @@ aucune erreur.
 
 C'est la partie importante, et je ne veux pas te la vendre comme finie.
 
-| Limite | Ce que ça veut dire concrètement |
+| Limite (mode local uniquement) | Ce que ça veut dire concrètement |
 |---|---|
 | **Les profils sont fictifs** | `app.html` contient 6 profils écrits en dur (Awa, Prisca, Fatou…). Tu ne vois pas de vraies personnes. |
-| **Pas de photos** | Aucun profil n'a d'image : ce sont des dégradés de couleur. |
+| **Pas de photos** | En local, les profils de démonstration sont des dégradés. En mode serveur, les vraies photos sont affichées, sans flou. |
 | **Les conversations sont inventées** | Le chat démarre avec de faux messages pré-remplis. Écrire ne joint personne. |
 | **Aucune donnée partagée** | Deux personnes qui s'inscrivent ne se voient pas. Chacune reste seule sur son téléphone. |
 | **Le compte ne suit pas d'un appareil à l'autre** | C'est la contrepartie du « sans API ». |

@@ -318,7 +318,9 @@ create trigger messages_check_sender
     before insert on public.messages
     for each row execute function app.check_message_sender();
 
--- Au 5ᵉ message, la photo des deux profils se débloque
+-- Trigger hérité : au 5ᵉ message il renseigne unlocked_at. Conservé pour la
+-- compatibilité et les tests SQL ; l'interface n'attend plus rien pour
+-- afficher la photo (décision du 29/10/2026).
 create or replace function app.unlock_photos_after_five()
 returns trigger
 language plpgsql
@@ -473,7 +475,9 @@ from public.likes l
 join public.users u on u.id = l.sender_id
 join public.users v on v.id = l.receiver_id;   -- v = celui qui consulte
 
--- Fil de découverte : on expose la photo seulement si le match est débloqué.
+-- Vue publique des profils : elle ne sert jamais la photo elle-même, juste
+-- l'information « ce profil a une photo ». L'API renvoie la photo principale
+-- à tout inscrit (on doit voir la personne avant de la liker).
 create or replace view app.public_profiles as
 select
     id,
