@@ -78,6 +78,22 @@ transmet la clé obtenue.
   (statut « Expirée · jamais ouverte »), pour ne pas remplir l'offre gratuite.
 - **Compte à rebours** : 8 s pour une photo, la durée + 2 s pour une vidéo.
 
+## Le voyant qui dit tout : /api/health
+
+`https://viens-chop-api.onrender.com/api/health` liste, en direct, ce que le
+serveur et la base savent faire :
+
+| Repère dans `features` | Ce qu'il prouve |
+|---|---|
+| `password-auth`, `photos` | le déploiement est à jour |
+| `recuperation` | la migration « mot de passe oublié » est passée |
+| `chat-media` | la vue unique est active |
+| `verifications`, `moderation` | selfie de vérification et modération des photos actifs |
+| `admin` | la variable `ADMIN_TOKEN` est posée sur Render |
+
+Un repère absent = une chose à faire. Réponse garantie en moins d'une seconde,
+même si la base est injoignable.
+
 ## À faire une fois pour activer le reste
 
 1. `database/MIGRATION-SECURITE.sql` (vue unique, vérification, modération)
