@@ -235,7 +235,7 @@
                 <!-- Succès : remplace le formulaire -->
                 <div id="signup-done" class="hidden text-center py-6">
                     <p class="text-5xl mb-3">🎉</p>
-                    <h3 class="text-xl font-extrabold mb-1">Bienvenue, <span id="done-name" class="text-brand-gradient"></span> !</h3>
+                    <h3 class="text-xl font-extrabold mb-1">Bienvenue<span id="done-suite"></span> !</h3>
                     <p class="text-sm text-slate-500 mb-5">Ton compte est prêt. Direction l'application.</p>
 
                     <!-- Clé de secours : le seul moyen de récupérer le compte -->
@@ -676,7 +676,10 @@
                     });
                     form.classList.add('hidden');
                     $('signup-done').classList.remove('hidden');
-                    $('done-name').textContent = account.name || ('+' + C.formatPhone(account.phone));
+                    // Un compte tout neuf n'a pas encore de prénom : on ne met
+                    // pas un pseudo technique ni un numéro vide dans le message.
+                    const prenom = account.name && !/^membre\d+$/i.test(account.name) ? account.name : '';
+                    $('done-suite').textContent = prenom ? ', ' + prenom : '';
 
                     if (account.cle_secours) {
                         // On ne redirige plus tout de suite : la clé ne sera
