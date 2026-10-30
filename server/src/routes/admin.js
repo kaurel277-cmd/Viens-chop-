@@ -1,0 +1,235 @@
+import { Router } from 'express';
+import { query } from '../db.js';
+import { requireAdmin, jetonAdminValide, creerJetonAdmin } from '../auth.js';
+import { AppError } from '../errors.js';
+import { config } from '../config.js';
+import { aVerifications, aModeration, aAdminActions } from '../capabilities.js';
+
+export const adminRouter = Router();
+
+/* ---------------------------------------------------------------------------
+   Console d'administration de Viens chop.
+
+   Accès : un seul secret, ADMIN_TOKEN, défini sur Render. Pas de compte
+   administrateur en base, donc rien à pirater côté site.
+   --------------------------------------------------------------------------- */
+
+async function journal(action, targetId, details) {
+  try {
+    if (!(await aAdminActions())) return;
+    await query(
+      'insert into public.admin_actions (action, target_id, details) values ($1, $2, $3)',
+      [action, targetId || null, details ? JSON.stringify(details) : null]
+    );
+  } catch { /* le journal ne doit jamais empêcher une action */ }
+}
+
+/* ---------------------------------------------------------------------------
+   GET /api/admin/etat — la console est-elle configurée ? (public, sans secret)
+   --------------------------------------------------------------------------- */
+adminRouter.get('/etat', async (_req, res) => {
+  res.json({
+    ok: true,
+    configuree: !!config.adminToken,
+    verifications: await aVerifications(),
+    moderation: await aModeration()
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   POST /api/admin/login — { token }
+   --------------------------------------------------------------------------- */
+adminRouter.post('/login', (req, res, next) => {
+  try {
+    if (!config.adminToken) {
+      throw new AppError(503, 'ADMIN_FERMEE', "ADMIN_TOKEN n'est pas défini : la console reste fermée.");
+    }
+    const { token } = req.body || {};
+    if (!jetonAdminValide(token)) {
+      throw new AppError(401, 'JETON_REFUSE', 'Mot de passe administrateur incorrect.');
+    }
+    res.json({ ok: true, token: creerJetonAdmin(), expires_in: config.adminTtl });
+  } catch (err) { next(err); }
+});
+
+/* Tout ce qui suit exige le jeton administrateur. */
+adminRouter.use(requireAdmin);
+
+/* ---------------------------------------------------------------------------
+   GET /api/admin/stats
+   --------------------------------------------------------------------------- */
+adminRouter.get('/stats', async (_req, res, next) => {
+  try {
+    const { rows: u } = await query('select count(*)::int as n from public.users');
+    const { rows: r } = await query("select count(*)::int as n from public.reports where status <> 'closed'");
+    let verif = 0;
+    if (await aVerifications()) {
+      const { rows } = await query("select count(*)::int as n from public.verifications where status = 'pending'");
+      verif = rows[0].n;
+    }
+    let photos = 0;
+    if (await aModeration()) {
+      const { rows } = await query("select count(*)::int as n from public.photos where moderation_status = 'review'");
+      photos = rows[0].n;
+    }
+    const { rows: m } = await query('select count(*)::int as n from public.matches');
+    res.json({ ok: true, stats: { comptes: u[0].n, signalements: r[0].n, verifications: verif, photos: photos, matchs: m[0].n } });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   SIGNALEMENTS
+   --------------------------------------------------------------------------- */
+adminRouter.get('/reports', async (req, res, next) => {
+  try {
+    const ouvert = req.query.status !== 'tous';
+    const { rows } = await query(
+      `select r.id, r.reason, r.details, r.status, r.created_at, r.resolved_at,
+              a.pseudo as reporter_pseudo,
+              t.id as target_id, t.pseudo as target_pseudo, t.main_photo_id as target_photo_id,
+              (select count(*)::int from public.reports r2 where r2.target_id = r.target_id) as target_reports
+         from public.reports r
+         join public.users a on a.id = r.reporter_id
+         join public.users t on t.id = r.target_id
+        ${ouvert ? "where r.status <> 'closed'" : ''}
+        order by r.created_at desc
+        limit 200`
+    );
+    res.json({ ok: true, reports: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/reports/:id/resolve', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `update public.reports set status = 'closed', resolved_at = now()
+        where id = $1 returning id, target_id`,
+      [req.params.id]
+    );
+    if (!rows.length) throw new AppError(404, 'SIGNALEMENT_INTROUVABLE', 'Signalement introuvable.');
+    await journal('report_close', rows[0].target_id, { report: rows[0].id });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   VÉRIFICATIONS D'IDENTITÉ
+   --------------------------------------------------------------------------- */
+adminRouter.get('/verifications', async (req, res, next) => {
+  try {
+    if (!(await aVerifications())) return res.json({ ok: true, disponible: false, verifications: [] });
+    const tous = req.query.status === 'tous';
+    const { rows } = await query(
+      `select v.id, v.status, v.created_at, v.reviewed_at, v.note,
+              u.id as user_id, u.pseudo, u.age, u.commune, u.phone,
+              u.main_photo_id,
+              (v.selfie is not null) as has_selfie
+         from public.verifications v
+         join public.users u on u.id = v.user_id
+        ${tous ? '' : "where v.status = 'pending'"}
+        order by v.created_at asc
+        limit 200`
+    );
+    res.json({ ok: true, disponible: true, verifications: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.get('/verifications/:id/selfie', async (req, res, next) => {
+  try {
+    const { rows } = await query('select mime, selfie from public.verifications where id = $1', [req.params.id]);
+    if (!rows.length || !rows[0].selfie) throw new AppError(404, 'SELFIE_INTROUVABLE', 'Selfie introuvable ou déjà effacé.');
+    res.set('Content-Type', rows[0].mime);
+    res.set('Cache-Control', 'no-store');
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.send(rows[0].selfie);
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/verifications/:id/decision', async (req, res, next) => {
+  try {
+    const { decision, note } = req.body || {};
+    if (!['approved', 'rejected'].includes(decision)) {
+      throw new AppError(400, 'DECISION_INVALIDE', 'Décision attendue : approved ou rejected.');
+    }
+    const { rows } = await query(
+      `update public.verifications
+          set status = $2, note = $3, reviewed_at = now(), selfie = null
+        where id = $1 and status = 'pending'
+        returning id, user_id`,
+      [req.params.id, decision, (note || '').slice(0, 500) || null]
+    );
+    if (!rows.length) throw new AppError(404, 'VERIFICATION_INTROUVABLE', 'Demande introuvable ou déjà traitée.');
+
+    if (decision === 'approved') {
+      await query('update public.users set is_certified = true where id = $1', [rows[0].user_id]);
+    }
+    await journal('verification_' + decision, rows[0].user_id, { verification: rows[0].id, note: note || null });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   PHOTOS À VÉRIFIER
+   --------------------------------------------------------------------------- */
+adminRouter.get('/photos', async (req, res, next) => {
+  try {
+    if (!(await aModeration())) return res.json({ ok: true, disponible: false, photos: [] });
+    const statut = ['ok', 'review', 'blocked'].includes(req.query.status) ? req.query.status : 'review';
+    const { rows } = await query(
+      `select p.id, p.position, p.bytes, p.created_at, p.moderation_status,
+              p.moderation_score, p.moderation_note,
+              u.id as user_id, u.pseudo, u.commune
+         from public.photos p
+         join public.users u on u.id = p.user_id
+        where p.moderation_status = $1
+        order by p.created_at desc
+        limit 200`,
+      [statut]
+    );
+    res.json({ ok: true, disponible: true, photos: rows.map(r => ({ ...r, url: '/api/photos/' + r.id })) });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/photos/:id/decision', async (req, res, next) => {
+  try {
+    if (!(await aModeration())) throw new AppError(503, 'MODERATION_INDISPONIBLE', 'La modération sera active après la migration SQL.');
+    const { decision } = req.body || {};
+    if (!['ok', 'blocked'].includes(decision)) {
+      throw new AppError(400, 'DECISION_INVALIDE', 'Décision attendue : ok ou blocked.');
+    }
+
+    const { rows } = await query(
+      `update public.photos set moderation_status = $2 where id = $1 returning id, user_id`,
+      [req.params.id, decision]
+    );
+    if (!rows.length) throw new AppError(404, 'PHOTO_INTROUVABLE', 'Photo introuvable.');
+
+    if (decision === 'blocked') {
+      // La photo principale ne doit jamais pointer sur une photo retirée.
+      await query(
+        `update public.users set main_photo_id = (
+           select id from public.photos
+            where user_id = $1 and moderation_status <> 'blocked'
+            order by position asc limit 1
+         ) where id = $1`,
+        [rows[0].user_id]
+      );
+    }
+    await journal('photo_' + decision, rows[0].user_id, { photo: rows[0].id });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   GET /api/admin/journal — les 100 dernières actions
+   --------------------------------------------------------------------------- */
+adminRouter.get('/journal', async (_req, res, next) => {
+  try {
+    if (!(await aAdminActions())) return res.json({ ok: true, disponible: false, actions: [] });
+    const { rows } = await query(
+      'select id, action, target_id, details, created_at from public.admin_actions order by created_at desc limit 100'
+    );
+    res.json({ ok: true, disponible: true, actions: rows });
+  } catch (err) { next(err); }
+});

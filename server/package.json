@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "test": "NODE_ENV=test node --test --test-concurrency=1 test/",
+    "test": "NODE_ENV=test node --test --test-concurrency=1 --test-reporter=spec test/",
     "db:schema": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f ../database/neon-schema.sql",
     "db:test": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f ../database/test-schema.sql"
   },

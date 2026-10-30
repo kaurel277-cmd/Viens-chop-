@@ -3,7 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viens chop</title>
+        <!-- PWA : installation sur l'écran d'accueil + ouverture hors ligne -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32">
+    <link rel="icon" href="assets/img/icon-192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Viens chop">
+    <meta name="mobile-web-app-capable" content="yes">
+<title>Viens chop</title>
+    <!-- Partage sur WhatsApp, Facebook, X : sans ces balises, un lien partagé
+         n'affiche ni image ni titre. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Viens chop">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:url" content="https://kaurel277-cmd.github.io/Viens-chop-/app.html">
+    <meta property="og:title" content="Viens chop">
+    <meta property="og:description" content="Viens chop : le fil de découverte, les matchs et les discussions.">
+    <meta property="og:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Viens chop — rencontre ivoirienne à Abidjan">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Viens chop">
+    <meta name="twitter:description" content="Viens chop : le fil de découverte, les matchs et les discussions.">
+    <meta name="twitter:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
     <meta name="description" content="Aperçu interactif de l'application Viens chop : matchs par commune, Mode Flirt, Faux Appel et protections Sécurité.">
     <meta name="theme-color" content="#FF5E1A">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -643,24 +668,29 @@
             <div id="setup-step-3" style="display:none;">
                 <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Vérifie ton profil 📸</h2>
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:24px;">
-                    Dernière étape : un selfie rapide et ton profil reçoit le badge « Profil Certifié ».
+                    Dernière étape, facultative : un selfie pour prouver que tu es bien la personne
+                    de tes photos. L'équipe compare les deux et ton profil reçoit le badge « Vérifié ».
                 </p>
 
                 <!-- Selfie Verification -->
                 <div style="padding:20px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); text-align:center; margin-bottom:24px;">
                     <span style="font-size:32px;">📸</span>
                     <h3 style="font-size:16px; font-weight:700; margin-top:8px;">Vérifie ton profil (Selfie rapide)</h3>
-                    <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Un selfie vidéo de 3 secondes pour prouver que tu es réel(le). Zéro brouteur autorisé !</p>
-                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;" onclick="fakeSelfie(this); startVerification();" type="button">
+                    <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">
+                        Une seule photo de ton visage, prise maintenant. Elle n'est jamais publiée :
+                        elle sert uniquement à la vérification, puis elle est effacée.
+                    </p>
+                    <button class="btn-secondary" style="margin-top:12px; max-width:250px; margin-left:auto; margin-right:auto;"
+                            onclick="demanderVerification(this)" type="button">
                         <i class="fa-solid fa-camera"></i> Prendre le selfie
                     </button>
                     <div id="verify-progress" style="display:none; margin-top:14px;">
                         <div style="height:6px; background:rgba(255,255,255,.12); border-radius:6px; overflow:hidden;">
                             <div id="verify-bar" style="width:0%; height:100%; background:linear-gradient(90deg,#FF6B00,#FF1E56); transition:width .15s linear;"></div>
                         </div>
-                        <p id="verify-label" style="font-size:12px; color:rgba(255,255,255,.6); margin-top:8px;">Analyse de ton selfie…</p>
+                        <p id="verify-label" style="font-size:12px; color:rgba(255,255,255,.6); margin-top:8px;">Envoi du selfie…</p>
                     </div>
-                    <p id="selfie-done" style="display:none; color:#34d399; font-weight:700; font-size:13px; margin-top:10px;">✅ Selfie vérifié ! Badge Profil Certifié ajouté</p>
+                    <p id="selfie-done" style="display:none; color:#34d399; font-weight:700; font-size:13px; margin-top:10px;"></p>
                 </div>
 
                 <button class="btn-primary" onclick="finishProfile()" type="button">
@@ -715,6 +745,21 @@
                 </p>
             </div>
 
+            <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <h3 style="font-size:14px; font-weight:800;">Profil vérifié</h3>
+                    <span id="verif-badge" style="display:none; font-size:10px; font-weight:800; color:#60a5fa; background:rgba(59,130,246,.18); padding:2px 8px; border-radius:99px;">
+                        <i class="fa-solid fa-circle-check"></i> Vérifié
+                    </span>
+                </div>
+                <p id="verif-status" style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.5;">
+                    Chargement…
+                </p>
+                <button class="btn-secondary" id="verif-btn" style="margin-top:12px; display:none;" onclick="demanderVerification(this)" type="button">
+                    <i class="fa-solid fa-camera"></i> Faire vérifier mon profil
+                </button>
+            </div>
+
             <div style="margin-top:22px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
                     <h3 style="font-size:14px; font-weight:800;">Profils bloqués</h3>
@@ -763,7 +808,7 @@
                 <div class="card-info">
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                         <h3 id="card-name" style="font-size:22px; font-weight:800;">Awa, 22</h3>
-                        <span class="badge" style="background:rgba(59,130,246,0.2); color:#60a5fa;"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
+                        <span class="badge" id="card-verified" style="display:none; background:rgba(59,130,246,0.2); color:#60a5fa;"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
                     </div>
                     <p id="card-location" style="font-size:13px; color:rgba(255,255,255,0.6);">📍 Cocody, Angré</p>
                     <div id="card-artists" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
@@ -1197,12 +1242,92 @@
 
         // Voice recording simulation
 
-        function fakeSelfie(el) {
-            document.getElementById('selfie-done').style.display = 'block';
-            const btn = el || (window.event && window.event.currentTarget);
-            if (!btn) return;
-            btn.textContent = '✅ Selfie validé';
-            btn.disabled = true;
+        /* Vérification d'identité : le selfie part vraiment au serveur, il est
+           comparé à la photo de profil par l'équipe, puis effacé. */
+        async function demanderVerification(el) {
+            const C = window.VCCompte;
+            const serveur = C && C.mode === 'api' && C.isLoggedIn() && window.VCAPI;
+            const box = document.getElementById('verify-progress');
+            const label = document.getElementById('verify-label');
+            const bar = document.getElementById('verify-bar');
+            const fait = document.getElementById('selfie-done');
+            const btn = el || null;
+
+            if (!serveur) {
+                if (box) box.style.display = 'block';
+                if (bar) bar.style.width = '0%';
+                if (label) label.textContent = "La vérification s'active une fois ton compte créé.";
+                return;
+            }
+
+            const fichier = await window.VCMedia.pickFile({ kind: 'photo', capture: true });
+            if (!fichier) return;
+
+            if (btn) { btn.disabled = true; btn.dataset.texte = btn.innerHTML; btn.innerHTML = 'Envoi…'; }
+            if (box) box.style.display = 'block';
+            if (fait) fait.style.display = 'none';
+            let pct = 8;
+            if (bar) bar.style.width = pct + '%';
+            if (label) label.textContent = 'Préparation du selfie…';
+
+            try {
+                const c = await window.VCMedia.compressImage(fichier, { maxSide: 720, target: 80 * 1024 });
+                pct = 45; if (bar) bar.style.width = pct + '%';
+                if (label) label.textContent = 'Envoi sécurisé…';
+                const r = await window.VCAPI.certification.envoyerSelfie(c.blob);
+                pct = 100; if (bar) bar.style.width = pct + '%';
+                const dejaVerifie = r && r.status === 'approved';
+                if (label) label.textContent = dejaVerifie ? 'Profil déjà vérifié' : 'Selfie reçu';
+                if (fait) {
+                    fait.style.display = 'block';
+                    fait.textContent = dejaVerifie
+                        ? '✅ Ton profil est déjà vérifié.'
+                        : '✅ Selfie envoyé. L\'équipe vérifie sous 24 h.';
+                }
+                renderVerification();
+            } catch (err) {
+                if (label) label.textContent = err && err.code === 'VERIFICATION_INDISPONIBLE'
+                    ? "La vérification s'active très bientôt. Réessaie plus tard."
+                    : 'Envoi impossible. Vérifie ta connexion et réessaie.';
+                if (bar) bar.style.width = '0%';
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.texte || 'Prendre le selfie'; }
+            }
+        }
+
+        /* État de la vérification affiché dans Mon profil */
+        async function renderVerification() {
+            const statut = document.getElementById('verif-status');
+            if (!statut || !window.VCAPI) return;
+            const badge = document.getElementById('verif-badge');
+            const bouton = document.getElementById('verif-btn');
+            try {
+                const r = await window.VCAPI.certification.statut();
+                const s = r.status;
+                if (s === 'approved') {
+                    statut.textContent = 'Ton profil est vérifié : les autres voient le badge bleu à côté de ton prénom.';
+                    if (badge) badge.style.display = 'inline-block';
+                    if (bouton) bouton.style.display = 'none';
+                } else if (s === 'pending') {
+                    statut.textContent = 'Selfie reçu. La vérification est faite à la main, sous 24 h.';
+                    if (badge) badge.style.display = 'none';
+                    if (bouton) bouton.style.display = 'none';
+                } else if (s === 'rejected') {
+                    statut.textContent = 'Le selfie ne correspondait pas à tes photos. Tu peux recommencer : mets-toi au même endroit que sur ta photo principale.';
+                    if (badge) badge.style.display = 'none';
+                    if (bouton) { bouton.style.display = 'block'; bouton.innerHTML = '<i class="fa-solid fa-camera"></i> Recommencer le selfie'; }
+                } else if (s === 'indisponible') {
+                    statut.textContent = "La vérification s'active très bientôt.";
+                    if (badge) badge.style.display = 'none';
+                    if (bouton) bouton.style.display = 'none';
+                } else {
+                    statut.textContent = 'Prends un selfie maintenant : l\'équipe compare ton visage à tes photos, puis efface le selfie.';
+                    if (badge) badge.style.display = 'none';
+                    if (bouton) { bouton.style.display = 'block'; bouton.innerHTML = '<i class="fa-solid fa-camera"></i> Faire vérifier mon profil'; }
+                }
+            } catch (e) {
+                statut.textContent = 'État de vérification indisponible pour le moment.';
+            }
         }
 
         function finishProfile() {
@@ -1235,6 +1360,11 @@
             
             const artistsDiv = document.getElementById('card-artists');
             artistsDiv.innerHTML = p.artists.map(a => `<span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎵 ${a}</span>`).join('');
+
+            // Le badge « Vérifié » ne s'affiche que pour les profils réellement
+            // vérifiés par l'équipe : plus aucun badge décoratif.
+            const verifie = document.getElementById('card-verified');
+            if (verifie) verifie.style.display = p.certified ? 'inline-flex' : 'none';
 
             // Reset card
             const card = document.getElementById('current-card');
@@ -1823,33 +1953,6 @@
            5. CERTIFICATION IA — CDC §2
               Comparaison photo de profil + selfie, badge en moins de 5 s.
            --------------------------------------------------------------- */
-        function startVerification() {
-            const box = document.getElementById('verify-progress');
-            const bar = document.getElementById('verify-bar');
-            const label = document.getElementById('verify-label');
-            if (!box) return null;
-            box.style.display = 'block';
-            let pct = 0;
-            const steps = [
-                'Analyse de ta photo de profil…',
-                'Comparaison avec le selfie…',
-                'Détection de visage…',
-                'Attribution du badge…'
-            ];
-            const timer = setInterval(() => {
-                pct = Math.min(100, pct + 4);
-                if (bar) bar.style.width = pct + '%';
-                if (label) label.textContent = steps[Math.min(steps.length - 1, Math.floor(pct / 25))];
-                if (pct >= 100) {
-                    clearInterval(timer);
-                    if (label) label.textContent = '✅ Profil Certifié — badge activé';
-                    AppState.data.certified = true;
-                    AppState.save();
-                }
-            }, 150); // ~3,75 s : sous les 5 s imposées par le cahier des charges
-            return timer;
-        }
-
         /* ---------------------------------------------------------------
            6. DÉTECTION OPÉRATEUR +225 — CDC §2 (07 / 05 / 01)
            --------------------------------------------------------------- */
@@ -1972,6 +2075,7 @@
                         color: 'linear-gradient(135deg,#2d1b4e,#1b3a4b)',
                         userId: u.id,
                         photoUrl: u.main_photo_id ? window.VCAPI.photos.url('/api/photos/' + u.main_photo_id) : null,
+                        certified: !!u.is_certified,
                         real: true
                     }));
                     if (vrais.length && typeof profiles !== 'undefined') {
@@ -2047,10 +2151,23 @@
             }
 
             /* ---------- Mon profil ---------- */
-            window.openMonProfil = function () {
+            window.openMonProfil = async function () {
+                // L'état de modération vient du serveur : on le charge avant l'affichage.
+                if (window.VCAPI && window.VCCompte && VCCompte.mode === 'api' && VCCompte.isLoggedIn()) {
+                    try {
+                        const r = await window.VCAPI.photos.list();
+                        const map = {};
+                        (r.photos || []).forEach(ph => {
+                            map[ph.url] = ph.moderation_status || 'ok';
+                            map[ph.id] = ph.moderation_status || 'ok';
+                        });
+                        window.__photosModeration = map;
+                    } catch (e) { /* on affiche sans les étiquettes */ }
+                }
                 renderMonProfil();
                 goTo('mon-profil');
                 if (typeof window.renderBloques === 'function') window.renderBloques();
+                if (typeof renderVerification === 'function') renderVerification();
             };
 
             function renderMonProfil() {
@@ -2075,6 +2192,13 @@
                         '<button type="button" aria-label="Retirer cette photo" style="position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; border:none; background:rgba(0,0,0,.55); color:#fff; font-size:11px; cursor:pointer;">✕</button>' +
                         (i === 0 ? '<span style="position:absolute; bottom:6px; left:6px; font-size:9px; font-weight:800; background:#FF6B00; color:#fff; padding:2px 6px; border-radius:6px;">PRINCIPALE</span>' : '');
                     cell.querySelector('button').onclick = () => removeMyPhoto(id);
+                    if (window.__photosModeration && window.__photosModeration[id] === 'review') {
+                        const note = document.createElement('span');
+                        note.textContent = 'À vérifier';
+                        note.style.cssText = 'position:absolute; top:6px; left:6px; font-size:9px; font-weight:800;' +
+                            'background:#b45309; color:#fff; padding:2px 6px; border-radius:6px;';
+                        cell.appendChild(note);
+                    }
                     if (SERVEUR) {
                         cell.querySelector('[data-img]').style.backgroundImage = 'url(' + window.VCAPI.photos.url(id) + ')';
                     } else {
@@ -2127,7 +2251,10 @@
                     try {
                         // La base n'accepte que 110 Ko : on compresse plus fort.
                         const c = await M.compressImage(fichier, { maxSide: 900, target: 85 * 1024 });
-                        await C.photos.add(c.blob, actuelles.length);
+                        const p = await C.photos.add(c.blob, actuelles.length, c.metrics);
+                        if (p && p.moderation && p.moderation.status === 'review') {
+                            messageHaut('Photo ajoutée. Elle passe une vérification rapide.', '#b45309');
+                        }
                         renderMonProfil();
                         refreshAvatar();
                     } catch (err) {
@@ -2321,6 +2448,14 @@
         function ouvrirSecuriteProfil() { alerteDemoSecurite(); }
         function ouvrirSecuriteChat() { alerteDemoSecurite(); }
 
+        /* Raccourcis du manifeste : app.html?ecran=discussions ou ?ecran=profil */
+        (function raccourci() {
+            const voulu = new URLSearchParams(location.search).get('ecran');
+            if (!voulu) return;
+            const cible = { discussions: 'discussions', profil: 'mon-profil', chat: 'discussions' }[voulu];
+            if (cible) setTimeout(() => { if (typeof goTo === 'function') goTo(cible); }, 900);
+        })();
+
         (async function initSocial() {
             const C = window.VCCompte;
             const S = window.VCSo;
@@ -2445,6 +2580,7 @@
                         color: 'linear-gradient(135deg,#2d1b4e,#1b3a4b)',
                         userId: u.id,
                         photoUrl: u.main_photo_id ? window.VCAPI.photos.url('/api/photos/' + u.main_photo_id) : null,
+                        certified: !!u.is_certified,
                         real: true
                     }));
                     if (typeof profiles !== 'undefined') {

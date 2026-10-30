@@ -175,11 +175,11 @@
 
   /* Photos de profil — stockées dans Neon, compressées côté navigateur. */
   const photos = {
-    async upload(blob, position) {
+    async upload(blob, position, metrics) {
       const data = await blobToBase64(blob);
       return request('/api/photos', {
         method: 'POST',
-        body: { data, mime: blob.type || 'image/jpeg', position: position || 0 }
+        body: { data, mime: blob.type || 'image/jpeg', position: position || 0, metrics: metrics || null }
       });
     },
     list() {
@@ -256,6 +256,20 @@
     }
   };
 
+  /* Vérification d'identité (selfie comparé à la main par l'équipe) */
+  const certification = {
+    statut() {
+      return request('/api/certification/me');
+    },
+    async envoyerSelfie(blob) {
+      const data = await blobToBase64(blob);
+      return request('/api/certification/selfie', {
+        method: 'POST',
+        body: { data, mime: blob.type || 'image/jpeg' }
+      });
+    }
+  };
+
   // Exposition globale (le site est en HTML simple, sans bundler)
   window.VCAPI = {
     ApiError,
@@ -264,6 +278,6 @@
     isLoggedIn,
     clearSession,
     request,
-    auth, users, feed, likes, matches, safety, photos
+    auth, users, feed, likes, matches, safety, photos, certification
   };
 })();

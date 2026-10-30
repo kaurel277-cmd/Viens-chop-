@@ -1,0 +1,9 @@
+# Viens chop
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /server/
+Disallow: /database/
+Disallow: /docs/
+
+Sitemap: https://kaurel277-cmd.github.io/Viens-chop-/sitemap.xml

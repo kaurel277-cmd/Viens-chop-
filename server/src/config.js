@@ -24,6 +24,11 @@ export const config = {
   // Autorise l'origine du site statique
   corsOrigin: process.env.CORS_ORIGIN || '*',
 
+  // Console d'administration. Si ADMIN_TOKEN est vide, la console est
+  // simplement fermée : aucun accès possible, aucune erreur au démarrage.
+  adminToken: process.env.ADMIN_TOKEN || '',
+  adminTtl: process.env.ADMIN_TTL || '8h',
+
   // Plafonds de requêtes (désactivés pendant les tests, ils ont leur propre test)
   rateLimitEnabled: process.env.NODE_ENV !== 'test',
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 300),

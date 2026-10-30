@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { query } from '../db.js';
 import { requireAuth } from '../auth.js';
 import { AppError } from '../errors.js';
+import { evaluerPhoto } from '../moderation.js';
+import { aModeration } from '../capabilities.js';
 
 export const photosRouter = Router();
 
@@ -39,7 +41,7 @@ function decodeBase64(data) {
    --------------------------------------------------------------------------- */
 photosRouter.post('/', requireAuth, async (req, res, next) => {
   try {
-    const { data, mime, position } = req.body || {};
+    const { data, mime, position, metrics } = req.body || {};
     const pos = Number.isInteger(position) ? position : 0;
 
     if (pos < 0 || pos > MAX_PHOTOS - 1) {
@@ -63,12 +65,24 @@ photosRouter.post('/', requireAuth, async (req, res, next) => {
       throw new AppError(409, 'TROP_DE_PHOTOS', `${MAX_PHOTOS} photos maximum.`);
     }
 
-    const { rows } = await query(
-      `insert into public.photos (user_id, position, mime, bytes, data)
-       values ($1, $2, $3, $4, $5)
-       returning id, position, bytes, created_at`,
-      [req.user.id, pos, mime, buf.length, buf]
-    );
+    // Modération automatique : le verdict est calculé avant l'écriture.
+    const verdict = evaluerPhoto(metrics);
+    const modere = await aModeration();
+
+    const { rows } = modere
+      ? await query(
+          `insert into public.photos (user_id, position, mime, bytes, data,
+                                      moderation_status, moderation_score, moderation_note)
+           values ($1, $2, $3, $4, $5, $6, $7, $8)
+           returning id, position, bytes, created_at, moderation_status, moderation_note`,
+          [req.user.id, pos, mime, buf.length, buf, verdict.status, verdict.score, verdict.note]
+        )
+      : await query(
+          `insert into public.photos (user_id, position, mime, bytes, data)
+           values ($1, $2, $3, $4, $5)
+           returning id, position, bytes, created_at`,
+          [req.user.id, pos, mime, buf.length, buf]
+        );
 
     if (pos === 0) {
       await query('update public.users set main_photo_id = $2 where id = $1', [req.user.id, rows[0].id]);
@@ -76,7 +90,15 @@ photosRouter.post('/', requireAuth, async (req, res, next) => {
 
     res.status(201).json({
       ok: true,
-      photo: { id: rows[0].id, position: rows[0].position, bytes: rows[0].bytes, url: photoUrl(rows[0].id) }
+      photo: {
+        id: rows[0].id,
+        position: rows[0].position,
+        bytes: rows[0].bytes,
+        url: photoUrl(rows[0].id),
+        moderation: modere
+          ? { status: rows[0].moderation_status, note: rows[0].moderation_note || null }
+          : null
+      }
     });
   } catch (err) { next(err); }
 });
@@ -86,9 +108,13 @@ photosRouter.post('/', requireAuth, async (req, res, next) => {
    --------------------------------------------------------------------------- */
 photosRouter.get('/me', requireAuth, async (req, res, next) => {
   try {
+    const modere = await aModeration();
     const { rows } = await query(
-      `select id, position, bytes, created_at from public.photos
-        where user_id = $1 order by position asc`,
+      modere
+        ? `select id, position, bytes, created_at, moderation_status, moderation_note
+             from public.photos where user_id = $1 order by position asc`
+        : `select id, position, bytes, created_at from public.photos
+            where user_id = $1 order by position asc`,
       [req.user.id]
     );
     res.json({ ok: true, photos: rows.map(r => ({ ...r, url: photoUrl(r.id) })) });
@@ -126,14 +152,23 @@ photosRouter.get('/:id', async (req, res, next) => {
     if (!/^[0-9a-f-]{36}$/i.test(req.params.id)) {
       throw new AppError(400, 'ID_INVALIDE', 'Identifiant invalide.');
     }
+    const modere = await aModeration();
     const { rows } = await query(
-      'select mime, data from public.photos where id = $1',
+      modere
+        ? `select mime, data, moderation_status from public.photos where id = $1`
+        : `select mime, data, 'ok' as moderation_status from public.photos where id = $1`,
       [req.params.id]
     );
     if (!rows.length) throw new AppError(404, 'PHOTO_INTROUVABLE', 'Photo introuvable.');
+    // Une photo retirée par la modération n'est plus servie à personne.
+    if (rows[0].moderation_status === 'blocked') {
+      throw new AppError(404, 'PHOTO_RETIREE', 'Cette photo a été retirée.');
+    }
 
     res.set('Content-Type', rows[0].mime);
-    res.set('Cache-Control', 'public, max-age=86400, immutable');
+    // 5 minutes et non 24 h : une photo retirée par la modération doit
+    // disparaître vite des navigateurs qui l'ont déjà affichée.
+    res.set('Cache-Control', 'public, max-age=300');
     res.set('X-Content-Type-Options', 'nosniff');
     // L'API et le site sont sur deux domaines différents : sans cet en-tête,
     // le navigateur refuse d'afficher l'image (helmet met same-origin).

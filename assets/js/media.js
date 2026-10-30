@@ -21,7 +21,7 @@
    API
      await VCMedia.ready()
      VCMedia.pick({ kind, viewOnce, ttlMs })   -> record | null  (ouvre le sélecteur)
-     await VCMedia.compressImage(file)          -> { blob, width, height, bytes }
+     await VCMedia.compressImage(file)          -> { blob, width, height, bytes, metrics }
      await VCMedia.probeVideo(file)             -> { duration, bytes }
      await VCMedia.save({ file, kind, viewOnce, ownerId, ttlMs })
      await VCMedia.get(id)                      -> record + blob
@@ -114,6 +114,39 @@ window.VCMedia = (function () {
         });
     }
 
+    /* Mesures simples, faites sur l'image déjà dessinée dans le canvas.
+       - peau  : part de pixels dans la plage des tons de peau (règle RGB
+                 classique, celle des détecteurs de peau des années 2000) ;
+       - lumiere : luminosité moyenne de l'image, de 0 à 255.
+       Sert uniquement à orienter la modération : aucune décision n'est prise
+       sur cette base sans qu'un humain regarde la photo. */
+    function mesurer(canvas, ctx) {
+        try {
+            const w = Math.min(canvas.width, 240);
+            const h = Math.min(canvas.height, 320);
+            const donnees = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let peau = 0, somme = 0, n = 0;
+            const saut = Math.max(1, Math.floor((canvas.width * canvas.height) / (w * h)));
+            for (let i = 0; i < donnees.length; i += 4 * saut) {
+                const r = donnees[i], g = donnees[i + 1], b = donnees[i + 2];
+                somme += 0.299 * r + 0.587 * g + 0.114 * b;
+                n++;
+                const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                if (r > 95 && g > 40 && b > 20 && max - min > 15 &&
+                    Math.abs(r - g) > 15 && r > g && r > b) peau++;
+            }
+            if (!n) return null;
+            return {
+                skin: Math.round((peau / n) * 1000) / 1000,
+                brightness: Math.round(somme / n),
+                width: canvas.width,
+                height: canvas.height
+            };
+        } catch (e) {
+            return null;   // canvas « non lisible » : la modération tranchera
+        }
+    }
+
     function toBlob(canvas, type, quality) {
         return new Promise(resolve => canvas.toBlob(b => resolve(b), type, quality));
     }
@@ -134,6 +167,7 @@ window.VCMedia = (function () {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(src, 0, 0, w, h);
         if (src.close) src.close();
+        const mesures = mesurer(canvas, ctx);
 
         // WebP si le navigateur sait le produire, sinon JPEG
         let type = 'image/webp';
@@ -152,7 +186,7 @@ window.VCMedia = (function () {
             if (!smaller) break;
             blob = smaller;
         }
-        return { blob, width: w, height: h, bytes: blob ? blob.size : 0, type };
+        return { blob, width: w, height: h, bytes: blob ? blob.size : 0, type, metrics: mesures };
     }
 
     /* ------------------------------------------------------------------ */

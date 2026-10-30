@@ -419,6 +419,100 @@ test('signalement enregistré', async () => {
   ok('signalement valide accepté, motif inconnu refusé');
 });
 
+test("vérification d'identité : selfie envoyé, puis validé par l'administration", async () => {
+  const u = await signup('+2250701000120', 'VerifMe', { gender: 'F' });
+
+  const avant = await api('/api/certification/me', { token: u.token });
+  assert.equal(avant.status, 200);
+  assert.equal(avant.json.status, 'none');
+  ok('statut initial : aucune vérification');
+
+  // Un selfie factice suffit : le serveur ne décode pas l'image, il la garde
+  // pour qu'un humain la regarde.
+  const selfie = Buffer.from('selfie-de-test-' + Date.now()).toString('base64');
+  const envoi = await api('/api/certification/selfie', {
+    method: 'POST', token: u.token, body: { data: selfie, mime: 'image/jpeg' }
+  });
+  assert.equal(envoi.status, 201, JSON.stringify(envoi.json));
+  assert.equal(envoi.json.status, 'pending');
+  ok('selfie accepté', 'en attente de vérification');
+
+  const apres = await api('/api/certification/me', { token: u.token });
+  assert.equal(apres.json.status, 'pending');
+  ok('le site affiche « en attente »');
+
+  // La console refuse un mauvais mot de passe et accepte le bon
+  const refus = await api('/api/admin/login', { method: 'POST', body: { token: 'mauvais' } });
+  assert.equal(refus.status, 401);
+  const login = await api('/api/admin/login', { method: 'POST', body: { token: process.env.ADMIN_TOKEN } });
+  assert.equal(login.status, 200);
+  assert.ok(login.json.token);
+  ok('console : mauvais mot de passe refusé, bon mot de passe accepté');
+
+  const sansJeton = await api('/api/admin/stats');
+  assert.equal(sansJeton.status, 401);
+  ok('la console exige le jeton administrateur');
+
+  const liste = await api('/api/admin/verifications', { token: login.json.token });
+  assert.equal(liste.status, 200);
+  const demande = liste.json.verifications.find((v) => v.user_id === u.id);
+  assert.ok(demande, 'la demande doit apparaître dans la console');
+  ok('la demande apparaît dans la console');
+
+  const decision = await api('/api/admin/verifications/' + demande.id + '/decision', {
+    method: 'POST', token: login.json.token, body: { decision: 'approved' }
+  });
+  assert.equal(decision.status, 200);
+
+  const final = await api('/api/certification/me', { token: u.token });
+  assert.equal(final.json.status, 'approved');
+  assert.equal(final.json.is_certified, true);
+  ok('profil validé : badge « Vérifié » actif');
+
+  // Le selfie a été effacé après décision
+  const { rows } = await query('select selfie from public.verifications where id = $1', [demande.id]);
+  assert.equal(rows[0].selfie, null);
+  ok('selfie effacé de la base après la décision');
+});
+
+test('modération : une photo douteuse part en vérification, une photo correcte passe', async () => {
+  const u = await signup('+2250701000125', 'PhotoMod', { gender: 'F' });
+  const image = Buffer.from('image-de-test-' + Date.now()).toString('base64').padEnd(400, 'A');
+
+  const normal = await api('/api/photos', {
+    method: 'POST', token: u.token,
+    body: { data: image, mime: 'image/jpeg', position: 0,
+            metrics: { skin: 0.21, brightness: 140, width: 600, height: 800 } }
+  });
+  assert.equal(normal.status, 201);
+  assert.equal(normal.json.photo.moderation.status, 'ok');
+  ok('photo normale acceptée sans remarque');
+
+  const douteux = await api('/api/photos', {
+    method: 'POST', token: u.token,
+    body: { data: image, mime: 'image/jpeg', position: 1,
+            metrics: { skin: 0.72, brightness: 150, width: 600, height: 800 } }
+  });
+  assert.equal(douteux.status, 201);
+  assert.equal(douteux.json.photo.moderation.status, 'review');
+  ok('photo très dénudée envoyée en vérification', douteux.json.photo.moderation.note);
+
+  const login = await api('/api/admin/login', { method: 'POST', body: { token: process.env.ADMIN_TOKEN } });
+  const file = await api('/api/admin/photos?status=review', { token: login.json.token });
+  const cible = file.json.photos.find((p) => p.id === douteux.json.photo.id);
+  assert.ok(cible, 'la photo doit être dans la file de vérification');
+  ok('la console liste la photo à vérifier');
+
+  const retire = await api('/api/admin/photos/' + cible.id + '/decision', {
+    method: 'POST', token: login.json.token, body: { decision: 'blocked' }
+  });
+  assert.equal(retire.status, 200);
+
+  const servie = await fetch(base + '/api/photos/' + cible.id);
+  assert.equal(servie.status, 404);
+  ok('photo retirée : elle n\'est plus servie (404)');
+});
+
 test('jeton : accès sans jeton refusé, refresh fonctionnel', async () => {
   const sans = await api('/api/feed');
   assert.equal(sans.status, 401);

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Administration</title>
+    <!-- Partage sur WhatsApp, Facebook, X : sans ces balises, un lien partagé
+         n'affiche ni image ni titre. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Viens chop">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:url" content="https://kaurel277-cmd.github.io/Viens-chop-/admin.html">
+    <meta property="og:title" content="Administration">
+    <meta property="og:description" content="Console d'administration de Viens chop.">
+    <meta property="og:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Viens chop — rencontre ivoirienne à Abidjan">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Administration">
+    <meta name="twitter:description" content="Console d'administration de Viens chop.">
+    <meta name="twitter:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #0B141A; color: #E9EDEF; min-height: 100vh; padding-bottom: 40px;
+        }
+        header {
+            position: sticky; top: 0; z-index: 10; background: #111B21;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        header h1 { font-size: 17px; font-weight: 800; }
+        .pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+        .pill.ok { background: rgba(37,211,102,.16); color: #25D366; }
+        .pill.off { background: rgba(255,107,107,.16); color: #FF6B6B; }
+        .spacer { flex: 1; }
+        button { font-family: inherit; cursor: pointer; }
+        .btn {
+            background: rgba(255,255,255,.08); color: #E9EDEF; border: 1px solid rgba(255,255,255,.16);
+            padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700;
+        }
+        .btn:hover { background: rgba(255,255,255,.14); }
+        .btn.primary { background: linear-gradient(135deg,#FF6B00,#FF1E56); border: none; color: #fff; }
+        .btn.danger { background: #E5484D; border: none; color: #fff; }
+        .btn.good { background: #1f9d55; border: none; color: #fff; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn.small { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+        main { max-width: 1000px; margin: 0 auto; padding: 18px 16px; }
+
+        /* Connexion */
+        #login { max-width: 380px; margin: 12vh auto 0; padding: 0 20px; }
+        #login h2 { font-size: 22px; margin-bottom: 8px; }
+        #login p { font-size: 13px; color: rgba(233,237,239,.6); line-height: 1.6; margin-bottom: 18px; }
+        input[type="password"] {
+            width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-family: inherit;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); color: #fff;
+            margin-bottom: 12px;
+        }
+        .err { color: #FF6B6B; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+        /* Compteurs */
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 18px; }
+        .stat { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 12px 14px; }
+        .stat b { display: block; font-size: 22px; }
+        .stat span { font-size: 12px; color: rgba(233,237,239,.55); }
+
+        /* Onglets */
+        nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+        nav button {
+            background: none; border: 1px solid rgba(255,255,255,.14); color: rgba(233,237,239,.7);
+            padding: 8px 12px; border-radius: 99px; font-size: 13px; font-weight: 700;
+        }
+        nav button[aria-selected="true"] { background: rgba(255,107,0,.18); border-color: #FF6B00; color: #FF8A3D; }
+
+        /* Cartes */
+        .card {
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px; padding: 14px; margin-bottom: 10px;
+            display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap;
+        }
+        .card .img {
+            width: 74px; height: 98px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+            background: #1b2730; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: rgba(255,255,255,.25); position: relative;
+        }
+        .card .img img { font-size: 0; }
+        .card .img img { width: 100%; height: 100%; object-fit: cover; }
+        .card .body { flex: 1; min-width: 180px; }
+        .card h3 { font-size: 15px; margin-bottom: 3px; }
+        .card .meta { font-size: 12px; color: rgba(233,237,239,.55); line-height: 1.55; }
+        .card .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-right: 6px; }
+        .tag.warn { background: rgba(251,191,36,.16); color: #fbbf24; }
+        .tag.danger { background: rgba(229,72,77,.18); color: #FF7B7F; }
+        .tag.ok { background: rgba(37,211,102,.16); color: #25D366; }
+        .empty { text-align: center; padding: 40px 20px; color: rgba(233,237,239,.5); font-size: 14px; }
+        .toast {
+            position: fixed; top: 0; left: 0; right: 0; padding: 13px; text-align: center;
+            font-weight: 700; font-size: 14px; z-index: 999; color: #fff; background: #1f9d55;
+        }
+        .toast.bad { background: #E5484D; }
+        .hidden { display: none !important; }
+        @media (max-width: 520px) { .card .img { width: 60px; height: 80px; } }
+    </style>
+</head>
+<body>
+
+<div id="login">
+    <h2>Console Viens chop</h2>
+    <p>
+        Réservée au propriétaire du site. Entre le mot de passe administrateur
+        (la variable <code>ADMIN_TOKEN</code> définie sur Render).
+    </p>
+    <input type="password" id="token" placeholder="Mot de passe administrateur" autocomplete="current-password">
+    <button class="btn primary" id="btn-login" style="width:100%; padding:14px;" type="button">Entrer</button>
+    <p class="err" id="login-err"></p>
+</div>
+
+<div id="console" class="hidden">
+    <header>
+        <h1>Viens chop · administration</h1>
+        <span class="pill ok" id="etat-pill">en ligne</span>
+        <span class="spacer"></span>
+        <button class="btn small" id="btn-refresh" type="button">Rafraîchir</button>
+        <button class="btn small" id="btn-logout" type="button">Sortir</button>
+    </header>
+
+    <main>
+        <div class="stats" id="stats"></div>
+
+        <nav role="tablist">
+            <button role="tab" data-onglet="signalements" aria-selected="true" type="button">Signalements</button>
+            <button role="tab" data-onglet="verifications" aria-selected="false" type="button">Vérifications</button>
+            <button role="tab" data-onglet="photos" aria-selected="false" type="button">Photos à vérifier</button>
+            <button role="tab" data-onglet="journal" aria-selected="false" type="button">Journal</button>
+        </nav>
+
+        <section id="panneau"></section>
+    </main>
+</div>
+
+<script>
+(function () {
+    const CLE = 'vc_admin_token';
+    let jeton = localStorage.getItem(CLE) || '';
+    let onglet = 'signalements';
+    const $ = id => document.getElementById(id);
+
+    const echapper = t => String(t == null ? '' : t).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const date = iso => {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const base = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
+
+    function toast(texte, mauvais) {
+        const d = document.createElement('div');
+        d.className = 'toast' + (mauvais ? ' bad' : '');
+        d.setAttribute('role', 'status');
+        d.textContent = texte;
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3500);
+    }
+
+    async function appel(chemin, options) {
+        const o = options || {};
+        const r = await fetch(base + chemin, {
+            method: o.method || 'GET',
+            headers: Object.assign(
+                { 'Content-Type': 'application/json' },
+                jeton ? { Authorization: 'Bearer ' + jeton } : {},
+                o.headers || {}
+            ),
+            body: o.body ? JSON.stringify(o.body) : undefined
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+            const err = new Error((data.error && data.error.message) || 'Erreur ' + r.status);
+            err.code = data.error && data.error.code;
+            err.status = r.status;
+            throw err;
+        }
+        return data;
+    }
+
+    /* ---------------- Connexion ---------------- */
+    async function entrer() {
+        const valeur = $('token').value.trim();
+        if (!valeur) { $('login-err').textContent = 'Entre le mot de passe.'; return; }
+        $('btn-login').disabled = true;
+        $('login-err').textContent = '';
+        try {
+            const r = await appel('/api/admin/login', { method: 'POST', body: { token: valeur } });
+            jeton = r.token;
+            localStorage.setItem(CLE, jeton);
+            $('token').value = '';
+            ouvrirConsole();
+        } catch (e) {
+            $('login-err').textContent = e.code === 'ADMIN_FERMEE'
+                ? "La console n'est pas encore configurée : ajoute ADMIN_TOKEN sur Render."
+                : 'Mot de passe incorrect.';
+        } finally {
+            $('btn-login').disabled = false;
+        }
+    }
+
+    function sortir() {
+        jeton = '';
+        localStorage.removeItem(CLE);
+        $('console').classList.add('hidden');
+        $('login').classList.remove('hidden');
+    }
+
+    async function ouvrirConsole() {
+        $('login').classList.add('hidden');
+        $('console').classList.remove('hidden');
+        await rafraichir();
+    }
+
+    /* ---------------- Onglets ---------------- */
+    document.querySelectorAll('nav button').forEach(b => {
+        b.addEventListener('click', () => {
+            onglet = b.dataset.onglet;
+            document.querySelectorAll('nav button').forEach(x =>
+                x.setAttribute('aria-selected', String(x.dataset.onglet === onglet)));
+            afficher();
+        });
+    });
+
+    async function rafraichir() {
+        try {
+            const s = await appel('/api/admin/stats');
+            const v = s.stats;
+            $('stats').innerHTML =
+                stat(v.comptes, 'comptes') + stat(v.signalements, 'signalements ouverts') +
+                stat(v.verifications, 'vérifications en attente') + stat(v.photos, 'photos à vérifier') +
+                stat(v.matchs, 'matchs');
+        } catch (e) {
+            if (e.status === 401 || e.status === 403) { sortir(); return; }
+            if (e.status === 503) {
+                $('etat-pill').className = 'pill off';
+                $('etat-pill').textContent = 'non configurée';
+            }
+            $('stats').innerHTML = '<div class="empty">' + echapper(e.message) + '</div>';
+            return;
+        }
+        await afficher();
+    }
+
+    const stat = (n, libelle) => '<div class="stat"><b>' + n + '</b><span>' + libelle + '</span></div>';
+
+    async function afficher() {
+        const p = $('panneau');
+        p.innerHTML = '<div class="empty">Chargement…</div>';
+        try {
+            if (onglet === 'signalements') return await afficherSignalements(p);
+            if (onglet === 'verifications') return await afficherVerifications(p);
+            if (onglet === 'photos') return await afficherPhotos(p);
+            if (onglet === 'journal') return await afficherJournal(p);
+        } catch (e) {
+            p.innerHTML = '<div class="empty">' + echapper(e.message) + '</div>';
+        }
+    }
+
+    /* ---------------- Signalements ---------------- */
+    const MOTIFS = {
+        fake_profile: 'Faux profil',
+        harassment: 'Harcèlement',
+        nudity: 'Contenu déplacé',
+        scam: 'Arnaque',
+        minor: 'Personne mineure',
+        other: 'Autre'
+    };
+
+    async function afficherSignalements(p) {
+        const r = await appel('/api/admin/reports');
+        if (!r.reports.length) { p.innerHTML = '<div class="empty">Aucun signalement en attente. 🎉</div>'; return; }
+        p.innerHTML = r.reports.map(x => `
+            <div class="card">
+                <div class="img">${x.target_photo_id
+                    ? '<img src="' + base + '/api/photos/' + x.target_photo_id + '" alt="">'
+                    : '👤'}</div>
+                <div class="body">
+                    <h3>${echapper(x.target_pseudo || 'Compte supprimé')}</h3>
+                    <div class="meta">
+                        <span class="tag ${x.reason === 'minor' || x.reason === 'nudity' ? 'danger' : 'warn'}">
+                            ${MOTIFS[x.reason] || x.reason}</span>
+                        signalé par ${echapper(x.reporter_pseudo || 'quelqu’un')} · ${date(x.created_at)}<br>
+                        ${x.details ? '« ' + echapper(x.details) + ' »<br>' : ''}
+                        ${x.target_reports > 1 ? '<strong>' + x.target_reports + ' signalements</strong> visent ce compte' : ''}
+                    </div>
+                    <div class="actions">
+                        <button class="btn good small" data-close="${x.id}" type="button">Marquer traité</button>
+                    </div>
+                </div>
+            </div>`).join('');
+        p.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', async () => {
+            b.disabled = true;
+            try {
+                await appel('/api/admin/reports/' + b.dataset.close + '/resolve', { method: 'POST' });
+                toast('Signalement marqué comme traité.');
+                rafraichir();
+            } catch (e) { b.disabled = false; toast(e.message, true); }
+        }));
+    }
+
+    /* ---------------- Vérifications ---------------- */
+    async function afficherVerifications(p) {
+        const r = await appel('/api/admin/verifications');
+        if (r.disponible === false) {
+            p.innerHTML = '<div class="empty">La table <code>verifications</code> n’existe pas encore : lance la migration SQL.</div>';
+            return;
+        }
+        if (!r.verifications.length) { p.innerHTML = '<div class="empty">Aucune vérification en attente.</div>'; return; }
+        p.innerHTML = r.verifications.map(v => `
+            <div class="card">
+                <div class="img">${v.has_selfie
+                    ? '<img alt="" data-selfie="' + v.id + '">'
+                    : '—'}</div>
+                <div class="img">${v.main_photo_id
+                    ? '<img src="' + base + '/api/photos/' + v.main_photo_id + '" alt="">'
+                    : '👤'}</div>
+                <div class="body">
+                    <h3>${echapper(v.pseudo || 'Membre')}${v.age ? ', ' + v.age : ''}</h3>
+                    <div class="meta">
+                        ${echapper(v.commune || '')} · demande ${date(v.created_at)}<br>
+                        La photo de gauche est le selfie, celle de droite la photo de profil.
+                    </div>
+                    <div class="actions">
+                        <button class="btn good small" data-verif="${v.id}" data-oui="approved" type="button">C’est la même personne</button>
+                        <button class="btn danger small" data-verif="${v.id}" data-oui="rejected" type="button">Refuser</button>
+                    </div>
+                </div>
+            </div>`).join('');
+        // Le selfie est protégé par le jeton : une balise <img> ne peut pas
+        // envoyer d'en-tête, on le récupère donc avec fetch puis en blob.
+        p.querySelectorAll('img[data-selfie]').forEach(async img => {
+            try {
+                const rep = await fetch(base + '/api/admin/verifications/' + img.dataset.selfie + '/selfie', {
+                    headers: { Authorization: 'Bearer ' + jeton }
+                });
+                if (!rep.ok) { img.replaceWith(document.createTextNode('(selfie indisponible)')); return; }
+                img.src = URL.createObjectURL(await rep.blob());
+            } catch (e) { img.replaceWith(document.createTextNode('(selfie indisponible)')); }
+        });
+
+        p.querySelectorAll('[data-verif]').forEach(b => b.addEventListener('click', async () => {
+            b.disabled = true;
+            try {
+                await appel('/api/admin/verifications/' + b.dataset.verif + '/decision', {
+                    method: 'POST', body: { decision: b.dataset.oui }
+                });
+                toast(b.dataset.oui === 'approved' ? 'Profil vérifié : le badge s’affiche.' : 'Vérification refusée.');
+                rafraichir();
+            } catch (e) { b.disabled = false; toast(e.message, true); }
+        }));
+    }
+
+    /* ---------------- Photos ---------------- */
+    async function afficherPhotos(p) {
+        const r = await appel('/api/admin/photos?status=review');
+        if (r.disponible === false) {
+            p.innerHTML = '<div class="empty">La colonne de modération n’existe pas encore : lance la migration SQL.</div>';
+            return;
+        }
+        if (!r.photos.length) { p.innerHTML = '<div class="empty">Aucune photo à vérifier.</div>'; return; }
+        p.innerHTML = r.photos.map(ph => `
+            <div class="card">
+                <div class="img"><img src="${base}${ph.url}" alt=""></div>
+                <div class="body">
+                    <h3>${echapper(ph.pseudo || 'Membre')} · photo ${ph.position + 1}</h3>
+                    <div class="meta">
+                        <span class="tag warn">à vérifier</span>
+                        ${echapper(ph.moderation_note || 'Signalée automatiquement')}<br>
+                        ${Math.round(ph.bytes / 1024)} Ko · publiée le ${date(ph.created_at)}
+                    </div>
+                    <div class="actions">
+                        <button class="btn good small" data-photo="${ph.id}" data-oui="ok" type="button">Elle est correcte</button>
+                        <button class="btn danger small" data-photo="${ph.id}" data-oui="blocked" type="button">Retirer la photo</button>
+                    </div>
+                </div>
+            </div>`).join('');
+        p.querySelectorAll('[data-photo]').forEach(b => b.addEventListener('click', async () => {
+            b.disabled = true;
+            try {
+                await appel('/api/admin/photos/' + b.dataset.photo + '/decision', {
+                    method: 'POST', body: { decision: b.dataset.oui }
+                });
+                toast(b.dataset.oui === 'ok' ? 'Photo validée.' : 'Photo retirée du site.');
+                rafraichir();
+            } catch (e) { b.disabled = false; toast(e.message, true); }
+        }));
+    }
+
+    /* ---------------- Journal ---------------- */
+    async function afficherJournal(p) {
+        const r = await appel('/api/admin/journal');
+        if (r.disponible === false) { p.innerHTML = '<div class="empty">Journal indisponible : lance la migration SQL.</div>'; return; }
+        if (!r.actions.length) { p.innerHTML = '<div class="empty">Aucune action pour le moment.</div>'; return; }
+        const noms = {
+            report_close: 'Signalement traité',
+            verification_approved: 'Profil vérifié',
+            verification_rejected: 'Vérification refusée',
+            photo_ok: 'Photo validée',
+            photo_blocked: 'Photo retirée'
+        };
+        p.innerHTML = r.actions.map(a => `
+            <div class="card"><div class="body">
+                <h3>${noms[a.action] || a.action}</h3>
+                <div class="meta">${date(a.created_at)}</div>
+            </div></div>`).join('');
+    }
+
+    /* ---------------- Démarrage ---------------- */
+    $('btn-login').addEventListener('click', entrer);
+    $('token').addEventListener('keydown', e => { if (e.key === 'Enter') entrer(); });
+    $('btn-logout').addEventListener('click', sortir);
+    $('btn-refresh').addEventListener('click', rafraichir);
+
+    (async function demarrage() {
+        try {
+            const etat = await fetch(base + '/api/admin/etat').then(r => r.json());
+            if (!etat.configuree) {
+                $('login-err').textContent =
+                    "La console n'est pas configurée : ajoute ADMIN_TOKEN dans les variables de Render, puis redéploie.";
+            }
+        } catch (e) { /* hors ligne : on laisse le formulaire */ }
+        if (jeton) {
+            try { await appel('/api/admin/stats'); ouvrirConsole(); }
+            catch (e) { sortir(); }
+        }
+    })();
+})();
+</script>
+</body>
+</html>

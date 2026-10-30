@@ -4,6 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tarifs</title>
+    <!-- Partage sur WhatsApp, Facebook, X : sans ces balises, un lien partagé
+         n'affiche ni image ni titre. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Viens chop">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:url" content="https://kaurel277-cmd.github.io/Viens-chop-/tarifs.html">
+    <meta property="og:title" content="Tarifs">
+    <meta property="og:description" content="Tarifs : 3 likes gratuits par jour, ou 700 FCFA par mois en Mode Debout, sans renouvellement piégeux.">
+    <meta property="og:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Viens chop — rencontre ivoirienne à Abidjan">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tarifs">
+    <meta name="twitter:description" content="Tarifs : 3 likes gratuits par jour, ou 700 FCFA par mois en Mode Debout, sans renouvellement piégeux.">
+    <meta name="twitter:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <!-- PWA : installation sur l'écran d'accueil + ouverture hors ligne -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32">
+    <link rel="icon" href="assets/img/icon-192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Viens chop">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -426,6 +451,18 @@
                     </ul>
                 </div>
             </div>
+            <div class="mb-8 rounded-2xl border border-slate-800 bg-slate-900 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-center sm:text-left">
+                    <p class="font-bold text-white text-sm">Installe Viens chop sur ton téléphone</p>
+                    <p class="text-xs text-slate-500 mt-1">Une icône sur l'écran d'accueil, comme une vraie application. Pas de store, pas de téléchargement lourd.</p>
+                </div>
+                <button id="btn-installer" type="button" class="hidden shrink-0 rounded-xl bg-gradient-to-r from-orange-500 to-rose-600 px-5 py-3 text-sm font-bold text-white">
+                    Installer
+                </button>
+                <button id="btn-installer-aide" type="button" class="shrink-0 rounded-xl border border-slate-700 px-5 py-3 text-sm font-bold text-slate-200">
+                    Comment faire ?
+                </button>
+            </div>
             <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
                 <p>© <span id="year">2026</span> Viens chop Côte d'Ivoire. Tous droits réservés.</p>
                 <p>Application réservée aux majeurs (+18 ans).</p>
@@ -472,5 +509,8 @@
             });
         })();
     </script>
+
+    <!-- Installation sur l'écran d'accueil -->
+    <script src="assets/js/pwa.js" defer></script>
 </body>
 </html>

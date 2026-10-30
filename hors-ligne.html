@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne</title>
+    <meta name="robots" content="noindex">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #0B141A; color: #E9EDEF; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; padding: 28px;
+            text-align: center;
+        }
+        .boite { max-width: 380px; }
+        .rond {
+            width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 22px;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+            display: flex; align-items: center; justify-content: center; font-size: 38px;
+        }
+        h1 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+        p { font-size: 14px; line-height: 1.7; color: rgba(233,237,239,.65); margin-bottom: 22px; }
+        a {
+            display: inline-block; padding: 14px 26px; border-radius: 14px; text-decoration: none;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56); color: #fff; font-weight: 800; font-size: 15px;
+        }
+        small { display: block; margin-top: 18px; font-size: 12px; color: rgba(233,237,239,.4); line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="boite">
+        <div class="rond" aria-hidden="true">📡</div>
+        <h1>Pas de connexion</h1>
+        <p>
+            Viens chop a besoin d'internet pour retrouver ton compte et les profils.
+            Vérifie ta connexion, puis réessaie : rien n'est perdu.
+        </p>
+        <a href="./app.html">Réessayer</a>
+        <small>Astuce : active puis coupe le mode avion, ça relance souvent le réseau.</small>
+    </div>
+</body>
+</html>

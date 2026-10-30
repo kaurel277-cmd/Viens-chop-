@@ -80,12 +80,18 @@ Une app de rencontre sans modération se fait fermer, ou se vide.
 
 - ✅ **Fait** — bouton **Signaler** et **Bloquer** sur chaque profil (fil) et dans
   la discussion : 6 motifs de signalement, blocage immédiat, liste
-  « Profils bloqués » dans Mon profil avec déblocage. Voir
-  `docs/SECURITE-MODERATION.md`.
-- Vérification selfie **réelle** (comparaison photo/selfie, détection de visage).
-- Modération des photos (au moins un filtre automatique + une revue manuelle).
-- Journal des signalements et délai de traitement : les signalements arrivent
-  dans `public.reports` (`status = open`), il reste à décider qui les traite.
+  « Profils bloqués » dans Mon profil avec déblocage.
+- ✅ **Fait** — vérification selfie **réelle** : le selfie part au serveur,
+  l'équipe le compare aux photos dans la console, le badge « Vérifié » ne
+  s'affiche qu'après validation, puis le selfie est effacé.
+- ✅ **Fait** — modération des photos : analyse automatique à l'envoi (peau,
+  luminosité, taille), file « à vérifier » dans la console, retrait en un clic.
+- ✅ **Fait** — console d'administration : signalements, vérifications, photos,
+  journal des actions.
+
+Voir `docs/ADMINISTRATION.md` et `docs/SECURITE-MODERATION.md`.
+Reste : un vrai filtre d'image côté serveur (aujourd'hui l'analyse tourne dans
+le navigateur et les seuils sont volontairement larges).
 - Test des politiques RLS : vérifier qu'un utilisateur ne peut pas lire les
   messages d'un autre.
 
@@ -93,14 +99,15 @@ Une app de rencontre sans modération se fait fermer, ou se vide.
 
 ## Étape 4 — Mise en ligne · *1 semaine*
 
-- Nom de domaine + hébergement statique (Cloudflare Pages, Netlify ou Vercel).
-- HTTPS, redirections `www`, page 404.
-- **Open Graph** : aujourd'hui absentes, donc un lien partagé sur WhatsApp
-  s'affiche sans image ni titre. C'est le premier canal d'acquisition en CI,
-  à ne pas négliger.
-- `sitemap.xml`, `robots.txt`.
-- **PWA** : manifest + service worker → l'app s'installe sur l'écran d'accueil
-  sans passer par un store. Gros levier en Côte d'Ivoire.
+- ✅ **Fait** — hébergement statique : le site est en ligne sur GitHub Pages
+  (`https://kaurel277-cmd.github.io/Viens-chop-/`), mis à jour à chaque push.
+- ✅ **Fait** — **Open Graph** sur les 9 pages : un lien partagé sur WhatsApp
+  affiche l'image « Viens chop », le titre et la description.
+- ✅ **Fait** — `sitemap.xml`, `robots.txt` (console d'administration exclue).
+- ✅ **Fait** — **PWA** : manifest, service worker, icônes 192/512/maskable,
+  page « Pas de connexion ». Bouton « Installer » sur les pages vitrine.
+- ⏳ **À toi** — nom de domaine + HTTPS : voir `docs/MISE-EN-LIGNE.md`.
+- ⏳ **À faire** — page 404 personnalisée (GitHub Pages sert sa propre page).
 - Analytics respectueux de la vie privée (Plausible ou Umami) pour mesurer
   inscription → match → message.
 

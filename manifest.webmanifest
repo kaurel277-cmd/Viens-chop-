@@ -1,0 +1,44 @@
+{
+  "name": "Viens chop",
+  "short_name": "Viens chop",
+  "description": "Rencontre ivoirienne : profils, matchs et discussions à Abidjan. 3 likes gratuits par jour.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./app.html",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B141A",
+  "theme_color": "#FF5E1A",
+  "categories": ["social", "dating", "lifestyle"],
+  "icons": [
+    { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/img/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/img/screenshot-app.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Le fil de découverte"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Discussions",
+      "short_name": "Discussions",
+      "url": "./app.html?ecran=discussions",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon profil",
+      "short_name": "Profil",
+      "url": "./app.html?ecran=profil",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

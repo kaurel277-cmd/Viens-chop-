@@ -408,9 +408,9 @@ window.VCCompte = (function () {
         },
 
         /** file = File/Blob déjà compressé ; position 0..2 */
-        async add(blob, position) {
+        async add(blob, position, metrics) {
             if (mode === 'api') {
-                const res = await window.VCAPI.photos.upload(blob, position || 0);
+                const res = await window.VCAPI.photos.upload(blob, position || 0, metrics);
                 const p = profilEnCache() || {};
                 const liste = (p.photos || []).slice();
                 liste[position || 0] = res.photo.url;

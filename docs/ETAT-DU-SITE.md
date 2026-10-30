@@ -25,7 +25,7 @@ aucune erreur.
 
 | Élément | État | Preuve |
 |---|---|---|
-| 9 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `app` |
+| 11 pages du site | ✅ 200 OK | `index`, `comment-ca-marche`, `securite`, `tarifs`, `maquis`, `faq`, `inscription`, `mentions-legales`, `app`, `admin`, `hors-ligne` |
 | Erreurs JavaScript | ✅ **0** sur les 9 pages | parcours automatisé |
 | Ressources manquantes (404, images cassées) | ✅ **0** | idem |
 | Liens internes (9 cibles distinctes) | ✅ **0 lien mort** | idem |
@@ -36,7 +36,11 @@ aucune erreur.
 | Moins de 18 ans | ✅ bloqué | testé |
 | Numéro déjà utilisé | ✅ refusé avec message clair | testé |
 | Régression complète du site | ✅ **40/40** | `audit/regression.js` |
-| Signaler / bloquer un profil | ✅ fonctionne (fil + discussion) | 31/31, `audit/test-securite.js` |
+| Signaler / bloquer un profil | ✅ fonctionne (fil + discussion) | 32/32, `audit/test-securite.js` |
+| Vérification selfie + badge | ✅ fonctionne | 23/23, `audit/test-admin.js` |
+| Console d'administration | ✅ fonctionne (signalements, vérifications, photos) | idem |
+| Installation sur l'écran d'accueil (PWA) | ✅ manifeste + service worker | 41/41, `audit/test-pwa.js` |
+| Partage WhatsApp (image + titre) | ✅ Open Graph sur les 9 pages | idem |
 | Liste « Profils bloqués » + déblocage | ✅ fonctionne | idem |
 | Backend Neon (base + API) | ✅ `ok:true`, 6 tables | `/api/health/db` en production |
 | Mobile | ✅ testé en 390 × 844 | captures |

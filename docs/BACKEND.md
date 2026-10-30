@@ -158,6 +158,28 @@ avec la même règle que le site (`M → F`, `F → A`).
 | `DELETE` | `/api/safety/block/:id` | débloquer : le profil et la discussion reviennent |
 | `GET` | `/api/safety/quiz` | 1 session/jour en gratuit |
 
+### Vérification d'identité
+
+| Méthode | Route | Notes |
+|---|---|---|
+| `GET` | `/api/certification/me` | statut : `none`, `pending`, `approved`, `rejected` |
+| `POST` | `/api/certification/selfie` | `{ data, mime }` — le selfie est effacé après décision |
+
+### Administration (`ADMIN_TOKEN`)
+
+| Méthode | Route | Notes |
+|---|---|---|
+| `GET` | `/api/admin/etat` | la console est-elle configurée (public) |
+| `POST` | `/api/admin/login` | `{ token }` → jeton de 8 h |
+| `GET` | `/api/admin/stats` | compteurs |
+| `GET` | `/api/admin/reports` | signalements ouverts |
+| `POST` | `/api/admin/reports/:id/resolve` | marquer traité |
+| `GET` | `/api/admin/verifications` | selfies en attente |
+| `POST` | `/api/admin/verifications/:id/decision` | `approved` ou `rejected` |
+| `GET` | `/api/admin/photos?status=review` | photos à vérifier |
+| `POST` | `/api/admin/photos/:id/decision` | `ok` ou `blocked` |
+| `GET` | `/api/admin/journal` | 100 dernières actions |
+
 ### Codes d'erreur
 
 Toujours `{ error: { code, message } }`. Les plus utiles côté site :

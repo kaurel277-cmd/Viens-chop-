@@ -12,6 +12,8 @@ import { matchesRouter } from './routes/matches.js';
 import { safetyRouter } from './routes/safety.js';
 import { healthRouter } from './routes/health.js';
 import { photosRouter } from './routes/photos.js';
+import { certificationRouter } from './routes/certification.js';
+import { adminRouter } from './routes/admin.js';
 
 export const app = express();
 
@@ -21,6 +23,7 @@ app.use(cors({ origin: config.corsOrigin }));
 // Le reste de l'API reste à 100 Ko. Seule l'envoi de photo monte à 600 Ko
 // (une image de 110 Ko pèse ~147 Ko une fois encodée en base64).
 app.use('/api/photos', express.json({ limit: '600kb' }));
+app.use('/api/certification', express.json({ limit: '600kb' }));
 app.use(express.json({ limit: '100kb' }));
 
 if (config.rateLimitEnabled) {
@@ -60,6 +63,8 @@ app.use('/api/likes',   likesRouter);
 app.use('/api/matches', matchesRouter);
 app.use('/api/safety',  safetyRouter);
 app.use('/api/photos',  photosRouter);
+app.use('/api/certification', certificationRouter);
+app.use('/api/admin',   adminRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: { code: 'ROUTE_INCONNUE', message: 'Route inconnue.' } });

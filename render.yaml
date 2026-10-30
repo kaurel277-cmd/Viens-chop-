@@ -27,5 +27,7 @@ services:
         sync: false            # 64 caractères aléatoires
       - key: CORS_ORIGIN
         sync: false            # URL exacte du site, ex: https://viens-chop.ci
+      - key: ADMIN_TOKEN
+        sync: false            # mot de passe de la console admin.html (vide = fermée)
       - key: JWT_TTL
         value: 15m

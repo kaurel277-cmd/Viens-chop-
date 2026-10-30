@@ -57,6 +57,51 @@ export async function requireAuth(req, _res, next) {
 }
 
 /* ---------------------------------------------------------------------------
+   Console d'administration — jeton unique, pas de compte utilisateur.
+
+   Le propriétaire du site définit ADMIN_TOKEN sur Render. Il l'entre une fois
+   dans admin.html, qui reçoit en échange un jeton de 8 h. Rien n'est stocké
+   en base : si ADMIN_TOKEN change, tous les accès tombent.
+   --------------------------------------------------------------------------- */
+export function jetonAdminValide(candidat) {
+  const attendu = config.adminToken;
+  if (!attendu || !candidat) return false;
+  const a = Buffer.from(String(candidat));
+  const b = Buffer.from(String(attendu));
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+export function creerJetonAdmin() {
+  return jwt.sign({ role: 'admin' }, config.jwtSecret, { expiresIn: config.adminTtl });
+}
+
+export async function requireAdmin(req, _res, next) {
+  try {
+    if (!config.adminToken) {
+      throw new AppError(503, 'ADMIN_FERMEE', "La console d'administration n'est pas configurée (ADMIN_TOKEN).");
+    }
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+    if (!token) throw new AppError(401, 'NON_AUTHENTIFIE', 'Jeton administrateur requis.');
+
+    let payload;
+    try {
+      payload = jwt.verify(token, config.jwtSecret);
+    } catch {
+      throw new AppError(401, 'JETON_INVALIDE', 'Session administrateur expirée, reconnecte-toi.');
+    }
+    if (!payload || payload.role !== 'admin') {
+      throw new AppError(403, 'ACCES_REFUSE', "Accès réservé à l'administration.");
+    }
+    req.isAdmin = true;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Refresh tokens : stockés hachés, révocables.
    --------------------------------------------------------------------------- */
 export async function createSession(userId, userAgent) {
