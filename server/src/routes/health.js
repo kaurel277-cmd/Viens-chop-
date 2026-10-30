@@ -6,12 +6,24 @@ import { aRecuperation, aChatMedia, aVerifications, aModeration } from '../capab
 export const healthRouter = Router();
 
 /* Une capacité ne doit jamais faire attendre /api/health : si la base met
-   plus de 800 ms à répondre, on considère simplement que ce n'est pas prêt. */
-function avecDelai(promesse, ms = 800) {
+   plus de 800 ms à répondre, on considère simplement que ce n'est pas prêt.
+
+   Cas particulier : la première requête après la mise en veille du service
+   gratuit paie l'ouverture du tunnel TLS vers Neon (souvent > 800 ms). Sans
+   reprise, ce premier appel annoncerait « rien n'est prêt » à tort. On refait
+   donc un essai, une seule fois, quand la réponse est négative. */
+function avecDelai(promesse, ms) {
   return Promise.race([
     promesse,
     new Promise(resolve => setTimeout(() => resolve(false), ms))
   ]).catch(() => false);
+}
+
+async function capacite(fn) {
+  const premier = await avecDelai(fn(), 1200);
+  if (premier) return true;
+  await new Promise(r => setTimeout(r, 150));
+  return avecDelai(fn(), 2500);
 }
 
 healthRouter.get('/', async (_req, res) => {
@@ -20,10 +32,10 @@ healthRouter.get('/', async (_req, res) => {
   // On y ajoute ce que la base accepte déjà : c'est le voyant qui dit si la
   // migration SQL est passée, sans avoir à lire les logs de Render.
   const [recuperation, chatMedia, verifications, moderation] = await Promise.all([
-    avecDelai(aRecuperation()),
-    avecDelai(aChatMedia()),
-    avecDelai(aVerifications()),
-    avecDelai(aModeration())
+    capacite(aRecuperation),
+    capacite(aChatMedia),
+    capacite(aVerifications),
+    capacite(aModeration)
   ]);
 
   const features = ['password-auth', 'photos'];
