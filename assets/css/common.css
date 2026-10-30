@@ -11,6 +11,10 @@ html {
        place le titre SOUS la navbar et on ne voit pas la section. */
     scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;
+    /* Le menu mobile attend hors de l'écran (translateX(100%)) : sans ceci,
+       il élargit la page et on peut la faire glisser de travers sur les
+       petits téléphones (320–360 px). */
+    overflow-x: hidden;
 }
 
 body {

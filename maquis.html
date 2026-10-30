@@ -47,8 +47,21 @@
     <style>
         .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
         .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
-        .mobile-menu.open { transform: translateX(0); }
+        /* Le menu attend hors de l'écran : un élément simplement décalé
+           élargit la page sur les petits téléphones (320–360 px) et l'on
+           peut faire glisser le site de travers. On le retire donc de la
+           mise en page quand il est fermé, et il glisse à l'ouverture. */
+        /* Les colonnes d'une grille refusent par défaut de rétrécir sous la
+           largeur de leur contenu : sur un petit téléphone (320–360 px), la
+           carte du formulaire débordait de la page. */
+        .grid > * { min-width: 0; }
+
+        .mobile-menu { display: none; }
+        .mobile-menu.open { display: block; animation: glisse-menu 0.3s ease; }
+        @keyframes glisse-menu {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
         .menu-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 60; }
         .menu-overlay.open { opacity: 1; pointer-events: auto; }
         body.menu-open { overflow: hidden; }
@@ -339,7 +352,7 @@
                         <label for="p-phone" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ton numéro WhatsApp</label>
                         <div class="flex gap-2">
                             <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 font-bold text-sm">+225</span>
-                            <input id="p-phone" type="tel" inputmode="numeric" required placeholder="07 XX XX XX XX" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <input id="p-phone" type="tel" inputmode="numeric" required placeholder="07 XX XX XX XX" class="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
                         </div>
                     </div>
 

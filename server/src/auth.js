@@ -38,13 +38,18 @@ export async function requireAuth(req, _res, next) {
     if (!token) throw new AppError(401, 'NON_AUTHENTIFIE', 'Authentification requise.');
 
     const payload = verifyAccessToken(token);
+    // Les colonnes de la clé de secours sont lues via to_jsonb : si la
+    // migration n'a pas encore été passée, elles valent simplement null au
+    // lieu de faire échouer TOUTES les routes authentifiées (fil, profil,
+    // matchs…). Une base en retard ne doit jamais bloquer l'application.
     const { rows } = await query(
-      `select id, phone, pseudo, gender, seeking, age, birth_date, commune, artists,
-              bio, photo_url, selfie_url, is_certified, plan, plan_expires_at,
-              fake_call_last_used, likes_today, likes_reset_at, last_seen_at,
-              (recovery_hash is not null) as a_cle_secours,
-              recovery_used_at
-         from public.users where id = $1`,
+      `select u.id, u.phone, u.pseudo, u.gender, u.seeking, u.age, u.birth_date,
+              u.commune, u.artists, u.bio, u.photo_url, u.selfie_url, u.is_certified,
+              u.plan, u.plan_expires_at, u.fake_call_last_used, u.likes_today,
+              u.likes_reset_at, u.last_seen_at,
+              (to_jsonb(u)->>'recovery_hash') is not null as a_cle_secours,
+              nullif(to_jsonb(u)->>'recovery_used_at', '') as recovery_used_at
+         from public.users u where u.id = $1`,
       [payload.sub]
     );
     if (!rows.length) throw new AppError(401, 'COMPTE_INTROUVABLE', 'Compte introuvable.');

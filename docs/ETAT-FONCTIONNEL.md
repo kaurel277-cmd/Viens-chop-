@@ -49,6 +49,32 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 4. **Les pages vendaient SOS, Check-In et Mode Incognito** comme s'ils étaient
    livrés : ils sont marqués « bientôt » et le Faux Appel, lui réel, est mis en
    avant.
+5. **Les raccourcis de l'application installée ne menaient nulle part.**
+   `?ecran=profil` et `?ecran=discussions` étaient ignorés : on retombait sur
+   l'écran par défaut. Ils ouvrent maintenant le bon écran (et renvoient à la
+   connexion si l'on n'est pas connecté).
+6. **L'écran de démarrage pouvait rester bloqué** (aucun compte, session
+   expirée, serveur muet) : il mène désormais toujours à la connexion, avec le
+   message « Ta session a expiré » quand c'est le cas.
+7. **Un double appui = deux likes, deux messages.** Sur un réseau lent, liker
+   ou passer deux fois brûlait un crédit ; un message dont l'envoi échouait
+   disparaissait. Un seul geste = un envoi, et le message raté revient dans le
+   champ, marqué « non envoyé ».
+8. **Le bouton de connexion ne réagissait pas** au premier appui (réseau lent) :
+   il affiche « Connexion… » et ne part qu'une fois.
+9. **Le retour du téléphone quittait l'application** : il ramène maintenant à
+   l'écran précédent.
+10. **Le site glissait de travers sur les petits téléphones** (320–360 px) : le
+    menu ☰ élargissait la page et le formulaire « Proposer un lieu » débordait.
+    Plus aucun débordement sur les 14 pages.
+11. **Le service worker pouvait servir un ancien script avec une page neuve.**
+    Les pages **et le code** (JS, CSS) passent désormais par le réseau d'abord ;
+    seules les images viennent du cache.
+12. **Une base en retard bloquait toute l'application** : si la migration du
+    mot de passe n'était pas passée sur Neon, l'inscription marchait mais le
+    fil, les matchs et le profil répondaient 500. Les colonnes de la clé de
+    secours sont lues de façon tolérante : une base sans migration reste
+    utilisable.
 
 ## Comment marche le « mot de passe oublié »
 

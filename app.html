@@ -203,6 +203,8 @@
         }
         .msg.sent { background: #005C4B; align-self: flex-end; border-bottom-right-radius: 4px; }
         .msg.received { background: #202C33; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.echec { opacity: .7; border: 1px dashed rgba(255,107,107,.7); }
+        .msg.echec::after { content: ' · non envoyé'; font-size: 11px; color: #fca5a5; }
         .msg.system {
             align-self: center; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
             font-size: 12px; text-align: center; border-radius: 12px; max-width: 90%;
@@ -424,6 +426,7 @@
             font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4);
             cursor: pointer; padding: 8px 12px; transition: all 0.2s;
         }
+        .nav-item { background: none; border: 0; font-family: inherit; flex: 1; }
         .nav-item i { font-size: 20px; }
         .nav-item.active { color: #FF6B00; }
         .nav-item .notif-dot {
@@ -500,7 +503,7 @@
                 <p id="login-error" role="alert" aria-live="polite"
                    style="display:none; color:#fca5a5; font-size:13px; font-weight:600; margin:4px 0 12px;"></p>
 
-                <button class="btn-primary" onclick="loginCompte()" type="button">Se connecter</button>
+                <button class="btn-primary" id="btn-login" onclick="loginCompte()" type="button">Se connecter</button>
 
                 <p style="text-align:center; margin-top:14px;">
                     <a href="mot-de-passe-oublie.html" style="color:rgba(255,255,255,0.65); font-size:13px; font-weight:600; text-decoration:none;">
@@ -519,7 +522,7 @@
     <!-- ==================== ÉCRAN 3: CRÉATION PROFIL ==================== -->
     <div id="profile-setup" class="screen">
         <div style="max-width:440px; margin:0 auto; width:100%;">
-            
+
             <!-- Step Indicators -->
             <div class="step-indicator">
                 <div class="step-dot active" id="sd1"></div>
@@ -1053,23 +1056,23 @@
 
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
     <div class="bottom-nav" id="bottom-nav" style="display:none;">
-        <div class="nav-item active" role="button" tabindex="0" onclick="switchTab('discover', this)">
+        <button type="button" class="nav-item active" onclick="switchTab('discover', this)">
             <i class="fa-solid fa-compass"></i>
             <span>Découvrir</span>
-        </div>
-        <div class="nav-item" role="button" tabindex="0" onclick="switchTab('discussions', this)" style="position:relative;">
+        </button>
+        <button type="button" class="nav-item" onclick="switchTab('discussions', this)" style="position:relative;">
             <i class="fa-solid fa-comment"></i>
             <span>Discussions</span>
-            <div class="notif-dot" id="chat-notif" style="display:none;"></div>
-        </div>
-        <div class="nav-item" role="button" tabindex="0" onclick="showQuiz(this)">
+            <span class="notif-dot" id="chat-notif" style="display:none;"></span>
+        </button>
+        <button type="button" class="nav-item" onclick="showQuiz(this)">
             <i class="fa-solid fa-gamepad"></i>
             <span>Mode Flirt</span>
-        </div>
-        <div class="nav-item" role="button" tabindex="0" onclick="triggerFakeCall()">
+        </button>
+        <button type="button" class="nav-item" onclick="triggerFakeCall()">
             <i class="fa-solid fa-phone-volume"></i>
             <span>Faux Appel</span>
-        </div>
+        </button>
     </div>
 
     <!-- ==================== JAVASCRIPT ==================== -->
@@ -1130,7 +1133,7 @@
         function goTo(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-            
+
             const navScreens = ['discover', 'chat', 'discussions'];
             document.getElementById('bottom-nav').style.display = navScreens.includes(screenId) ? 'flex' : 'none';
         }
@@ -1151,9 +1154,12 @@
             el.style.display = msg ? 'block' : 'none';
         }
 
+        let connexionEnCours = false;
+
         function loginCompte() {
             const C = window.VCCompte;
             if (!C) { loginError("Le module de compte n'a pas pu se charger. Recharge la page."); return; }
+            if (connexionEnCours) return;                 // un seul essai à la fois
             const phone = document.getElementById('phone-input').value;
             const pwd = document.getElementById('password-input').value;
             loginError('');
@@ -1161,13 +1167,27 @@
             if (!C.isValidPhone(phone)) { loginError('Entre tes 10 chiffres, par exemple 07 00 00 00 00.'); return; }
             if (!pwd) { loginError('Entre ton mot de passe.'); return; }
 
+            // Sur un réseau lent, on voyait « Se connecter » sans réaction :
+            // l'utilisateur appuyait plusieurs fois et se faisait bloquer par
+            // la limite d'essais. Le bouton dit maintenant ce qu'il fait.
+            const bouton = document.getElementById('btn-login');
+            connexionEnCours = true;
+            if (bouton) { bouton.disabled = true; bouton.textContent = 'Connexion…'; }
+
+            const fini = () => {
+                connexionEnCours = false;
+                if (bouton) { bouton.disabled = false; bouton.textContent = 'Se connecter'; }
+            };
             C.login(phone, pwd).then(me => {
+                fini();
+                loginError('');
                 if (me && me.name) {
                     const el = document.getElementById('setup-name');
                     if (el) el.value = me.name;
                 }
                 ouvrirSelonProfil();
             }).catch(err => {
+                fini();
                 const messages = {
                     // Le serveur répond volontairement la même chose pour un
                     // numéro inconnu et un mauvais mot de passe.
@@ -1204,6 +1224,54 @@
             }
             goTo('discover');
         }
+
+        /* ---------- Bouton « retour » du téléphone ----------
+           Sur Android, un appui sur retour quittait l'application d'un coup,
+           même depuis une discussion. On garde la trace des écrans : le retour
+           ramène à l'écran précédent et ne quitte l'application que depuis
+           l'accueil. */
+        (function brancherRetour() {
+            const natif = goTo;
+            const pile = [];
+            let enRetour = false;
+
+            window.goTo = function (id, options) {
+                const actif = document.querySelector('.screen.active');
+                const avant = actif ? actif.id : null;
+                natif(id);
+                if (enRetour || options === 'sans-historique' || avant === id) return;
+
+                // Depuis l'écran de démarrage ou la connexion, le retour ne doit
+                // pas ramener en arrière (on retomberait sur un écran mort ou
+                // sur le formulaire de connexion une fois connecté).
+                const sansRetour = ['splash', 'login'];
+                if (sansRetour.includes(avant) || sansRetour.includes(id)) {
+                    try { history.replaceState({ vc: id }, '', location.pathname + location.search); } catch (e) { /* pas grave */ }
+                    return;
+                }
+
+                pile.push({ ecran: avant });
+                try { history.pushState({ vc: id }, '', location.pathname + location.search); } catch (e) { /* pas grave */ }
+            };
+
+            window.addEventListener('popstate', function () {
+                const precedent = pile.pop();
+                enRetour = true;
+                try { natif(precedent && precedent.ecran ? precedent.ecran : 'discover'); }
+                catch (e) { /* écran inconnu : on ne casse rien */ }
+                enRetour = false;
+            });
+        })();
+
+        /* Barre du bas : au clavier, Entrée ou Espace doivent ouvrir l'onglet
+           comme le ferait un doigt (ce sont des div role="button"). */
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const cible = e.target.closest && e.target.closest('.nav-item[role="button"]');
+            if (!cible) return;
+            e.preventDefault();
+            cible.click();
+        });
 
         function startApp() {
             const C = window.VCCompte;
@@ -1467,7 +1535,7 @@
             zonePhoto.style.backgroundImage = '';
             const vide = document.getElementById('card-photo-vide');
             if (vide) vide.style.display = p.photoId || p.photoUrl ? 'none' : 'block';
-            
+
             const artistsDiv = document.getElementById('card-artists');
             artistsDiv.innerHTML = p.artists.map(a => `<span class="badge" style="background:rgba(255,107,0,0.2); color:#FF6B00;">🎵 ${a}</span>`).join('');
 
@@ -1537,7 +1605,7 @@
             if (av) av.style.filter = 'none';
             messageCount = 0;
             photoUnlocked = false;
-            
+
             // Clear messages
             const msgContainer = document.getElementById('chat-messages');
             msgContainer.innerHTML = `
@@ -1646,7 +1714,7 @@
             el.classList.add('selected');
             const options = el.parentElement.querySelectorAll('.quiz-option');
             options.forEach(o => { if(o !== el) o.style.opacity = '0.4'; o.style.pointerEvents = 'none'; });
-            
+
             // Send answer as message
             addMessage(`🎲 Quiz : ${el.textContent}`, 'sent');
 
@@ -1686,7 +1754,7 @@
             const name = callerNames[Math.floor(Math.random() * callerNames.length)];
             document.getElementById('caller-name').textContent = name;
             document.getElementById('fake-call-overlay').classList.add('active');
-            
+
             // Vibrate if supported
             if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
         }
@@ -1721,9 +1789,9 @@
             isVIP = true;
             likesRemaining = Infinity;
             document.getElementById('likes-left').textContent = '∞';
-            
+
             closeVipModal();
-            
+
             // Show success
             const successMsg = document.createElement('div');
             successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:fadeIn 0.25s ease;';
@@ -2124,6 +2192,31 @@
            et médias « vue unique » dans le chat.
            S'appuie sur assets/js/media.js (stockage local, R2-ready).
            ================================================================== */
+        /* Une session peut être morte sans qu'on le sache : le jeton est
+           encore dans le téléphone, mais le serveur ne le reconnaît plus
+           (expiré, révoqué après un changement de mot de passe…). On demande
+           une fois au serveur, et on ne déconnecte QUE si c'est lui qui
+           refuse — jamais à cause d'un simple problème de réseau. */
+        let _verifSession = null;
+        function verifierSession() {
+            if (_verifSession) return _verifSession;
+            _verifSession = (async () => {
+                const C = window.VCCompte;
+                if (!C || C.mode !== 'api' || !C.isLoggedIn() || !window.VCAPI) return true;
+                try {
+                    await window.VCAPI.auth.me();
+                    return true;
+                } catch (e) {
+                    const mort = ['TOKEN_INVALIDE', 'NON_AUTHENTIFIE', 'SESSION_INVALIDE',
+                                  'COMPTE_INTROUVABLE', 'REFRESH_MANQUANT'].includes(e && e.code);
+                    if (!mort) return true;
+                    try { await C.logout(); } catch (err) { /* on efface quand même */ }
+                    return false;
+                }
+            })();
+            return _verifSession;
+        }
+
         (async function initMedia() {
             const C = window.VCCompte;
             const M = window.VCMedia;
@@ -2132,7 +2225,15 @@
             // ?api=... permet de viser un serveur local pendant les tests
             const apiChoisie = new URLSearchParams(location.search).get('api');
             await C.configure({ api: apiChoisie });
-            if (!C.isLoggedIn()) return;
+
+            // Plus jamais d'écran de démarrage sans issue : sans compte (ou
+            // avec une session morte), on ouvre l'écran de connexion.
+            const sessionVivante = await verifierSession();
+            if (!C.isLoggedIn() || !sessionVivante) {
+                if (!sessionVivante) loginError('Ta session a expiré. Reconnecte-toi.');
+                goTo('login');
+                return;
+            }
 
             const me = C.current();
             const SERVEUR = C.mode === 'api';
@@ -2755,12 +2856,41 @@
         function ouvrirSecuriteProfil() { alerteDemoSecurite(); }
         function ouvrirSecuriteChat() { alerteDemoSecurite(); }
 
-        /* Raccourcis du manifeste : app.html?ecran=discussions ou ?ecran=profil */
+        /* Raccourcis du manifeste : app.html?ecran=discussions ou ?ecran=profil
+           Le profil ne s'affiche pas tout seul : il faut aussi charger ses
+           photos et son état de vérification. On appelle donc la vraie
+           fonction d'ouverture, et on réessaie tant que les modules ne sont
+           pas prêts (ils arrivent après, en asynchrone). */
         (function raccourci() {
             const voulu = new URLSearchParams(location.search).get('ecran');
             if (!voulu) return;
-            const cible = { discussions: 'discussions', profil: 'mon-profil', chat: 'discussions' }[voulu];
-            if (cible) setTimeout(() => { if (typeof goTo === 'function') goTo(cible); }, 900);
+            const direct = {
+                discussions: 'discussions', chat: 'discussions',
+                profil: 'mon-profil', login: 'login', connexion: 'login'
+            }[voulu];
+            if (!direct) return;
+
+            let essais = 0;
+            const ouvrir = () => {
+                essais++;
+                const C = window.VCCompte;
+                const connecte = !!(C && C.isLoggedIn && C.isLoggedIn());
+
+                // Sans compte, on ne saute pas dans une page réservée : le
+                // raccourci doit se comporter comme un lien protégé.
+                if (!connecte && voulu !== 'login' && voulu !== 'connexion') {
+                    if (essais < 40) setTimeout(ouvrir, 250);
+                    return;
+                }
+                if (voulu === 'profil') {
+                    if (typeof window.openMonProfil === 'function') { window.openMonProfil(); return; }
+                } else if (typeof goTo === 'function') {
+                    goTo(direct);
+                    return;
+                }
+                if (essais < 40) setTimeout(ouvrir, 250);   // jusqu'à 10 s
+            };
+            setTimeout(ouvrir, 700);
         })();
 
         (async function initSocial() {
@@ -2778,7 +2908,16 @@
             // Compte incomplet (pseudo automatique « membre… » ou « je cherche »
             // pas encore choisi) : on ouvre l'écran de profil au lieu du fil.
             if (profilIncomplet(C.current()) && !new URLSearchParams(location.search).get('ecran')) {
-                setTimeout(() => goTo('profile-setup'), 300);
+                // On ne détourne que si l'utilisateur est encore sur l'écran de
+                // démarrage : s'il a été renvoyé à la connexion (session morte)
+                // entre-temps, on n'écrase pas cet écran.
+                setTimeout(async () => {
+                    if (!C.isLoggedIn()) return;
+                    if (!(await verifierSession())) return;
+                    const actif = document.querySelector('.screen.active');
+                    if (actif && actif.id !== 'splash') return;
+                    goTo('profile-setup');
+                }, 300);
             }
 
             /* ---------- Petits utilitaires ---------- */
@@ -2804,8 +2943,15 @@
                 if (typeof likesRemaining !== 'undefined') likesRemaining = restants;
             }
 
-            /* ---------- 1. Liker un profil ---------- */
+            /* ---------- 1. Liker un profil ----------
+               Un geste nerveux, un double-tap sur un réseau lent, et deux
+               « j'aime » partaient pour la même personne : le second brûlait
+               un crédit et ramenait la carte en arrière. On verrouille le
+               temps de la requête. */
+            let likeEnCours = false;
+
             window.swipeLike = async function () {
+                if (likeEnCours) return;
                 const profil = (typeof profiles !== 'undefined') ? profiles[typeof currentProfileIndex !== 'undefined' ? currentProfileIndex : 0] : null;
                 if (!profil) return;
 
@@ -2820,6 +2966,7 @@
                     return;
                 }
 
+                likeEnCours = true;
                 try {
                     const r = await S.like(profil.userId);
                     afficherLikes(r.likesLeft);
@@ -2838,6 +2985,7 @@
                         }, 450);
                     }
                 } catch (err) {
+                    marque.classList.remove('show');
                     if (err.code === 'QUOTA_LIKES') {
                         showVipModal("Tu as utilisé tes 3 Likes du jour ! Repasse demain ou débloque les Likes illimités 👑");
                     } else if (err.code === 'LIKE_DEJA_ENVOYE') {
@@ -2845,6 +2993,8 @@
                     } else {
                         alert("Like impossible pour le moment. Vérifie ta connexion.");
                     }
+                } finally {
+                    likeEnCours = false;
                 }
             };
 
@@ -2867,8 +3017,13 @@
 
             /* ---------- 1 bis. Passer un profil ----------
                Sans appel serveur, le profil repasserait au rechargement. */
+            let passEnCours = false;
+
             const _swipePassLocal = window.swipePass;
             window.swipePass = function () {
+                if (passEnCours || likeEnCours) return;   // un geste = un profil
+                passEnCours = true;
+                setTimeout(() => { passEnCours = false; }, 450);
                 const profil = (typeof profiles !== 'undefined')
                     ? profiles[typeof currentProfileIndex !== 'undefined' ? currentProfileIndex : 0]
                     : null;
@@ -3206,14 +3361,18 @@
             }
 
             /* ---------- 5. Envoyer un message ---------- */
+            let envoiEnCours = false;
+
             window.sendMessage = async function () {
                 const champ = $('chat-input');
                 const texte = champ.value.trim();
-                if (!texte) return;
+                if (!texte || envoiEnCours) return;          // pas de doublon
                 if (!matchCourant) { champ.value = ''; return; }
 
+                envoiEnCours = true;
                 champ.value = '';
                 bulle(texte, 'sent');
+                const derniere = $('chat-messages').lastElementChild;
 
                 try {
                     const r = await S.send(matchCourant.id, texte);
@@ -3227,7 +3386,17 @@
                         MESSAGE_TROP_LONG: 'message trop long (1000 caractères maximum)',
                         RESEAU: 'pas de connexion'
                     };
+                    // Le message n'est pas parti : on le rend visiblement en
+                    // échec et on le remet dans le champ, pour ne pas le perdre.
+                    if (derniere) {
+                        derniere.classList.remove('sent');
+                        derniere.classList.add('echec');
+                        derniere.setAttribute('title', 'Non envoyé');
+                    }
+                    if (!$('chat-input').value.trim()) $('chat-input').value = texte;
                     bulle('Message non envoyé : ' + (raisons[err.code] || 'réessaie dans un instant'), 'system');
+                } finally {
+                    envoiEnCours = false;
                 }
             };
 

@@ -5,13 +5,15 @@
    arrive souvent), et elle s'installe sur l'écran d'accueil.
 
    Règles simples et volontairement prudentes :
-     - les pages HTML : réseau d'abord, copie de secours quand on est hors ligne ;
-     - les fichiers du site (CSS, images, scripts) : copie locale d'abord ;
+     - les pages HTML et le code (JS, CSS) : réseau d'abord, copie de secours
+       quand on est hors ligne. Le code doit suivre les pages : servir un
+       ancien script avec une page neuve casse l'application ;
+     - les images et les polices : copie locale d'abord (elles ne changent pas) ;
      - l'API : jamais de copie. Un like, un message ou un match ne doit
        JAMAIS être servi depuis un cache : on veut la vérité, ou une erreur.
    --------------------------------------------------------------------------- */
 
-const VERSION = 'vienschop-v1';
+const VERSION = 'vienschop-v2';
 const COQUILLE = [
   './',
   './index.html',
@@ -67,7 +69,11 @@ self.addEventListener('fetch', (e) => {
   // Uniquement notre propre origine : les polices et icônes viennent de CDN.
   if (url.origin !== self.location.origin) return;
 
-  if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
+  const chemin = url.pathname;
+  const estCode = /\.(?:js|css)$/i.test(chemin);
+  const estPage = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+
+  if (estPage || estCode) {
     e.respondWith((async () => {
       try {
         const frais = await fetch(req);
@@ -78,6 +84,7 @@ self.addEventListener('fetch', (e) => {
         const cache = await caches.open(VERSION);
         const garde = await cache.match(req);
         if (garde) return garde;
+        if (estCode) return new Response('', { status: 504 });
         const secours = await cache.match('./hors-ligne.html');
         if (secours) return secours;
         return new Response('Hors ligne', { status: 503, headers: { 'Content-Type': 'text/plain' } });

@@ -70,6 +70,16 @@ Tous trouvés **en exécution**, pas en théorie. Les plus notables :
 5. Bouton « Se déconnecter » absent de l'écran Mon profil.
 6. Texte « Stockage de l'appareil » alors que les photos sont en ligne.
 7. Un profil bloqué restait dans la liste des discussions.
+8. Raccourcis de l'application installée ignorés (`?ecran=profil`, `?ecran=discussions`).
+9. Écran de démarrage bloqué sans compte ou avec une session morte.
+10. Double appui = deux likes / deux messages ; message raté qui disparaissait.
+11. Bouton de connexion sans réaction sur réseau lent.
+12. Retour du téléphone qui fermait l'application.
+13. Page qui glissait de travers sur un petit téléphone (menu ☰, formulaire lieu).
+14. Ancien script servi avec une page neuve par le service worker.
+15. Base sans la migration mot de passe : toute l'application répondait 500.
+
+Le détail complet est dans `ETAT-FONCTIONNEL.md`, section « Ce qui a été corrigé le 30/10 ».
 
 ## 4. Verdict honnête
 
