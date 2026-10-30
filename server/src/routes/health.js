@@ -1,16 +1,42 @@
 import { Router } from 'express';
 import { query, pool } from '../db.js';
 import { config } from '../config.js';
+import { aRecuperation, aChatMedia, aVerifications, aModeration } from '../capabilities.js';
 
 export const healthRouter = Router();
 
-healthRouter.get('/', (_req, res) => {
+/* Une capacité ne doit jamais faire attendre /api/health : si la base met
+   plus de 800 ms à répondre, on considère simplement que ce n'est pas prêt. */
+function avecDelai(promesse, ms = 800) {
+  return Promise.race([
+    promesse,
+    new Promise(resolve => setTimeout(() => resolve(false), ms))
+  ]).catch(() => false);
+}
+
+healthRouter.get('/', async (_req, res) => {
   // `features` permet au site de savoir ce que ce déploiement sait faire.
   // Sans ça, le navigateur essaie une route absente et reçoit une erreur.
+  // On y ajoute ce que la base accepte déjà : c'est le voyant qui dit si la
+  // migration SQL est passée, sans avoir à lire les logs de Render.
+  const [recuperation, chatMedia, verifications, moderation] = await Promise.all([
+    avecDelai(aRecuperation()),
+    avecDelai(aChatMedia()),
+    avecDelai(aVerifications()),
+    avecDelai(aModeration())
+  ]);
+
+  const features = ['password-auth', 'photos'];
+  if (recuperation) features.push('recuperation');
+  if (chatMedia) features.push('chat-media');
+  if (verifications) features.push('verifications');
+  if (moderation) features.push('moderation');
+  if (config.adminToken) features.push('admin');
+
   res.json({
     ok: true,
     service: 'viens-chop-api',
-    features: ['password-auth', 'photos'],
+    features,
     time: new Date().toISOString()
   });
 });

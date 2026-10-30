@@ -778,6 +778,16 @@ test('mot de passe oublié : la clé de secours récupère le compte', async () 
   ok('la clé générée depuis le profil sert bien de secours');
 });
 
+test('santé : /api/health annonce ce que la base accepte déjà', async () => {
+  const r = await api('/api/health', { auth: false });
+  assert.equal(r.status, 200);
+  const f = r.json.features || [];
+  assert.ok(f.includes('password-auth'), 'le site détecte le mode serveur avec ça');
+  assert.ok(f.includes('recuperation'), 'la clé de secours doit être annoncée');
+  assert.ok(f.includes('chat-media'));
+  ok('les capacités de la base sont annoncées', f.join(', '));
+});
+
 test('jeton : accès sans jeton refusé, refresh fonctionnel', async () => {
   const sans = await api('/api/feed');
   assert.equal(sans.status, 401);
