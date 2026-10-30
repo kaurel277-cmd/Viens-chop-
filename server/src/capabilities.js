@@ -1,14 +1,30 @@
 /* ---------------------------------------------------------------------------
-   Ce que la base sait faire, détecté une seule fois au démarrage.
+   Ce que la base sait faire.
 
    Pourquoi : le code est déployé avant que le SQL de migration soit exécuté
    dans Neon. Tant que la migration n'est pas passée, l'API ne doit pas
    planter : elle répond simplement « pas encore disponible » sur les routes
    concernées, et le reste du site continue de fonctionner.
+
+   Détail important : une réponse « pas encore » n'est gardée que 30 secondes.
+   Comme ça, la personne peut coller le SQL dans Neon et voir la fonctionnalité
+   s'activer toute seule, sans redéployer quoi que ce soit.
    --------------------------------------------------------------------------- */
 import { query } from './db.js';
 
-const cache = { verifications: null, moderation: null, adminActions: null, chatMedia: null };
+const TTL_MS = 30 * 1000;
+
+const cache = {
+  verifications: null, verificationsAt: 0,
+  moderation: null, moderationAt: 0,
+  adminActions: null, adminActionsAt: 0,
+  chatMedia: null, chatMediaAt: 0
+};
+
+function encoreValable(valeur, at) {
+  if (valeur === true) return true;                 // c'est en place, on garde
+  return valeur !== null && Date.now() - at < TTL_MS;
+}
 
 async function tableExiste(nom) {
   try {
@@ -19,41 +35,47 @@ async function tableExiste(nom) {
   }
 }
 
+async function capacite(cle, detecter) {
+  if (encoreValable(cache[cle], cache[cle + 'At'])) return cache[cle];
+  const valeur = await detecter();
+  cache[cle] = valeur;
+  cache[cle + 'At'] = Date.now();
+  return valeur;
+}
+
 export async function aVerifications() {
-  if (cache.verifications === null) cache.verifications = await tableExiste('verifications');
-  return cache.verifications;
+  return capacite('verifications', () => tableExiste('verifications'));
 }
 
 export async function aAdminActions() {
-  if (cache.adminActions === null) cache.adminActions = await tableExiste('admin_actions');
-  return cache.adminActions;
+  return capacite('adminActions', () => tableExiste('admin_actions'));
 }
 
 export async function aModeration() {
-  if (cache.moderation === null) {
+  return capacite('moderation', async () => {
     try {
       const { rows } = await query(
         `select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'photos'
             and column_name = 'moderation_status' limit 1`
       );
-      cache.moderation = rows.length > 0;
+      return rows.length > 0;
     } catch {
-      cache.moderation = false;
+      return false;
     }
-  }
-  return cache.moderation;
+  });
 }
 
 export async function aChatMedia() {
-  if (cache.chatMedia === null) cache.chatMedia = await tableExiste('chat_media');
-  return cache.chatMedia;
+  return capacite('chatMedia', () => tableExiste('chat_media'));
 }
 
 /** Réinitialise le cache (utilisé par les tests). */
 export function oublierCapacites() {
-  cache.verifications = null;
-  cache.moderation = null;
-  cache.adminActions = null;
-  cache.chatMedia = null;
+  Object.keys(cache).forEach(k => {
+    if (!k.endsWith('At')) cache[k] = null;
+  });
+  Object.keys(cache).forEach(k => {
+    if (k.endsWith('At')) cache[k] = 0;
+  });
 }
