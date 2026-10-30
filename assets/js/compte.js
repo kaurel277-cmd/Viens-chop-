@@ -268,10 +268,21 @@ window.VCCompte = (function () {
     let configEnCours = null;
 
     /* Appelée par plusieurs modules : la détection n'est faite qu'une fois. */
+    const KEY_API = 'vc_api_base';
+    const API_DEFAUT = 'https://viens-chop-api.onrender.com';
+
     function configure(options) {
         if (!configEnCours) {
             configEnCours = (async () => {
-                API_BASE = (options && options.api) || '';
+                // Le serveur choisi une fois (?api=...) est mémorisé : passer de
+                // l'inscription à l'application ne doit pas changer de serveur
+                // et invalider la session qui vient de s'ouvrir.
+                // ?api=reset oublie le serveur mémorisé.
+                const demande = String((options && options.api) || '').trim();
+                if (demande === 'reset') store.del(KEY_API);
+                const memo = store.get(KEY_API) || '';
+                API_BASE = (demande && demande !== 'reset') ? demande : (memo || API_DEFAUT);
+                if (demande && demande !== 'reset' && /^https?:\/\//i.test(demande)) store.set(KEY_API, demande);
                 if (lireVœuHorsLigne()) { mode = 'local'; return mode; }
                 if (API_BASE && window.VCAPI) {
                     window.VCAPI.configure(API_BASE);
@@ -348,18 +359,30 @@ window.VCCompte = (function () {
         store.del(KEY_SESSION);
     }
 
+    /* Les écrans parlent en français, le serveur stocke des lettres. */
+    const GENRE_SERVEUR = { homme: 'M', h: 'M', m: 'M', femme: 'F', f: 'F' };
+    const RECHERCHE_SERVEUR = { homme: 'M', h: 'M', m: 'M', femme: 'F', f: 'F', tous: 'A', tout: 'A', a: 'A' };
+    const enLettre = (table, v) => {
+        if (!v) return undefined;
+        const k = String(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+        return table[k];
+    };
+
     async function update(patch) {
         if (mode === 'api') {
             const envoi = {};
             if (patch.name !== undefined) envoi.pseudo = patch.name;
             if (patch.birth !== undefined) envoi.birth_date = patch.birth;
             if (patch.commune !== undefined) envoi.commune = patch.commune;
-            if (patch.gender !== undefined) envoi.gender = patch.gender;
+            if (patch.gender !== undefined) envoi.gender = enLettre(GENRE_SERVEUR, patch.gender) || patch.gender;
+            if (patch.seeking !== undefined) envoi.seeking = enLettre(RECHERCHE_SERVEUR, patch.seeking) || patch.seeking;
             if (patch.artists !== undefined) envoi.artists = patch.artists;
             if (Object.keys(envoi).length) {
-                await window.VCAPI.users.updateProfile(envoi);
-                const p = profilEnCache() || {};
-                cacheProfil(Object.assign({}, p, patch));
+                const rep = await window.VCAPI.users.updateProfile(envoi);
+                const avant = profilEnCache() || {};
+                const apres = (rep && rep.user) ? versProfil(rep.user) : Object.assign({}, avant, patch);
+                // On garde ce que le serveur ne renvoie pas dans cette réponse
+                cacheProfil(Object.assign({}, avant, apres, { photos: (avant.photos || []) }));
             }
             return profilEnCache();
         }

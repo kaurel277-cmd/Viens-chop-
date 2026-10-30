@@ -232,6 +232,20 @@
     },
     send(matchId, body) {
       return request('/api/matches/' + matchId + '/messages', { method: 'POST', body: { body } });
+    },
+    media(matchId) {
+      return request('/api/matches/' + matchId + '/media');
+    },
+    async sendMedia(matchId, blob, kind) {
+      const data = await blobToBase64(blob);
+      return request('/api/matches/' + matchId + '/media', {
+        method: 'POST',
+        body: { data, mime: blob.type || 'image/jpeg', kind }
+      });
+    },
+    ouvrirMedia(matchId, mediaId) {
+      return request('/api/matches/' + matchId + '/media/' + encodeURIComponent(mediaId) + '/ouvrir',
+        { method: 'POST' });
     }
   };
 

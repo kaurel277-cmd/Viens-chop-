@@ -7,12 +7,32 @@ export const usersRouter = Router();
 
 const SEEKING_RULE = { M: 'F', F: 'A' };
 
+/* L'écran d'inscription parle en français (« Homme », « Femme », « Tous »),
+   le serveur stocke des lettres. On accepte les deux pour ne jamais perdre
+   un profil à cause d'un libellé. */
+const GENRES = { M: 'M', H: 'M', HOMME: 'M', F: 'F', FEMME: 'F' };
+const RECHERCHES = { M: 'M', H: 'M', HOMME: 'M', F: 'F', FEMME: 'F', A: 'A', TOUS: 'A', TOUT: 'A' };
+
+const sansAccent = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase();
+
+function normaliserGenre(v) {
+  if (v === undefined || v === null || v === '') return undefined;
+  return GENRES[sansAccent(v)];
+}
+function normaliserRecherche(v) {
+  if (v === undefined || v === null || v === '') return undefined;
+  return RECHERCHES[sansAccent(v)];
+}
+
 /* ---------------------------------------------------------------------------
    POST /api/users/me — finalise le profil juste après l'inscription
    --------------------------------------------------------------------------- */
 usersRouter.post('/me', requireAuth, async (req, res, next) => {
   try {
-    const { pseudo, birth_date, gender, commune, artists, bio } = req.body || {};
+    const body = req.body || {};
+    const { pseudo, birth_date, commune, artists, bio } = body;
+    const gender = normaliserGenre(body.gender);
+    const recherche = normaliserRecherche(body.seeking);
 
     if (pseudo !== undefined) {
       const p = String(pseudo).trim();
@@ -23,15 +43,16 @@ usersRouter.post('/me', requireAuth, async (req, res, next) => {
     if (commune !== undefined && String(commune).trim().length < 2) {
       throw new AppError(400, 'COMMUNE_INVALIDE', 'Choisis une commune ou une ville.');
     }
-    if (gender !== undefined && !['M', 'F'].includes(gender)) {
+    if (body.gender !== undefined && body.gender !== null && body.gender !== '' && !gender) {
       throw new AppError(400, 'GENRE_INVALIDE', 'Genre invalide.');
     }
     if (artists !== undefined && (!Array.isArray(artists) || artists.length > 12)) {
       throw new AppError(400, 'ARTISTES_INVALIDE', '12 artistes maximum.');
     }
 
-    // seeking n'est jamais fourni par le client : il est déduit côté serveur
-    const seeking = gender ? SEEKING_RULE[gender] : undefined;
+    // « Je recherche » : le choix de la personne est respecté quand il est fourni,
+    // sinon on retombe sur la règle par défaut liée au genre.
+    const seeking = recherche !== undefined ? recherche : (gender ? SEEKING_RULE[gender] : undefined);
 
     const { rows } = await query(
       `update public.users set

@@ -61,6 +61,26 @@ create index if not exists photos_moderation_idx
     on public.photos (moderation_status, created_at desc);
 
 -- ----------------------------------------------------------------------------
+-- 2 bis. Médias échangés dans les discussions (vue unique obligatoire)
+--    Le contenu est effacé dès la première ouverture par l'autre personne :
+--    la ligne reste, avec data = NULL, pour que l'expéditeur voie « vue ».
+-- ----------------------------------------------------------------------------
+create table if not exists public.chat_media (
+    id         uuid primary key default gen_random_uuid(),
+    match_id   uuid not null references public.matches(id) on delete cascade,
+    sender_id  uuid not null references public.users(id) on delete cascade,
+    kind       text not null check (kind in ('photo','video')),
+    mime       text not null,
+    bytes      integer not null,
+    data       bytea,
+    viewed_at  timestamptz,
+    created_at timestamptz not null default now()
+);
+
+create index if not exists chat_media_match_idx
+    on public.chat_media (match_id, created_at desc);
+
+-- ----------------------------------------------------------------------------
 -- 3. Journal des actions d'administration (qui a validé quoi, quand)
 -- ----------------------------------------------------------------------------
 create table if not exists public.admin_actions (
@@ -80,6 +100,7 @@ create index if not exists admin_actions_created_idx
 select
     (to_regclass('public.verifications')  is not null) as table_verifications,
     (to_regclass('public.admin_actions')  is not null) as table_admin_actions,
+    (to_regclass('public.chat_media')     is not null) as table_chat_media,
     exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'photos'
                and column_name = 'moderation_status')     as colonne_moderation;

@@ -8,7 +8,7 @@
    --------------------------------------------------------------------------- */
 import { query } from './db.js';
 
-const cache = { verifications: null, moderation: null, adminActions: null };
+const cache = { verifications: null, moderation: null, adminActions: null, chatMedia: null };
 
 async function tableExiste(nom) {
   try {
@@ -45,9 +45,15 @@ export async function aModeration() {
   return cache.moderation;
 }
 
+export async function aChatMedia() {
+  if (cache.chatMedia === null) cache.chatMedia = await tableExiste('chat_media');
+  return cache.chatMedia;
+}
+
 /** Réinitialise le cache (utilisé par les tests). */
 export function oublierCapacites() {
   cache.verifications = null;
   cache.moderation = null;
   cache.adminActions = null;
+  cache.chatMedia = null;
 }

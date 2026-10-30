@@ -432,7 +432,7 @@
 
             // Serveur si disponible, sinon enregistrement sur l'appareil.
             const apiChoisie = new URLSearchParams(location.search).get('api');
-            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
+            await C.configure({ api: apiChoisie });
 
             const MIN = C.MIN_PASSWORD;
             let busy = false;

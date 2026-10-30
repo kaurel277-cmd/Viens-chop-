@@ -1102,7 +1102,7 @@
                     const el = document.getElementById('setup-name');
                     if (el) el.value = me.name;
                 }
-                goTo('discover');
+                ouvrirSelonProfil();
             }).catch(err => {
                 const messages = {
                     COMPTE_INTROUVABLE: "Aucun compte avec ce numéro. Inscris-toi d'abord.",
@@ -1112,9 +1112,32 @@
             });
         }
 
+        /* Un compte tout neuf n'a ni prénom choisi, ni « je cherche », ni photo :
+           il apparaîtrait comme « Membre » et ne verrait personne. On l'envoie
+           donc compléter son profil avant d'entrer dans le fil. */
+        function profilIncomplet(compte) {
+            if (!compte) return false;
+            const nomAuto = !compte.name || /^membre\d+$/i.test(String(compte.name));
+            return nomAuto || !compte.gender;
+        }
+
+        function ouvrirSelonProfil() {
+            const C = window.VCCompte;
+            const compte = C && C.current ? C.current() : null;
+            if (C && C.mode === 'api' && compte && profilIncomplet(compte)) {
+                const nom = document.getElementById('setup-name');
+                if (nom && !nom.value && compte.name && !/^membre\d+$/i.test(compte.name)) nom.value = compte.name;
+                const naiss = document.getElementById('setup-birth');
+                if (naiss && !naiss.value && compte.birth) naiss.value = compte.birth;
+                goTo('profile-setup');
+                return;
+            }
+            goTo('discover');
+        }
+
         function startApp() {
             const C = window.VCCompte;
-            if (C && C.isLoggedIn()) { goTo('discover'); return; }
+            if (C && C.isLoggedIn()) { ouvrirSelonProfil(); return; }
             goTo('login');
         }
 
@@ -1330,18 +1353,35 @@
             }
         }
 
-        function finishProfile() {
-            // On garde le profil dans le compte local : il sera rechargé au prochain passage.
+        async function finishProfile() {
             const C = window.VCCompte;
             if (C && C.isLoggedIn() && typeof userProfile !== 'undefined' && userProfile) {
-                C.update({
-                    name: userProfile.name,
-                    gender: userProfile.gender,
-                    seeking: userProfile.seeking,
-                    commune: userProfile.city
-                });
+                // Les artistes cochés à l'étape 2 sont ce que les autres voient
+                // en premier : on les enregistre avec le reste du profil.
+                const coches = Array.from(document.querySelectorAll('#setup-step-2 .tag.selected'))
+                    .map(t => t.textContent.replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]/gu, '').trim())
+                    .filter(Boolean)
+                    .slice(0, 12);
+
+                try {
+                    await C.update({
+                        name: userProfile.name,
+                        birth: userProfile.birth,
+                        gender: userProfile.gender,
+                        seeking: userProfile.seeking,
+                        commune: userProfile.city,
+                        artists: coches
+                    });
+                } catch (e) {
+                    alert('Profil enregistré sur cet appareil, mais le serveur n\'a pas répondu. Tu pourras réessayer depuis Mon profil.');
+                }
             }
-            loadProfile(0);
+            const C2 = window.VCCompte;
+            if (C2 && C2.mode === 'api' && typeof window.rechargerFil === 'function') {
+                await window.rechargerFil();
+            } else {
+                loadProfile(0);
+            }
             goTo('discover');
         }
 
@@ -2021,7 +2061,7 @@
             // On tente le serveur ; s'il ne répond pas, on reste en local.
             // ?api=... permet de viser un serveur local pendant les tests
             const apiChoisie = new URLSearchParams(location.search).get('api');
-            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
+            await C.configure({ api: apiChoisie });
             if (!C.isLoggedIn()) return;
 
             const me = C.current();
@@ -2299,6 +2339,37 @@
 
             /* ---------- Vue unique dans le chat ---------- */
             window.sendVueUnique = async function (kind) {
+                // En mode connecté, le média part au serveur : c'est la seule
+                // façon que l'autre personne le reçoive vraiment.
+                // La conversation ouverte est tenue par l'autre module : on lit la
+                // valeur partagée, sinon cette fonction ne saurait pas à qui envoyer.
+                const courant = window.matchCourant || null;
+                const S = window.VCSo;          // ce module-ci ne l'a pas en portée
+                if (SERVEUR && courant && window.VCAPI && S) {
+                    const fichier = await M.pickFile({ kind });
+                    if (!fichier) return;
+                    try {
+                        const c = kind === 'video'
+                            ? { blob: fichier }
+                            : await M.compressImage(fichier, { maxSide: 1100, target: 280 * 1024 });
+                        const media = await S.envoyerMedia(courant.id, c.blob, kind);
+                        window.dessinerMediaBulle({
+                            id: media.id, kind: media.kind, aMoi: true,
+                            vue: false, disponible: true
+                        });
+                    } catch (err) {
+                        const raisons = {
+                            CHAT_MEDIA_INDISPONIBLE: "L'envoi de photos dans la discussion s'active très bientôt.",
+                            MEDIA_TROP_LOURD: kind === 'video' ? 'Vidéo trop lourde (3 Mo).' : 'Photo trop lourde (400 Ko).',
+                            CONVERSATION_BLOQUEE: 'Cette conversation est fermée.',
+                            VIDEO_TROP_LONGUE: 'Vidéo trop longue (15 secondes maximum).',
+                            VIDEO_TROP_LOURDE: 'Vidéo trop lourde (3 Mo maximum).'
+                        };
+                        alert(raisons[err.code] || "Envoi impossible. Vérifie ta connexion.");
+                    }
+                    return;
+                }
+
                 const rec = await M.pick({
                     kind,
                     viewOnce: true,
@@ -2462,11 +2533,17 @@
             if (!C || !S) return;
 
             const apiChoisie = new URLSearchParams(location.search).get('api');
-            await C.configure({ api: apiChoisie || 'https://viens-chop-api.onrender.com' });
+            await C.configure({ api: apiChoisie });
             if (C.mode !== 'api' || !C.isLoggedIn()) return;
 
             S.brancher(window.VCAPI);
             document.body.dataset.mode = 'serveur';
+
+            // Compte incomplet (pseudo automatique « membre… » ou « je cherche »
+            // pas encore choisi) : on ouvre l'écran de profil au lieu du fil.
+            if (profilIncomplet(C.current()) && !new URLSearchParams(location.search).get('ecran')) {
+                setTimeout(() => goTo('profile-setup'), 300);
+            }
 
             /* ---------- Petits utilitaires ---------- */
             const $ = id => document.getElementById(id);
@@ -2636,6 +2713,139 @@
                 }).join('');
             };
 
+            /* ---------- 3 bis. Médias en vue unique venus du serveur ---------- */
+            const mediasVus = new Set();
+            let ouvrirMediaEnCours = false;
+
+            function dessinerMediaBulle(m, forcer) {
+                const zone = $('chat-messages');
+                if (!zone || !m || !m.id) return;
+                const cle = m.id + ':' + (m.vue ? 'vue' : 'neuf');
+                if (!forcer && mediasVus.has(cle)) return;
+                mediasVus.add(cle);
+
+                // Un média déjà affiché avec l'état « neuve » est mis à jour si
+                // l'autre personne vient de l'ouvrir (l'expéditeur voit « Vue »).
+                const ancienne = zone.querySelector('[data-media-id="' + m.id + '"]');
+                if (ancienne) ancienne.remove();
+
+                const bulle = document.createElement('div');
+                bulle.className = 'msg ' + (m.aMoi ? 'sent' : 'received') + ' anim-slide-up';
+                bulle.dataset.mediaId = m.id;
+                bulle.style.cssText = 'padding:0; overflow:hidden; cursor:pointer; max-width:230px;';
+
+                const etiquette = m.kind === 'video' ? '🎬 Vidéo' : '📷 Photo';
+                let sousTitre;
+                if (m.aMoi) {
+                    sousTitre = m.disponible && !m.vue ? 'Envoyée · en attente' : 'Vue 👁️';
+                } else {
+                    sousTitre = m.disponible && !m.vue ? 'Appuie pour ouvrir · une seule fois' : 'Déjà vue 👁️';
+                }
+
+                bulle.innerHTML =
+                    '<div style="padding:12px 14px; display:flex; align-items:center; gap:10px;">' +
+                        '<span style="font-size:20px;">' + (m.vue || !m.disponible ? '👁️' : '👁️‍🗨️') + '</span>' +
+                        '<div>' +
+                            '<div style="font-weight:800; font-size:13px;">' + etiquette + ' en vue unique</div>' +
+                            '<div style="font-size:11px; opacity:.75;">' + sousTitre + '</div>' +
+                        '</div>' +
+                    '</div>';
+
+                bulle.onclick = () => ouvrirMediaServeur(m, bulle);
+                zone.appendChild(bulle);
+                zone.scrollTop = zone.scrollHeight;
+            }
+
+            // L'envoi de média vit dans l'autre module : il lui faut ce point d'entrée.
+            window.dessinerMediaBulle = (m, forcer) => dessinerMediaBulle(m, forcer);
+
+            async function ouvrirMediaServeur(m, bulle) {
+                if (!matchCourant || ouvrirMediaEnCours) return;
+                if (m.aMoi) {
+                    messageHaut(m.vue || !m.disponible ? 'Cette personne a déjà regardé ton média.' : 'En attente : elle ne l\'a pas encore ouvert.', '#37474f');
+                    return;
+                }
+                if (m.vue || !m.disponible) {
+                    messageHaut('Ce média a déjà été regardé. Il n\'existe plus.', '#37474f');
+                    return;
+                }
+                ouvrirMediaEnCours = true;
+                try {
+                    const r = await S.ouvrirMedia(matchCourant.id, m.id);
+                    afficherMediaDistant(r, bulle);
+                } catch (err) {
+                    messageHaut(err.code === 'MEDIA_DEJA_VU'
+                        ? 'Ce média a déjà été regardé.'
+                        : 'Impossible d\'ouvrir ce média.', '#E5484D');
+                } finally {
+                    ouvrirMediaEnCours = false;
+                }
+            }
+
+            function afficherMediaDistant(r, bulle) {
+                const binaire = atob(r.data);
+                const octets = new Uint8Array(binaire.length);
+                for (let i = 0; i < binaire.length; i++) octets[i] = binaire.charCodeAt(i);
+                const blob = new Blob([octets], { type: r.mime || (r.kind === 'video' ? 'video/mp4' : 'image/jpeg') });
+                const url = URL.createObjectURL(blob);
+
+                const voile = document.createElement('div');
+                voile.setAttribute('role', 'dialog');
+                voile.setAttribute('aria-label', 'Média en vue unique');
+                voile.style.cssText = 'position:fixed; inset:0; background:#000; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
+
+                const entete = document.createElement('div');
+                entete.style.cssText = 'position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:18px 20px; color:#fff; font-size:12px; font-weight:700;';
+                const compte = document.createElement('span');
+                compte.textContent = '⏳ 8 s';
+                const fermer = document.createElement('button');
+                fermer.type = 'button';
+                fermer.setAttribute('aria-label', 'Fermer');
+                fermer.style.cssText = 'background:rgba(255,255,255,.15); border:none; color:#fff; width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer;';
+                fermer.textContent = '✕';
+                entete.append(compte, fermer);
+
+                let media;
+                if (r.kind === 'video') {
+                    media = document.createElement('video');
+                    media.src = url; media.controls = true; media.autoplay = true; media.playsInline = true;
+                } else {
+                    media = document.createElement('img');
+                    media.src = url; media.alt = 'Photo en vue unique';
+                }
+                media.style.cssText = 'max-width:100%; max-height:78vh; border-radius:14px; object-fit:contain;';
+
+                const pied = document.createElement('p');
+                pied.style.cssText = 'position:absolute; bottom:22px; left:20px; right:20px; text-align:center; color:rgba(255,255,255,.6); font-size:12px;';
+                pied.textContent = 'Ce média est déjà effacé du serveur : il disparaît à la fermeture.';
+
+                voile.append(entete, media, pied);
+                document.body.appendChild(voile);
+
+                let reste = 8;
+                const minuteur = setInterval(() => {
+                    reste--;
+                    compte.textContent = '⏳ ' + reste + ' s';
+                    if (reste <= 0) fin();
+                }, 1000);
+
+                function fin() {
+                    clearInterval(minuteur);
+                    voile.remove();
+                    URL.revokeObjectURL(url);
+                    if (bulle) {
+                        bulle.dataset.vue = '1';
+                        const sous = bulle.querySelector('div > div:last-child');
+                        if (sous) sous.textContent = 'Déjà vue 👁️';
+                    }
+                }
+                fermer.onclick = fin;
+                voile.addEventListener('click', e => { if (e.target === voile) fin(); });
+                document.addEventListener('keydown', function esc(e) {
+                    if (e.key === 'Escape') { document.removeEventListener('keydown', esc); fin(); }
+                });
+            }
+
             /* ---------- 4. Ouvrir une conversation réelle ---------- */
             let matchCourant = null;
             const vus = new Set();          // identifiants de messages déjà affichés
@@ -2647,6 +2857,7 @@
                 } catch (e) { alert('Conversation indisponible.'); return; }
 
                 matchCourant = infos.find(m => m.id === matchId) || null;
+                window.matchCourant = matchCourant;   // partagé avec l'envoi de médias
                 if (!matchCourant) { alert('Match introuvable.'); return; }
 
                 let conv;
@@ -2668,6 +2879,21 @@
                 // qu'on vient d'envoyer réapparaissait en double au tour suivant.
                 vus.clear();
                 conv.messages.forEach(m => vus.add(m.id));
+                mediasVus.clear();
+
+                // Les médias déjà échangés (reçus et envoyés) sont réaffichés
+                // tels quels : l'expéditeur voit « Vue » une fois ouvert.
+                try {
+                    const liste = await S.mediaListe(matchId);
+                    const monId = (window.VCCompte.current() || {}).id;
+                    (liste.media || []).forEach(mm => dessinerMediaBulle({
+                        id: mm.id,
+                        kind: mm.kind,
+                        aMoi: mm.sender_id === monId,
+                        vue: mm.vue,
+                        disponible: mm.encore_disponible
+                    }, true));
+                } catch (e) { /* médias indisponibles : la discussion marche quand même */ }
 
                 S.suivre(matchId, (nouveaux, tout) => {
                     const moi = (window.VCCompte.current() || {}).id;
@@ -2677,6 +2903,14 @@
                         bulle(m.body, m.sender_id === moi ? 'sent' : 'received', m.created_at);
                     });
                     zone.scrollTop = zone.scrollHeight;
+                }, null, (medias, monId) => {
+                    (medias || []).forEach(mm => dessinerMediaBulle({
+                        id: mm.id,
+                        kind: mm.kind,
+                        aMoi: mm.sender_id === monId,
+                        vue: mm.vue,
+                        disponible: mm.encore_disponible
+                    }));
                 });
             };
 
@@ -2884,6 +3118,7 @@
                 if (cible.origine === 'chat') {
                     S.close();
                     matchCourant = null;
+                    window.matchCourant = null;
                     goTo('discussions');
                     renderConversations();
                 } else {

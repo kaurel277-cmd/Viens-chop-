@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../db.js';
 import { requireAuth } from '../auth.js';
 import { AppError } from '../errors.js';
+import { aChatMedia } from '../capabilities.js';
 
 export const matchesRouter = Router();
 
@@ -129,6 +130,115 @@ matchesRouter.post('/:id/messages', requireAuth, async (req, res, next) => {
 /* ---------------------------------------------------------------------------
    Aide : charge un match en vérifiant que l'utilisateur y participe.
    --------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   MÉDIAS EN VUE UNIQUE (photos et vidéos échangées dans une discussion)
+
+   Règle du produit : ce qui est envoyé ne peut être regardé qu'une fois.
+   Côté serveur, ça veut dire :
+     - le fichier est stocké dans Neon, pas sur l'appareil ;
+     - seul l'autre participant peut l'ouvrir ;
+     - dès la première ouverture, le contenu est effacé et la ligne est
+       marquée « vue » : impossible de le rouvrir, même en rejouant la requête.
+   --------------------------------------------------------------------------- */
+const MEDIA_MAX = { photo: 400 * 1024, video: 3 * 1024 * 1024 };
+
+function decodeMedia(data) {
+  const clean = String(data || '').replace(/^data:[^;]+;base64,/, '');
+  if (!/^[A-Za-z0-9+/=\s]+$/.test(clean)) throw new AppError(400, 'MEDIA_INVALIDE', 'Fichier illisible.');
+  const buf = Buffer.from(clean, 'base64');
+  if (!buf.length) throw new AppError(400, 'MEDIA_VIDE', 'Fichier vide.');
+  return buf;
+}
+
+matchesRouter.post('/:id/media', requireAuth, async (req, res, next) => {
+  try {
+    if (!(await aChatMedia())) {
+      throw new AppError(503, 'CHAT_MEDIA_INDISPONIBLE',
+        "L'envoi de photos et de vidéos s'active dès que la base est mise à jour.");
+    }
+    const match = await loadMatch(req.params.id, req.user.id);
+
+    const bloque = await query(
+      `select 1 from public.blocks
+        where (blocker_id = $1 and blocked_id = $2) or (blocker_id = $2 and blocked_id = $1)`,
+      [req.user.id, match.other_id]
+    );
+    if (bloque.rowCount) throw new AppError(403, 'CONVERSATION_BLOQUEE', "Cette conversation n'est plus disponible.");
+
+    const { data, mime, kind } = req.body || {};
+    if (!['photo', 'video'].includes(kind)) {
+      throw new AppError(400, 'TYPE_INVALIDE', 'Type attendu : photo ou video.');
+    }
+    const buf = decodeMedia(data);
+    if (buf.length > MEDIA_MAX[kind]) {
+      throw new AppError(413, 'MEDIA_TROP_LOURD',
+        kind === 'video' ? 'Vidéo trop lourde (3 Mo maximum).' : 'Photo trop lourde (400 Ko maximum).');
+    }
+
+    const { rows } = await query(
+      `insert into public.chat_media (match_id, sender_id, kind, mime, bytes, data)
+       values ($1, $2, $3, $4, $5, $6)
+       returning id, kind, mime, bytes, created_at`,
+      [match.id, req.user.id, kind, String(mime || 'image/jpeg').slice(0, 40), buf.length, buf]
+    );
+
+    res.status(201).json({ ok: true, media: rows[0] });
+  } catch (err) { next(err); }
+});
+
+/* Liste des médias de la discussion (sans le contenu) */
+matchesRouter.get('/:id/media', requireAuth, async (req, res, next) => {
+  try {
+    if (!(await aChatMedia())) return res.json({ ok: true, disponible: false, media: [] });
+    const match = await loadMatch(req.params.id, req.user.id);
+
+    const { rows } = await query(
+      `select id, sender_id, kind, mime, bytes, created_at,
+              (viewed_at is not null) as vue,
+              (data is not null) as encore_disponible
+         from public.chat_media
+        where match_id = $1
+        order by created_at asc
+        limit 100`,
+      [match.id]
+    );
+    res.json({ ok: true, disponible: true, media: rows, moi: req.user.id });
+  } catch (err) { next(err); }
+});
+
+/* Ouverture : une seule fois, pour l'autre personne, puis le contenu disparaît */
+matchesRouter.post('/:id/media/:mediaId/ouvrir', requireAuth, async (req, res, next) => {
+  try {
+    if (!(await aChatMedia())) throw new AppError(503, 'CHAT_MEDIA_INDISPONIBLE', "Indisponible pour le moment.");
+    const match = await loadMatch(req.params.id, req.user.id);
+
+    const { rows } = await query(
+      `select id, sender_id, kind, mime, data, viewed_at
+         from public.chat_media
+        where id = $1 and match_id = $2`,
+      [req.params.mediaId, match.id]
+    );
+    if (!rows.length) throw new AppError(404, 'MEDIA_INTROUVABLE', 'Média introuvable.');
+
+    const m = rows[0];
+    if (m.sender_id === req.user.id) {
+      throw new AppError(403, 'MEDIA_DE_SOI', "C'est toi qui l'as envoyé.");
+    }
+    if (m.viewed_at || !m.data) {
+      throw new AppError(410, 'MEDIA_DEJA_VU', 'Ce média a déjà été regardé.');
+    }
+
+    // On efface le contenu AVANT de répondre : même une deuxième requête
+    // simultanée ne pourra plus le récupérer.
+    await query(
+      `update public.chat_media set viewed_at = now(), data = null where id = $1 and viewed_at is null`,
+      [m.id]
+    );
+
+    res.json({ ok: true, kind: m.kind, mime: m.mime, data: m.data.toString('base64') });
+  } catch (err) { next(err); }
+});
+
 async function loadMatch(matchId, userId) {
   const { rows } = await query(
     `select id, user_a, user_b, unlocked_at,

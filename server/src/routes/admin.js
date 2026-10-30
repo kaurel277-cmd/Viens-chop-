@@ -3,7 +3,7 @@ import { query } from '../db.js';
 import { requireAdmin, jetonAdminValide, creerJetonAdmin } from '../auth.js';
 import { AppError } from '../errors.js';
 import { config } from '../config.js';
-import { aVerifications, aModeration, aAdminActions } from '../capabilities.js';
+import { aVerifications, aModeration, aAdminActions, aChatMedia } from '../capabilities.js';
 
 export const adminRouter = Router();
 
@@ -32,7 +32,8 @@ adminRouter.get('/etat', async (_req, res) => {
     ok: true,
     configuree: !!config.adminToken,
     verifications: await aVerifications(),
-    moderation: await aModeration()
+    moderation: await aModeration(),
+    chatMedia: await aChatMedia()
   });
 });
 

@@ -513,6 +513,78 @@ test('modération : une photo douteuse part en vérification, une photo correcte
   ok('photo retirée : elle n\'est plus servie (404)');
 });
 
+test('médias de discussion : envoyés, reçus une seule fois, puis effacés', async () => {
+  const a = await signup('+2250701000130', 'MediaA', { gender: 'F' });
+  const b = await signup('+2250701000131', 'MediaB', { gender: 'M' });
+
+  await api('/api/likes', { method: 'POST', token: a.token, body: { user_id: b.id } });
+  const l2 = await api('/api/likes', { method: 'POST', token: b.token, body: { user_id: a.id } });
+  const matchId = l2.json.match_id;
+  assert.ok(matchId);
+
+  const image = Buffer.from('photo-en-vue-unique-' + Date.now()).toString('base64');
+  const envoi = await api('/api/matches/' + matchId + '/media', {
+    method: 'POST', token: a.token, body: { data: image, mime: 'image/jpeg', kind: 'photo' }
+  });
+  assert.equal(envoi.status, 201, JSON.stringify(envoi.json));
+  ok('photo envoyée dans la discussion', 'stockée côté serveur');
+
+  const coteB = await api('/api/matches/' + matchId + '/media', { token: b.token });
+  assert.equal(coteB.json.media.length, 1);
+  assert.equal(coteB.json.media[0].encore_disponible, true);
+  assert.equal(coteB.json.media[0].vue, false);
+  ok("l'autre personne voit qu'un média l'attend");
+
+  // L'expéditeur ne peut pas ouvrir son propre média
+  const soi = await api('/api/matches/' + matchId + '/media/' + coteB.json.media[0].id + '/ouvrir', {
+    method: 'POST', token: a.token
+  });
+  assert.equal(soi.status, 403);
+  ok("l'expéditeur ne peut pas ouvrir son propre média");
+
+  // Première ouverture : le contenu est renvoyé et effacé aussitôt
+  const ouvre = await api('/api/matches/' + matchId + '/media/' + coteB.json.media[0].id + '/ouvrir', {
+    method: 'POST', token: b.token
+  });
+  assert.equal(ouvre.status, 200);
+  assert.ok(ouvre.json.data.length > 0);
+  ok('première ouverture : contenu reçu');
+
+  // Deuxième ouverture : impossible
+  const encore = await api('/api/matches/' + matchId + '/media/' + coteB.json.media[0].id + '/ouvrir', {
+    method: 'POST', token: b.token
+  });
+  assert.equal(encore.status, 410);
+  ok('deuxième ouverture refusée', 'MEDIA_DEJA_VU');
+
+  // Le contenu n'existe plus en base
+  const { rows } = await query('select data, viewed_at from public.chat_media where id = $1',
+    [coteB.json.media[0].id]);
+  assert.equal(rows[0].data, null);
+  assert.ok(rows[0].viewed_at);
+  ok('le fichier est effacé de la base après la vue');
+
+  // L'expéditeur voit que c'est vu
+  const coteA = await api('/api/matches/' + matchId + '/media', { token: a.token });
+  assert.equal(coteA.json.media[0].vue, true);
+  assert.equal(coteA.json.media[0].encore_disponible, false);
+  ok("l'expéditeur voit « vue »");
+
+  // Un média trop lourd est refusé
+  const gros = Buffer.alloc(500 * 1024, 65).toString('base64');
+  const refus = await api('/api/matches/' + matchId + '/media', {
+    method: 'POST', token: a.token, body: { data: gros, mime: 'image/jpeg', kind: 'photo' }
+  });
+  assert.equal(refus.status, 413);
+  ok('photo trop lourde refusée (413)');
+
+  // Un tiers n'a pas accès aux médias
+  const c = await signup('+2250701000132', 'MediaC', { gender: 'M' });
+  const intrus = await api('/api/matches/' + matchId + '/media', { token: c.token });
+  assert.equal(intrus.status, 404);
+  ok('un tiers ne voit pas les médias de la conversation');
+});
+
 test('jeton : accès sans jeton refusé, refresh fonctionnel', async () => {
   const sans = await api('/api/feed');
   assert.equal(sans.status, 401);

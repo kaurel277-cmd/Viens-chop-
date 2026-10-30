@@ -82,8 +82,25 @@ window.VCSo = (function () {
         return rep;
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Médias en vue unique                                               */
+    /* ------------------------------------------------------------------ */
+    async function mediaListe(matchId) {
+        const rep = await API.matches.media(matchId);
+        return { disponible: rep.disponible !== false, media: rep.media || [], moi: rep.moi };
+    }
+
+    async function envoyerMedia(matchId, blob, kind) {
+        const rep = await API.matches.sendMedia(matchId, blob, kind);
+        return rep.media;
+    }
+
+    async function ouvrirMedia(matchId, mediaId) {
+        return API.matches.ouvrirMedia(matchId, mediaId);
+    }
+
     /** Suit les nouveaux messages sans recharger la page. */
-    function suivre(matchId, onNouveau, onDeblocage) {
+    function suivre(matchId, onNouveau, onDeblocage, onMedia) {
         arreter();
         minuteur = setInterval(async () => {
             try {
@@ -99,6 +116,10 @@ window.VCSo = (function () {
                     if (onDeblocage) onDeblocage();
                 }
                 ouvert.restants = rep.match.messages_until_unlock;
+                if (onMedia) {
+                    const m = await API.matches.media(matchId);
+                    onMedia(m.media || [], m.moi);
+                }
             } catch (e) { /* réseau instable : on réessaiera */ }
         }, 3000);
     }
@@ -117,6 +138,7 @@ window.VCSo = (function () {
         brancher(api) { API = api; },
         get pret() { return !!API; },
         get ouvert() { return ouvert; },
-        like, matches, open, send, suivre, arreter, close
+        like, matches, open, send, suivre, arreter, close,
+        mediaListe, envoyerMedia, ouvrirMedia
     };
 })();
