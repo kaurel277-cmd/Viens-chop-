@@ -72,10 +72,18 @@ create table if not exists public.chat_media (
     kind       text not null check (kind in ('photo','video')),
     mime       text not null,
     bytes      integer not null,
+    duration_s integer,                                   -- durée d'une vidéo
     data       bytea,
-    viewed_at  timestamptz,
+    viewed_at  timestamptz,                               -- ouvert une fois
+    expired_at timestamptz,                               -- jamais ouvert, effacé
     created_at timestamptz not null default now()
 );
+
+-- Si la table existait déjà dans une version précédente, on ajoute les colonnes.
+alter table if exists public.chat_media
+    add column if not exists duration_s integer;
+alter table if exists public.chat_media
+    add column if not exists expired_at timestamptz;
 
 create index if not exists chat_media_match_idx
     on public.chat_media (match_id, created_at desc);

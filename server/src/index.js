@@ -24,8 +24,10 @@ app.use(cors({ origin: config.corsOrigin }));
 // (une image de 110 Ko pèse ~147 Ko une fois encodée en base64).
 app.use('/api/photos', express.json({ limit: '600kb' }));
 app.use('/api/certification', express.json({ limit: '600kb' }));
-// Les médias de discussion montent à 3 Mo (vidéo) : 4 Mo de marge pour le base64.
-app.use('/api/matches', express.json({ limit: '4mb' }));
+// Les médias de discussion montent à 3 Mo (vidéo). En base64 un fichier pèse
+// ~4,1 Mo : on laisse 5 Mo de marge, sinon Express refuserait la vidéo avant
+// même d'arriver à la route.
+app.use('/api/matches', express.json({ limit: '5mb' }));
 app.use(express.json({ limit: '100kb' }));
 
 if (config.rateLimitEnabled) {

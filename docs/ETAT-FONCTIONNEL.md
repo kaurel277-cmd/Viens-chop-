@@ -15,7 +15,7 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 | 3 likes par jour (Mode Coulé) | ✅ | Compteur appliqué par le serveur, pas seulement par l'écran |
 | Match et discussions | ✅ | Messages enregistrés en base, rafraîchis toutes les 2 secondes |
 | « Qui m'a aimé » | ✅ | Gratuit ; la photo n'apparaît qu'en Mode Debout |
-| Photos et vidéos en vue unique | 🟡 | Code prêt et testé, **inactif tant que la migration SQL n'est pas passée** (voir plus bas) |
+| Photos et vidéos en vue unique | 🟡 | Tout est en place et testé (envoi, durée, limites, effacement, expiration), **inactif tant que la migration SQL n'est pas passée** (voir plus bas) |
 | Signaler / bloquer | ✅ | Depuis le fil et depuis la discussion ; un profil bloqué disparaît partout |
 | Faux appel d'urgence | ✅ | Route serveur réelle, quota d'un essai par semaine en Mode Coulé |
 | PWA installable + page hors ligne | ✅ | Manifeste, icônes, service worker, page « tu es hors ligne » |
@@ -47,6 +47,18 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 4. **Les pages vendaient SOS, Check-In et Mode Incognito** comme s'ils étaient
    livrés : ils sont marqués « bientôt » et le Faux Appel, lui réel, est mis en
    avant.
+
+## Comment marche la vue unique (chat)
+
+- **Photo** : compressée sur l'appareil (280 Ko visés), 400 Ko maximum serveur.
+- **Vidéo** : 15 secondes et 3 Mo maximum, durée mesurée avant l'envoi.
+- **Une seule ouverture**, réservée à l'autre personne : l'expéditeur ne peut pas
+  rouvrir son propre média, la deuxième tentative répond `410 MEDIA_DEJA_VU`.
+- **Le fichier est effacé de la base avant même que la réponse parte** : il ne
+  reste que la ligne « vue », pour que l'expéditeur voie « Vue 👁️ ».
+- **Expiration** : un média jamais ouvert est effacé au bout de 30 jours
+  (statut « Expirée · jamais ouverte »), pour ne pas remplir l'offre gratuite.
+- **Compte à rebours** : 8 s pour une photo, la durée + 2 s pour une vidéo.
 
 ## À faire une fois pour activer le reste
 

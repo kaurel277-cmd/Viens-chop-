@@ -90,8 +90,8 @@ window.VCSo = (function () {
         return { disponible: rep.disponible !== false, media: rep.media || [], moi: rep.moi };
     }
 
-    async function envoyerMedia(matchId, blob, kind) {
-        const rep = await API.matches.sendMedia(matchId, blob, kind);
+    async function envoyerMedia(matchId, blob, kind, meta) {
+        const rep = await API.matches.sendMedia(matchId, blob, kind, meta);
         return rep.media;
     }
 

@@ -141,6 +141,22 @@ matchesRouter.post('/:id/messages', requireAuth, async (req, res, next) => {
        marquée « vue » : impossible de le rouvrir, même en rejouant la requête.
    --------------------------------------------------------------------------- */
 const MEDIA_MAX = { photo: 400 * 1024, video: 3 * 1024 * 1024 };
+const VIDEO_MAX_S = 15;                       // au-delà, on refuse : c'est une story, pas un film
+const MEDIA_TTL_JOURS = 30;                   // non ouvert au bout de 30 jours = effacé
+
+// Un média non ouvert au bout du délai est effacé de la base : on ne garde pas
+// des fichiers que personne ne viendra jamais chercher (l'offre Neon est petite).
+async function purgerVieuxMedias(matchId) {
+  await query(
+    `update public.chat_media
+        set data = null, expired_at = now()
+      where match_id = $1
+        and data is not null
+        and viewed_at is null
+        and created_at < now() - ($2 || ' days')::interval`,
+    [matchId, String(MEDIA_TTL_JOURS)]
+  );
+}
 
 function decodeMedia(data) {
   const clean = String(data || '').replace(/^data:[^;]+;base64,/, '');
@@ -169,17 +185,40 @@ matchesRouter.post('/:id/media', requireAuth, async (req, res, next) => {
     if (!['photo', 'video'].includes(kind)) {
       throw new AppError(400, 'TYPE_INVALIDE', 'Type attendu : photo ou video.');
     }
+
+    // Le fichier doit vraiment être du type annoncé : sinon on pourrait faire
+    // passer n'importe quoi pour une photo.
+    const typeAnnonce = String(mime || '').toLowerCase().slice(0, 40);
+    const prefixe = kind === 'video' ? 'video/' : 'image/';
+    if (typeAnnonce && !typeAnnonce.startsWith(prefixe)) {
+      throw new AppError(400, 'FORMAT_INVALIDE',
+        kind === 'video' ? 'Ce fichier n’est pas une vidéo.' : 'Ce fichier n’est pas une image.');
+    }
+
     const buf = decodeMedia(data);
     if (buf.length > MEDIA_MAX[kind]) {
       throw new AppError(413, 'MEDIA_TROP_LOURD',
         kind === 'video' ? 'Vidéo trop lourde (3 Mo maximum).' : 'Photo trop lourde (400 Ko maximum).');
     }
 
+    // La durée est mesurée sur l'appareil (le serveur ne décode pas la vidéo) :
+    // on la vérifie quand même, pour qu'une heure de film ne passe pas.
+    let duree = null;
+    if (kind === 'video' && req.body.duration_s !== undefined && req.body.duration_s !== null) {
+      const d = Number(req.body.duration_s);
+      if (!Number.isFinite(d) || d < 0) throw new AppError(400, 'DUREE_INVALIDE', 'Durée illisible.');
+      if (d > VIDEO_MAX_S + 0.5) {
+        throw new AppError(413, 'VIDEO_TROP_LONGUE', 'Vidéo trop longue (15 secondes maximum).');
+      }
+      duree = Math.round(d);
+    }
+
     const { rows } = await query(
-      `insert into public.chat_media (match_id, sender_id, kind, mime, bytes, data)
-       values ($1, $2, $3, $4, $5, $6)
-       returning id, kind, mime, bytes, created_at`,
-      [match.id, req.user.id, kind, String(mime || 'image/jpeg').slice(0, 40), buf.length, buf]
+      `insert into public.chat_media (match_id, sender_id, kind, mime, bytes, data, duration_s)
+       values ($1, $2, $3, $4, $5, $6, $7)
+       returning id, kind, mime, bytes, duration_s, created_at`,
+      [match.id, req.user.id, kind, typeAnnonce || (kind === 'video' ? 'video/mp4' : 'image/jpeg'),
+       buf.length, buf, duree]
     );
 
     res.status(201).json({ ok: true, media: rows[0] });
@@ -191,10 +230,12 @@ matchesRouter.get('/:id/media', requireAuth, async (req, res, next) => {
   try {
     if (!(await aChatMedia())) return res.json({ ok: true, disponible: false, media: [] });
     const match = await loadMatch(req.params.id, req.user.id);
+    await purgerVieuxMedias(match.id);
 
     const { rows } = await query(
-      `select id, sender_id, kind, mime, bytes, created_at,
+      `select id, sender_id, kind, mime, bytes, duration_s, created_at,
               (viewed_at is not null) as vue,
+              (expired_at is not null) as expiree,
               (data is not null) as encore_disponible
          from public.chat_media
         where match_id = $1
@@ -212,8 +253,10 @@ matchesRouter.post('/:id/media/:mediaId/ouvrir', requireAuth, async (req, res, n
     if (!(await aChatMedia())) throw new AppError(503, 'CHAT_MEDIA_INDISPONIBLE', "Indisponible pour le moment.");
     const match = await loadMatch(req.params.id, req.user.id);
 
+    await purgerVieuxMedias(match.id);
+
     const { rows } = await query(
-      `select id, sender_id, kind, mime, data, viewed_at
+      `select id, sender_id, kind, mime, data, viewed_at, expired_at, duration_s
          from public.chat_media
         where id = $1 and match_id = $2`,
       [req.params.mediaId, match.id]
@@ -224,8 +267,10 @@ matchesRouter.post('/:id/media/:mediaId/ouvrir', requireAuth, async (req, res, n
     if (m.sender_id === req.user.id) {
       throw new AppError(403, 'MEDIA_DE_SOI', "C'est toi qui l'as envoyé.");
     }
-    if (m.viewed_at || !m.data) {
-      throw new AppError(410, 'MEDIA_DEJA_VU', 'Ce média a déjà été regardé.');
+    if (m.viewed_at) throw new AppError(410, 'MEDIA_DEJA_VU', 'Ce média a déjà été regardé.');
+    if (m.expired_at || !m.data) {
+      throw new AppError(410, 'MEDIA_EXPIRE',
+        "Ce média a expiré : il n'a pas été ouvert dans les 30 jours.");
     }
 
     // On efface le contenu AVANT de répondre : même une deuxième requête
@@ -235,7 +280,13 @@ matchesRouter.post('/:id/media/:mediaId/ouvrir', requireAuth, async (req, res, n
       [m.id]
     );
 
-    res.json({ ok: true, kind: m.kind, mime: m.mime, data: m.data.toString('base64') });
+    res.json({
+      ok: true,
+      kind: m.kind,
+      mime: m.mime,
+      duration_s: m.duration_s,
+      data: m.data.toString('base64')
+    });
   } catch (err) { next(err); }
 });
 

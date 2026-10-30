@@ -236,11 +236,17 @@
     media(matchId) {
       return request('/api/matches/' + matchId + '/media');
     },
-    async sendMedia(matchId, blob, kind) {
+    async sendMedia(matchId, blob, kind, meta) {
       const data = await blobToBase64(blob);
+      const m = meta || {};
       return request('/api/matches/' + matchId + '/media', {
         method: 'POST',
-        body: { data, mime: blob.type || 'image/jpeg', kind }
+        body: {
+          data,
+          mime: blob.type || (kind === 'video' ? 'video/mp4' : 'image/jpeg'),
+          kind,
+          ...(m.duration_s !== undefined ? { duration_s: m.duration_s } : {})
+        }
       });
     },
     ouvrirMedia(matchId, mediaId) {

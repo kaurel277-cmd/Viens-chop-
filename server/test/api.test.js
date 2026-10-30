@@ -585,6 +585,77 @@ test('médias de discussion : envoyés, reçus une seule fois, puis effacés', a
   ok('un tiers ne voit pas les médias de la conversation');
 });
 
+test('vidéos en vue unique : format, durée et expiration vérifiés', async () => {
+  const a = await signup('+2250701000140', 'VideoA', { gender: 'F' });
+  const b = await signup('+2250701000141', 'VideoB', { gender: 'M' });
+
+  await api('/api/likes', { method: 'POST', token: a.token, body: { user_id: b.id } });
+  const l2 = await api('/api/likes', { method: 'POST', token: b.token, body: { user_id: a.id } });
+  const matchId = l2.json.match_id;
+
+  const mp4 = Buffer.from('faux-mp4-' + Date.now()).toString('base64');
+  const envoi = await api('/api/matches/' + matchId + '/media', {
+    method: 'POST', token: a.token,
+    body: { data: mp4, mime: 'video/mp4', kind: 'video', duration_s: 8 }
+  });
+  assert.equal(envoi.status, 201, JSON.stringify(envoi.json));
+  assert.equal(envoi.json.media.duration_s, 8);
+  ok('vidéo de 8 s acceptée et durée retenue');
+
+  const tropLongue = await api('/api/matches/' + matchId + '/media', {
+    method: 'POST', token: a.token,
+    body: { data: mp4, mime: 'video/mp4', kind: 'video', duration_s: 45 }
+  });
+  assert.equal(tropLongue.status, 413);
+  ok('vidéo de 45 s refusée', tropLongue.json.error.code);
+
+  const mauvaisType = await api('/api/matches/' + matchId + '/media', {
+    method: 'POST', token: a.token,
+    body: { data: mp4, mime: 'image/jpeg', kind: 'video' }
+  });
+  assert.equal(mauvaisType.status, 400);
+  assert.equal(mauvaisType.json.error.code, 'FORMAT_INVALIDE');
+  ok('une image ne peut pas passer pour une vidéo');
+
+  const coteB = await api('/api/matches/' + matchId + '/media', { token: b.token });
+  const video = coteB.json.media.find(m => m.kind === 'video');
+  assert.equal(video.duration_s, 8);
+  assert.equal(video.encore_disponible, true);
+  ok('la destinataire voit la durée avant d\'ouvrir');
+
+  const ouvre = await api('/api/matches/' + matchId + '/media/' + video.id + '/ouvrir', {
+    method: 'POST', token: b.token
+  });
+  assert.equal(ouvre.status, 200);
+  assert.equal(ouvre.json.kind, 'video');
+  assert.equal(ouvre.json.duration_s, 8);
+  ok('la vidéo s\'ouvre une fois, avec sa durée');
+
+  // Expiration : un média jamais ouvert au bout de 30 jours est effacé
+  const vieux = await query(
+    `insert into public.chat_media (match_id, sender_id, kind, mime, bytes, data, created_at)
+     values ($1, $2, 'photo', 'image/jpeg', 4, $3, now() - interval '40 days')
+     returning id`,
+    [matchId, a.id, Buffer.from('vieux')]
+  );
+  const apres = await api('/api/matches/' + matchId + '/media', { token: b.token });
+  const ligne = apres.json.media.find(m => m.id === vieux.rows[0].id);
+  assert.equal(ligne.expiree, true);
+  assert.equal(ligne.encore_disponible, false);
+  ok('un média non ouvert depuis 40 jours est marqué expiré');
+
+  const tropTard = await api('/api/matches/' + matchId + '/media/' + vieux.rows[0].id + '/ouvrir', {
+    method: 'POST', token: b.token
+  });
+  assert.equal(tropTard.status, 410);
+  assert.equal(tropTard.json.error.code, 'MEDIA_EXPIRE');
+  ok('ouverture refusée avec le code MEDIA_EXPIRE');
+
+  const contenu = await query('select data from public.chat_media where id = $1', [vieux.rows[0].id]);
+  assert.equal(contenu.rows[0].data, null);
+  ok('le fichier expiré est effacé de la base');
+});
+
 test('jeton : accès sans jeton refusé, refresh fonctionnel', async () => {
   const sans = await api('/api/feed');
   assert.equal(sans.status, 401);

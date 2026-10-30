@@ -909,6 +909,10 @@
                     title="Photo en vue unique" style="background:rgba(255,107,0,.15); color:#FF6B00;">
                 <i class="fa-solid fa-camera"></i>
             </button>
+            <button onclick="sendVueUnique('video')" type="button" aria-label="Envoyer une vidéo en vue unique"
+                    title="Vidéo en vue unique (15 s max)" style="background:rgba(110,231,183,.15); color:#6ee7b7;">
+                <i class="fa-solid fa-video"></i>
+            </button>
             <input type="text" id="chat-input" placeholder="Écris ton message..." aria-label="Écrire un message" onkeypress="if(event.key==='Enter')sendMessage()">
             <button onclick="sendMessage()" type="button" aria-label="Envoyer le message"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
@@ -2349,13 +2353,31 @@
                     const fichier = await M.pickFile({ kind });
                     if (!fichier) return;
                     try {
-                        const c = kind === 'video'
-                            ? { blob: fichier }
-                            : await M.compressImage(fichier, { maxSide: 1100, target: 280 * 1024 });
-                        const media = await S.envoyerMedia(courant.id, c.blob, kind);
+                        let envoi, duree = null;
+                        if (kind === 'video') {
+                            // Une vidéo n'est pas recompressée : on vérifie donc
+                            // avant de l'envoyer qu'elle tient dans les limites.
+                            const info = await M.probeVideo(fichier).catch(() => null);
+                            if (!info) { alert("Cette vidéo n'a pas pu être lue."); return; }
+                            if (info.bytes > 3 * 1024 * 1024) {
+                                alert('Vidéo trop lourde (3 Mo maximum). Filme plus court ou en plus basse qualité.');
+                                return;
+                            }
+                            if (Number.isFinite(info.duration) && info.duration > 15.5) {
+                                alert('Vidéo trop longue (' + Math.round(info.duration) + ' s). 15 secondes maximum.');
+                                return;
+                            }
+                            duree = Number.isFinite(info.duration) ? Math.round(info.duration) : null;
+                            envoi = fichier;
+                        } else {
+                            envoi = (await M.compressImage(fichier, { maxSide: 1100, target: 280 * 1024 })).blob;
+                        }
+                        const media = await S.envoyerMedia(courant.id, envoi, kind,
+                            duree === null ? undefined : { duration_s: duree });
                         window.dessinerMediaBulle({
                             id: media.id, kind: media.kind, aMoi: true,
-                            vue: false, disponible: true
+                            vue: false, disponible: true,
+                            duration_s: media.duration_s !== undefined ? media.duration_s : duree
                         });
                     } catch (err) {
                         const raisons = {
@@ -2734,17 +2756,23 @@
                 bulle.dataset.mediaId = m.id;
                 bulle.style.cssText = 'padding:0; overflow:hidden; cursor:pointer; max-width:230px;';
 
-                const etiquette = m.kind === 'video' ? '🎬 Vidéo' : '📷 Photo';
-                let sousTitre;
-                if (m.aMoi) {
-                    sousTitre = m.disponible && !m.vue ? 'Envoyée · en attente' : 'Vue 👁️';
+                const duree = m.duration_s ? ' · ' + m.duration_s + ' s' : '';
+                const etiquette = (m.kind === 'video' ? '🎬 Vidéo' : '📷 Photo') + duree;
+                let sousTitre, symbole;
+                if (m.expiree) {
+                    sousTitre = 'Expirée · jamais ouverte';
+                    symbole = '⏳';
+                } else if (m.vue || !m.disponible) {
+                    sousTitre = m.aMoi ? 'Vue 👁️' : 'Déjà vue 👁️';
+                    symbole = '👁️';
                 } else {
-                    sousTitre = m.disponible && !m.vue ? 'Appuie pour ouvrir · une seule fois' : 'Déjà vue 👁️';
+                    sousTitre = m.aMoi ? 'Envoyée · en attente' : 'Appuie pour ouvrir · une seule fois';
+                    symbole = '👁️‍🗨️';
                 }
 
                 bulle.innerHTML =
                     '<div style="padding:12px 14px; display:flex; align-items:center; gap:10px;">' +
-                        '<span style="font-size:20px;">' + (m.vue || !m.disponible ? '👁️' : '👁️‍🗨️') + '</span>' +
+                        '<span style="font-size:20px;">' + symbole + '</span>' +
                         '<div>' +
                             '<div style="font-weight:800; font-size:13px;">' + etiquette + ' en vue unique</div>' +
                             '<div style="font-size:11px; opacity:.75;">' + sousTitre + '</div>' +
@@ -2765,6 +2793,10 @@
                     messageHaut(m.vue || !m.disponible ? 'Cette personne a déjà regardé ton média.' : 'En attente : elle ne l\'a pas encore ouvert.', '#37474f');
                     return;
                 }
+                if (m.expiree) {
+                    messageHaut("Ce média a expiré : il n'a pas été ouvert dans les 30 jours.", '#37474f');
+                    return;
+                }
                 if (m.vue || !m.disponible) {
                     messageHaut('Ce média a déjà été regardé. Il n\'existe plus.', '#37474f');
                     return;
@@ -2774,8 +2806,8 @@
                     const r = await S.ouvrirMedia(matchCourant.id, m.id);
                     afficherMediaDistant(r, bulle);
                 } catch (err) {
-                    messageHaut(err.code === 'MEDIA_DEJA_VU'
-                        ? 'Ce média a déjà été regardé.'
+                    messageHaut(err.code === 'MEDIA_DEJA_VU' ? 'Ce média a déjà été regardé.'
+                        : err.code === 'MEDIA_EXPIRE' ? "Ce média a expiré avant d'être ouvert."
                         : 'Impossible d\'ouvrir ce média.', '#E5484D');
                 } finally {
                     ouvrirMediaEnCours = false;
@@ -2821,8 +2853,12 @@
 
                 voile.append(entete, media, pied);
                 document.body.appendChild(voile);
+                if (r.kind === 'video') { try { media.play(); } catch (e) { /* lecture manuelle */ } }
 
-                let reste = 8;
+                // Une vidéo demande plus de temps qu'une photo : le compte à
+                // rebours suit sa durée, avec deux secondes de marge.
+                let reste = r.kind === 'video' ? Math.max(8, Math.round(r.duration_s || 15) + 2) : 8;
+                compte.textContent = '⏳ ' + reste + ' s';
                 const minuteur = setInterval(() => {
                     reste--;
                     compte.textContent = '⏳ ' + reste + ' s';
@@ -2891,6 +2927,8 @@
                         kind: mm.kind,
                         aMoi: mm.sender_id === monId,
                         vue: mm.vue,
+                        expiree: mm.expiree,
+                        duration_s: mm.duration_s,
                         disponible: mm.encore_disponible
                     }, true));
                 } catch (e) { /* médias indisponibles : la discussion marche quand même */ }
@@ -2909,6 +2947,8 @@
                         kind: mm.kind,
                         aMoi: mm.sender_id === monId,
                         vue: mm.vue,
+                        expiree: mm.expiree,
+                        duration_s: mm.duration_s,
                         disponible: mm.encore_disponible
                     }));
                 });
