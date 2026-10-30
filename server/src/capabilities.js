@@ -19,6 +19,7 @@ const cache = {
   moderation: null, moderationAt: 0,
   adminActions: null, adminActionsAt: 0,
   chatMedia: null, chatMediaAt: 0,
+  paiements: null, paiementsAt: 0,
   recuperation: null, recuperationAt: 0
 };
 
@@ -61,6 +62,22 @@ export async function aModeration() {
             and column_name = 'moderation_status' limit 1`
       );
       return rows.length > 0;
+    } catch {
+      return false;
+    }
+  });
+}
+
+/* Table des paiements + réglages : sans elles, le Mode Debout ne peut pas
+   s'activer. On vérifie les deux d'un coup. */
+export async function aPaiements() {
+  return capacite('paiements', async () => {
+    try {
+      const { rows } = await query(
+        `select to_regclass('public.payments') is not null as p,
+                to_regclass('public.reglages') is not null as r`
+      );
+      return !!(rows[0].p && rows[0].r);
     } catch {
       return false;
     }

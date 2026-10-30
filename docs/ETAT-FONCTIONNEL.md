@@ -29,11 +29,27 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 
 | Fonction | État | Pourquoi |
 |---|---|---|
-| Paiement Mobile Money (Wave, Orange, MTN, Moov) | ⛔ maquette | Le bouton affiche « Paiement confirmé » et débloque en local, sans encaisser quoi que ce soit ; tout disparaît au rechargement |
-| Activation du Mode Debout | ⛔ | Aucun paiement ne l'active : aujourd'hui, seul un `UPDATE` en base peut le faire |
+| Paiement du Mode Debout par Wave | 🟡 prêt, à allumer | Circuit complet et testé : la personne paie sur ton numéro Wave, colle l'identifiant de la transaction, tu valides dans la console, la base active 30 jours. **Il reste à coller `MIGRATION-PAIEMENTS.sql` dans Neon et à saisir ton numéro Wave** (console → Réglages). Tant que ce n'est pas fait, la fenêtre dit « bientôt » |
+| Activation du Mode Debout | 🟡 | Automatique dès qu'un paiement est validé (déclencheur en base). Un renouvellement s'ajoute à la date de fin |
+| Paiement automatique (API marchand) | ⛔ prêt derrière | Webhook écrit et signé (HMAC), inactif : il s'allume avec `PAIEMENT_WEBHOOK_SECRET` le jour où tu auras un compte Wave Business / CinetPay. Voir `PAIEMENT.md` |
 | Quiz Mode Flirt | 🟡 | Les questions sont écrites dans la page (4 questions, tirage local). La route serveur existe mais n'est pas branchée |
 | Mode Incognito | ⛔ | Annoncé dans les pages, pas encore développé |
 | SOS / Check-In | ⛔ | Annoncés dans les pages, pas encore développés (marqués « bientôt ») |
+
+## Le paiement du Mode Debout (30/10)
+
+Le faux bouton « Paiement confirmé » a disparu. À la place :
+
+- la fenêtre affiche le **prix**, la **durée** et le **numéro Wave** réglés dans
+  la console d'admin — rien n'est écrit en dur dans le site ;
+- la personne envoie l'argent, puis colle **l'identifiant de la transaction** ;
+- la demande arrive dans **admin.html → Paiements** ; « Valider » passe la ligne
+  en `paid`, et le déclencheur PostgreSQL active 30 jours ;
+- une référence Wave ne sert qu'une fois, une seule demande en attente par
+  personne, 6 déclarations par quart d'heure ;
+- le montant est imposé par le serveur (pas de paiement à 1 FCFA).
+
+Procédure complète, écran par écran : `PAIEMENT.md`.
 
 ## Ce qui a été corrigé le 30/10
 
@@ -120,15 +136,17 @@ serveur et la base savent faire :
 Un repère absent = une chose à faire. Réponse garantie en moins d'une seconde,
 même si la base est injoignable.
 
-## Les trois étapes d'activation : faites
+## Les étapes d'activation
 
 1. `database/MIGRATION-SECURITE.sql` (vue unique, vérification, modération) — **passée**
 2. `database/MIGRATION-MOT-DE-PASSE.sql` (clé de secours, changement de mot de passe) — **passée**
 3. La variable `ADMIN_TOKEN` sur Render (console d'admin) — **posée**
+4. `database/MIGRATION-PAIEMENTS.sql` (réglages + statut « refusé ») — **à passer**
+   puis saisir le numéro Wave dans la console → Réglages (voir `PAIEMENT.md`)
 
 Preuve en direct : `GET /api/health` renvoie les 7 repères
 (`password-auth`, `photos`, `recuperation`, `chat-media`, `verifications`,
-`moderation`, `admin`) et `GET /api/admin/etat` répond
+`moderation`, `admin`) — le 8ᵉ, `paiement`, apparaîtra après l'étape 4. et `GET /api/admin/etat` répond
 `{"configuree":true,"verifications":true,"moderation":true,"chatMedia":true}`.
 
 ## Avancement par bloc
@@ -141,7 +159,7 @@ Preuve en direct : `GET /api/health` renvoie les 7 repères
 | Sécurité minimum avant lancement | ✅ 100 % | Signaler + bloquer partout, faux appel, modération des photos, selfie |
 | Console d'administration | ✅ 100 % | Stats, signalements, selfies, photos, journal |
 | Plateforme (PWA, hors ligne, vitesse) | ✅ 100 % | Installable, page hors ligne, service worker v2 |
-| Monétisation (Mode Debout) | ⛔ 20 % | Les écrans existent, **aucun encaissement** et aucune route pour activer un compte |
+| Monétisation (Mode Debout) | 🟡 85 % | Encaissement Wave réel, validation en console, activation automatique. Reste : coller le SQL et saisir le numéro Wave. Les 15 % restants = paiement automatique (compte marchand) |
 | Extras annoncés (SOS, Check-In, Incognito) | ⛔ 0 % | Annoncés « bientôt » sur les pages, pas de code serveur |
 | Quiz Mode Flirt | 🟡 60 % | Jouable, mais questions écrites dans la page ; la route `/api/safety/quiz` existe sans être utilisée |
 | Répertoire des maquis | 🟡 40 % | Page et formulaire de proposition ; pas encore de liste de lieux en base |

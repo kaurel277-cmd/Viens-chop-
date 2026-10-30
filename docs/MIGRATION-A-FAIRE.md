@@ -1,77 +1,74 @@
-# Une seule chose à faire : la migration de la base
+# Une seule chose à faire : passer la migration « paiements »
 
-> 29 octobre 2026
+> 30 octobre 2026
 
 ## Où on en est
 
-Le code est **poussé et déployé** (`53b2387`). Le serveur Render annonce
-déjà les nouvelles fonctions :
+Les trois premières étapes sont faites : sécurité (vue unique, selfie,
+modération), mot de passe oublié, et `ADMIN_TOKEN` sur Render. Le serveur le
+confirme :
 
 ```
-GET /api/health → {"ok":true, "features":["password-auth","photos"]}
+GET /api/health
+→ {"ok":true,"features":["password-auth","photos","recuperation","chat-media",
+   "verifications","moderation","admin"]}
 ```
 
-Mais l'inscription renvoie une erreur 500, parce que **la base n'a pas encore
-la nouvelle colonne**. Le site ne casse pas pour autant : il bascule tout seul
-en mode « sur l'appareil ».
-
-Il manque **une seule action**, et c'est du SQL, pas des logs.
-
----
+Il reste **une** chose pour que le Mode Debout puisse être payé : la migration
+des paiements.
 
 ## Écran par écran
 
-1. Va sur **https://console.neon.tech**
-2. Clique sur ton projet (celui qui contient `neondb`)
-3. Dans le menu de gauche, clique sur **SQL Editor**
-4. Ouvre ce fichier du dépôt et copie **tout** son contenu :
-   `database/migration-v3.1-comptes-photos.sql`
-   → sur GitHub : **Code** → `database` → `migration-v3.1-comptes-photos.sql`
-   → bouton **Copy raw file** (les deux carrés en haut à droite)
-5. Colle dans la zone de texte du SQL Editor
-6. Clique sur **Run** (ou `Ctrl` + `Entrée`)
+1. Ouvre **https://console.neon.tech** et connecte-toi.
+2. Clique sur ton projet **Viens chop**, puis sur **SQL Editor** (menu de
+   gauche).
+3. Ouvre le fichier `database/MIGRATION-PAIEMENTS.sql` du dépôt, **sélectionne
+   tout** et copie.
+4. Colle dans la zone de Neon.
+5. Clique sur **Run** (ou `Ctrl` + `Entrée`).
 
 ### Ce que tu dois voir ensuite
 
-En bas, un message du type :
+Un tableau de contrôle à trois colonnes :
 
 ```
-Query executed successfully
+ reglages | colonne_note | declencheur
+----------+--------------+-------------
+ t        | t            | t
 ```
 
-Un avertissement jaune peut apparaître : c'est normal, il ne bloque rien.
+Les trois `t` = c'est passé.
 
 ### Comment vérifier que c'est bon
 
-Reviens ici et dis-moi simplement **« migration faite »**. Je lance la
-vérification depuis mon côté et je te confirme en une ligne.
+Ouvre dans un navigateur :
 
-Si tu préfères vérifier toi-même : ouvre l'onglet **Tables** dans Neon, tu dois
-voir une nouvelle table **`photos`**.
+```
+https://viens-chop-api.onrender.com/api/health
+```
 
----
+`features` doit contenir **`paiement`** (en plus des 7 autres).
 
 ## Ce que cette migration fait
 
-| Action | Effet |
-|---|---|
-| Ajoute `password_hash` | permet les comptes par mot de passe |
-| Crée la table `photos` | stocke les photos de profil |
-| Crée le trigger `photos_replace` | une photo par emplacement |
-| Note la version dans `schema_migrations` | traçabilité |
+- crée la table **`public.reglages`** : prix, durée, numéro Wave, nom affiché,
+  interrupteur « paiement ouvert », avec des valeurs par défaut ;
+- ajoute deux colonnes à **`public.payments`** : `note` (motif de refus) et
+  `decided_at` (date de décision) ;
+- autorise le statut **`rejected`** (demande refusée) ;
+- interdit **plus d'une demande en attente** par personne ;
+- met à jour le déclencheur **`app.activate_plan_on_payment()`** : un paiement
+  passé en `paid` active 30 jours (durée réglable), et un renouvellement
+  s'ajoute à la date de fin au lieu de la remplacer.
 
-**Rien n'est supprimé.** Tous les `if not exists` sont là pour ça. Tu peux la
-relancer sans risque.
-
----
+Elle ne supprime aucune donnée et peut être relancée sans risque.
 
 ## Après la migration
 
-Dans l'ordre, sans que tu aies à intervenir :
+1. Ouvre `https://kaurel277-cmd.github.io/Viens-chop-/admin.html`.
+2. Entre ton **ADMIN_TOKEN**, puis va dans l'onglet **Réglages**.
+3. Saisis le **numéro Wave** qui doit recevoir les 700 FCFA, ton nom, et vérifie
+   que « Paiement ouvert » est sur **Oui**.
+4. **Enregistrer**.
 
-1. Le site bascule **automatiquement** en mode serveur.
-2. L'inscription crée un compte réel dans Neon.
-3. Les photos sont visibles entre comptes, y compris depuis un autre téléphone.
-4. Je vérifie tout depuis mon côté et je te le confirme.
-
-Puis j'enchaîne sur la suite : **likes et matchs réels**.
+La procédure complète du paiement est dans `PAIEMENT.md`.

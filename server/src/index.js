@@ -13,6 +13,7 @@ import { safetyRouter } from './routes/safety.js';
 import { healthRouter } from './routes/health.js';
 import { photosRouter } from './routes/photos.js';
 import { certificationRouter } from './routes/certification.js';
+import { paiementRouter } from './routes/paiement.js';
 import { adminRouter } from './routes/admin.js';
 
 export const app = express();
@@ -65,9 +66,17 @@ if (config.rateLimitEnabled) {
     message: { error: { code: 'TROP_D_ESSAIS', message: 'Trop d\'essais. Réessaie dans un quart d\'heure.' } }
   }));
 
+  // Preuve de paiement : une personne n'a aucune raison d'en envoyer 20.
+  app.use('/api/paiement/declarer', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: config.paiementRateLimitMax,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: { code: 'TROP_DE_DEMANDES', message: 'Trop de demandes. Réessaie dans un quart d\'heure.' } }
+  }));
+
 }
 
-// /api/health = le processus répond. /api/health/db = la base répond vraiment.
 app.use('/api/health', healthRouter);
 
 app.use('/api/auth',    authRouter);
@@ -78,6 +87,7 @@ app.use('/api/matches', matchesRouter);
 app.use('/api/safety',  safetyRouter);
 app.use('/api/photos',  photosRouter);
 app.use('/api/certification', certificationRouter);
+app.use('/api/paiement',  paiementRouter);
 app.use('/api/admin',   adminRouter);
 
 app.use((_req, res) => {

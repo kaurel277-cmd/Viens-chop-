@@ -136,6 +136,8 @@
             <button role="tab" data-onglet="signalements" aria-selected="true" type="button">Signalements</button>
             <button role="tab" data-onglet="verifications" aria-selected="false" type="button">Vérifications</button>
             <button role="tab" data-onglet="photos" aria-selected="false" type="button">Photos à vérifier</button>
+            <button role="tab" data-onglet="paiements" aria-selected="false" type="button">Paiements</button>
+            <button role="tab" data-onglet="reglages" aria-selected="false" type="button">Réglages</button>
             <button role="tab" data-onglet="journal" aria-selected="false" type="button">Journal</button>
         </nav>
 
@@ -242,7 +244,7 @@
             $('stats').innerHTML =
                 stat(v.comptes, 'comptes') + stat(v.signalements, 'signalements ouverts') +
                 stat(v.verifications, 'vérifications en attente') + stat(v.photos, 'photos à vérifier') +
-                stat(v.matchs, 'matchs');
+                stat(v.paiements || 0, 'paiements à valider') + stat(v.matchs, 'matchs');
         } catch (e) {
             if (e.status === 401 || e.status === 403) { sortir(); return; }
             if (e.status === 503) {
@@ -264,6 +266,8 @@
             if (onglet === 'signalements') return await afficherSignalements(p);
             if (onglet === 'verifications') return await afficherVerifications(p);
             if (onglet === 'photos') return await afficherPhotos(p);
+            if (onglet === 'paiements') return await afficherPaiements(p);
+            if (onglet === 'reglages') return await afficherReglages(p);
             if (onglet === 'journal') return await afficherJournal(p);
         } catch (e) {
             p.innerHTML = '<div class="empty">' + echapper(e.message) + '</div>';
@@ -417,6 +421,139 @@
                 <h3>${noms[a.action] || a.action}</h3>
                 <div class="meta">${date(a.created_at)}</div>
             </div></div>`).join('');
+    }
+
+    /* ---------------- Paiements du Mode Debout ----------------
+       Circuit manuel : la personne a payé par Wave et collé l'identifiant de
+       sa transaction. « Valider » passe la ligne en « paid » : la base active
+       alors 30 jours de Mode Debout, sans autre manipulation. */
+    async function afficherPaiements(p) {
+        const filtre = p.dataset.filtre || 'pending';
+        const r = await appel('/api/admin/paiements?statut=' + filtre);
+
+        if (r.disponible === false) {
+            p.innerHTML = '<div class="empty">La table <code>reglages</code> n’existe pas encore : colle le SQL de la migration « paiements ».</div>';
+            return;
+        }
+
+        const onglets = [['pending', 'En attente'], ['paid', 'Validés'], ['rejected', 'Refusés'], ['tous', 'Tout']];
+        const barre = '<div class="actions" style="margin-bottom:14px;">' + onglets.map(([v, l]) =>
+            '<button class="btn small' + (filtre === v ? ' primary' : '') + '" data-filtre="' + v + '" type="button">' + l + '</button>'
+        ).join('') + '</div>';
+
+        if (!r.paiements.length) {
+            p.innerHTML = barre + '<div class="empty">Aucun paiement ' +
+                (filtre === 'pending' ? 'en attente' : 'dans cette liste') + '.</div>';
+        } else {
+            p.innerHTML = barre + r.paiements.map(x => `
+                <div class="card"><div class="body">
+                    <h3>${echapper(x.pseudo || 'Membre')} · ${x.amount_fcfa} FCFA</h3>
+                    <div class="meta">
+                        Référence <b>${echapper(x.provider_ref || '—')}</b> (${echapper(x.provider)})<br>
+                        ${x.phone ? '+' + echapper(x.phone) + ' · ' : ''}demande ${date(x.created_at)}
+                        ${x.decided_at ? '<br>traitée ' + date(x.decided_at) : ''}
+                        ${x.note ? '<br>note : ' + echapper(x.note) : ''}
+                        ${x.plan === 'debout' && x.plan_expires_at ? '<br>compte Debout jusqu’au ' + date(x.plan_expires_at) : ''}
+                    </div>
+                    ${x.status === 'pending' ? `
+                    <div class="actions">
+                        <button class="btn good small" data-pay="${x.id}" data-oui="1" type="button">Valider (30 jours)</button>
+                        <button class="btn danger small" data-pay="${x.id}" data-oui="0" type="button">Refuser</button>
+                    </div>` : '<div class="actions"><span class="pill ' + (x.status === 'paid' ? 'ok' : '') + '">' + echapper(x.status) + '</span></div>'}
+                </div></div>`).join('');
+        }
+
+        p.querySelectorAll('[data-filtre]').forEach(b => b.addEventListener('click', () => {
+            p.dataset.filtre = b.dataset.filtre;
+            afficher();
+        }));
+
+        p.querySelectorAll('[data-pay]').forEach(b => b.addEventListener('click', async () => {
+            const valider = b.dataset.oui === '1';
+            let note = '';
+            if (!valider) {
+                note = window.prompt('Pourquoi refuser ? (facultatif, visible par la personne)', '') || '';
+            }
+            b.disabled = true;
+            try {
+                const r2 = await appel('/api/admin/paiements/' + b.dataset.pay + '/decision', {
+                    method: 'POST', body: { valider: valider, note: note }
+                });
+                if (valider) {
+                    const fin = r2.compte && r2.compte.plan_expires_at;
+                    toast('Paiement validé. Mode Debout actif' + (fin ? ' jusqu’au ' + date(fin).split(' ')[0] : '') + '.');
+                } else {
+                    toast('Paiement refusé.');
+                }
+                rafraichir();
+            } catch (e) { b.disabled = false; toast(e.message, true); }
+        }));
+    }
+
+    /* ---------------- Réglages du paiement ---------------- */
+    async function afficherReglages(p) {
+        const r = await appel('/api/admin/reglages');
+        const g = r.reglages || {};
+        const o = r.offre || {};
+
+        p.innerHTML = `
+            <div class="card"><div class="body">
+                <h3>Où l’argent arrive</h3>
+                <div class="meta" style="margin-bottom:12px;">
+                    Ce numéro s’affiche dans l’application, à l’écran « Mode Debout ».
+                    Laisse-le vide pour fermer le paiement (la fenêtre dira « bientôt »).
+                </div>
+
+                <label for="r-numero" style="font-size:12px;">Numéro Wave qui reçoit les paiements</label>
+                <input id="r-numero" type="tel" inputmode="numeric" placeholder="07 00 00 00 00"
+                       value="${echapper(g.wave_numero || '')}" style="margin:6px 0 12px;">
+
+                <label for="r-nom" style="font-size:12px;">Nom affiché (« au nom de … »)</label>
+                <input id="r-nom" type="text" maxlength="60" placeholder="Prénom et initiale"
+                       value="${echapper(g.wave_nom || '')}" style="margin:6px 0 12px;">
+
+                <label for="r-prix" style="font-size:12px;">Prix du Mode Debout (FCFA)</label>
+                <input id="r-prix" type="number" min="100" max="100000" step="50"
+                       value="${echapper(g.prix_debout || '700')}" style="margin:6px 0 12px;">
+
+                <label for="r-duree" style="font-size:12px;">Durée (jours)</label>
+                <input id="r-duree" type="number" min="1" max="366" value="${echapper(g.duree_jours || '30')}" style="margin:6px 0 12px;">
+
+                <label for="r-actif" style="font-size:12px;">Paiement ouvert</label>
+                <select id="r-actif" style="margin:6px 0 16px;">
+                    <option value="oui"${g.paiement_actif === 'oui' ? ' selected' : ''}>Oui, on accepte les paiements</option>
+                    <option value="non"${g.paiement_actif !== 'oui' ? ' selected' : ''}>Non, on ferme (affiche « bientôt »)</option>
+                </select>
+
+                <div class="actions">
+                    <button class="btn primary small" id="r-enregistrer" type="button">Enregistrer</button>
+                </div>
+                <div class="meta" style="margin-top:12px;">
+                    État actuel : ${o.disponible
+                        ? 'ouvert — la fenêtre affiche ' + o.prix + ' ' + o.devise + ' au ' + echapper(o.numero_lisible) + '.'
+                        : 'fermé — il manque le numéro Wave ou l’interrupteur est sur « non ».'}
+                    <br>Validation automatique : ${o.auto ? 'branchée' : 'non branchée (circuit manuel)'}.
+                </div>
+            </div></div>`;
+
+        $('r-enregistrer').addEventListener('click', async () => {
+            const bouton = $('r-enregistrer');
+            bouton.disabled = true;
+            try {
+                await appel('/api/admin/reglages', {
+                    method: 'POST',
+                    body: {
+                        wave_numero: $('r-numero').value,
+                        wave_nom: $('r-nom').value,
+                        prix_debout: $('r-prix').value,
+                        duree_jours: $('r-duree').value,
+                        paiement_actif: $('r-actif').value
+                    }
+                });
+                toast('Réglages enregistrés.');
+                afficher();
+            } catch (e) { bouton.disabled = false; toast(e.message, true); }
+        });
     }
 
     /* ---------------- Démarrage ---------------- */

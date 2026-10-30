@@ -316,6 +316,20 @@
     }
   };
 
+  /* Paiement du Mode Debout : prix et numéro Wave viennent du serveur,
+     jamais du navigateur (impossible de payer 1 FCFA pour un mois). */
+  const paiement = {
+    offre() {
+      return request('/api/paiement/offre', { auth: false });
+    },
+    moi() {
+      return request('/api/paiement/moi');
+    },
+    declarer(reference) {
+      return request('/api/paiement/declarer', { method: 'POST', body: { reference } });
+    }
+  };
+
   // Exposition globale (le site est en HTML simple, sans bundler)
   window.VCAPI = {
     ApiError,
@@ -324,6 +338,6 @@
     isLoggedIn,
     clearSession,
     request,
-    auth, users, feed, likes, matches, safety, photos, certification
+    auth, users, feed, likes, matches, safety, photos, certification, paiement
   };
 })();

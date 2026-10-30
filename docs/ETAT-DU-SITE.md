@@ -57,7 +57,7 @@ C'est la partie importante, et je ne veux pas te la vendre comme finie.
 | **Aucune donnée partagée** | Deux personnes qui s'inscrivent ne se voient pas. Chacune reste seule sur son téléphone. |
 | **Le compte ne suit pas d'un appareil à l'autre** | C'est la contrepartie du « sans API ». |
 | **Mot de passe non récupérable** | Oublié = perdu, il faut écrire au support. |
-| **Pas de paiement** | Les écrans Wave / Orange Money sont des maquettes. |
+| **Paiement à allumer** | Le circuit Wave est complet et testé, mais il attend le SQL `MIGRATION-PAIEMENTS.sql` et ton numéro Wave (console → Réglages). Tant que ce n'est pas fait, la fenêtre dit « bientôt ». |
 
 ## 3. Les bugs corrigés jusqu'ici
 

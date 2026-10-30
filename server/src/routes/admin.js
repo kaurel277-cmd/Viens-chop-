@@ -3,7 +3,8 @@ import { query } from '../db.js';
 import { requireAdmin, jetonAdminValide, creerJetonAdmin } from '../auth.js';
 import { AppError } from '../errors.js';
 import { config } from '../config.js';
-import { aVerifications, aModeration, aAdminActions, aChatMedia } from '../capabilities.js';
+import { aVerifications, aModeration, aAdminActions, aChatMedia, aPaiements } from '../capabilities.js';
+import { lireReglages, ecrireReglages, offre } from '../reglages.js';
 
 export const adminRouter = Router();
 
@@ -73,8 +74,16 @@ adminRouter.get('/stats', async (_req, res, next) => {
       const { rows } = await query("select count(*)::int as n from public.photos where moderation_status = 'review'");
       photos = rows[0].n;
     }
+    let paiements = 0;
+    if (await aPaiements()) {
+      const { rows } = await query("select count(*)::int as n from public.payments where status = 'pending'");
+      paiements = rows[0].n;
+    }
     const { rows: m } = await query('select count(*)::int as n from public.matches');
-    res.json({ ok: true, stats: { comptes: u[0].n, signalements: r[0].n, verifications: verif, photos: photos, matchs: m[0].n } });
+    res.json({ ok: true, stats: {
+      comptes: u[0].n, signalements: r[0].n, verifications: verif,
+      photos: photos, paiements: paiements, matchs: m[0].n
+    } });
   } catch (err) { next(err); }
 });
 
@@ -233,4 +242,111 @@ adminRouter.get('/journal', async (_req, res, next) => {
     );
     res.json({ ok: true, disponible: true, actions: rows });
   } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   PAIEMENTS DU MODE DEBOUT
+
+   Circuit manuel : la personne envoie 700 FCFA par Wave, colle l'identifiant
+   de la transaction dans l'application, et la demande apparaît ici. Valider =
+   passer la ligne en « paid » : le déclencheur PostgreSQL active alors 30
+   jours de Mode Debout, sans autre action.
+   --------------------------------------------------------------------------- */
+
+adminRouter.get('/paiements', async (req, res, next) => {
+  try {
+    if (!(await aPaiements())) {
+      return res.json({ ok: true, disponible: false, paiements: [] });
+    }
+    const statut = String(req.query.statut || 'pending');
+    const acceptes = ['pending', 'paid', 'rejected', 'failed', 'tous'];
+    const filtre = acceptes.includes(statut) ? statut : 'pending';
+
+    const { rows } = await query(
+      `select p.id, p.provider, p.provider_ref, p.amount_fcfa, p.status,
+              p.created_at, p.decided_at, p.note,
+              u.id as user_id, u.pseudo, u.phone, u.plan, u.plan_expires_at
+         from public.payments p
+         join public.users u on u.id = p.user_id
+        where ($1 = 'tous' or p.status = $1)
+        order by p.created_at desc
+        limit 200`,
+      [filtre]
+    );
+    res.json({ ok: true, disponible: true, statut: filtre, paiements: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/paiements/:id/decision', async (req, res, next) => {
+  try {
+    if (!(await aPaiements())) {
+      throw new AppError(503, 'PAIEMENTS_INDISPONIBLES', 'Le paiement sera actif après la migration SQL.');
+    }
+
+    const { valider, note } = req.body || {};
+    if (typeof valider !== 'boolean') {
+      throw new AppError(400, 'DECISION_INVALIDE', 'Décision attendue : valider true ou false.');
+    }
+
+    const avant = await query(
+      'select id, user_id, status, provider_ref from public.payments where id = $1',
+      [req.params.id]
+    );
+    if (!avant.rowCount) throw new AppError(404, 'PAIEMENT_INTROUVABLE', 'Paiement introuvable.');
+    if (avant.rows[0].status !== 'pending') {
+      throw new AppError(409, 'DEJA_TRAITE', 'Cette demande a déjà été traitée.');
+    }
+
+    const { rows } = await query(
+      `update public.payments
+          set status = $2,
+              note = $3,
+              paid_at = case when $2 = 'paid' then now() else paid_at end
+        where id = $1
+        returning id, status, decided_at`,
+      [req.params.id, valider ? 'paid' : 'rejected', String(note || '').slice(0, 300) || null]
+    );
+
+    const compte = await query(
+      'select plan, plan_expires_at from public.users where id = $1',
+      [avant.rows[0].user_id]
+    );
+
+    await journal(valider ? 'paiement_valide' : 'paiement_refuse', avant.rows[0].user_id, {
+      paiement: avant.rows[0].id,
+      reference: avant.rows[0].provider_ref,
+      note: note || null
+    });
+
+    res.json({
+      ok: true,
+      paiement: rows[0],
+      compte: compte.rows[0] || null
+    });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   RÉGLAGES — prix, durée, numéro Wave qui reçoit l'argent
+   --------------------------------------------------------------------------- */
+adminRouter.get('/reglages', async (_req, res, next) => {
+  try {
+    const r = await lireReglages(true);
+    const o = await offre();
+    res.json({ ok: true, reglages: r, offre: o });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/reglages', async (req, res, next) => {
+  try {
+    const r = await ecrireReglages(req.body || {});
+    const o = await offre();
+    await journal('reglages_paiement', null, { prix: r.prix_debout, duree: r.duree_jours });
+    res.json({ ok: true, reglages: r, offre: o });
+  } catch (err) {
+    if (err && ['PRIX_INVALIDE', 'DUREE_INVALIDE', 'NUMERO_INVALIDE'].includes(err.code)) {
+      return next(new AppError(400, err.code, err.message));
+    }
+    next(err);
+  }
 });

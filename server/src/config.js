@@ -36,5 +36,12 @@ export const config = {
   // réseau (cybercafé, partage de connexion). Réglable sur Render.
   registerRateLimitMax: Number(process.env.REGISTER_RATE_LIMIT_MAX || 40),
   loginRateLimitMax: Number(process.env.LOGIN_RATE_LIMIT_MAX || 40),
-  recuperationRateLimitMax: Number(process.env.RECUPERATION_RATE_LIMIT_MAX || 10)
+  recuperationRateLimitMax: Number(process.env.RECUPERATION_RATE_LIMIT_MAX || 10),
+  // Déclarations de paiement (preuves Wave) : 6 par quart d'heure et par IP.
+  paiementRateLimitMax: Number(process.env.PAIEMENT_RATE_LIMIT_MAX || 6),
+
+  // Paiement automatique. Vide = le circuit manuel seul (ce qui est le cas
+  // aujourd'hui). Dès que tu as un compte marchand, tu colles le secret ici
+  // et le webhook devient actif, sans toucher au reste.
+  paiementWebhookSecret: process.env.PAIEMENT_WEBHOOK_SECRET || ''
 };

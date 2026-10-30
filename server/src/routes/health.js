@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query, pool } from '../db.js';
 import { config } from '../config.js';
-import { aRecuperation, aChatMedia, aVerifications, aModeration } from '../capabilities.js';
+import { aRecuperation, aChatMedia, aVerifications, aModeration, aPaiements } from '../capabilities.js';
 
 export const healthRouter = Router();
 
@@ -31,11 +31,12 @@ healthRouter.get('/', async (_req, res) => {
   // Sans ça, le navigateur essaie une route absente et reçoit une erreur.
   // On y ajoute ce que la base accepte déjà : c'est le voyant qui dit si la
   // migration SQL est passée, sans avoir à lire les logs de Render.
-  const [recuperation, chatMedia, verifications, moderation] = await Promise.all([
+  const [recuperation, chatMedia, verifications, moderation, paiements] = await Promise.all([
     capacite(aRecuperation),
     capacite(aChatMedia),
     capacite(aVerifications),
-    capacite(aModeration)
+    capacite(aModeration),
+    capacite(aPaiements)
   ]);
 
   const features = ['password-auth', 'photos'];
@@ -43,6 +44,8 @@ healthRouter.get('/', async (_req, res) => {
   if (chatMedia) features.push('chat-media');
   if (verifications) features.push('verifications');
   if (moderation) features.push('moderation');
+  if (paiements) features.push('paiement');
+  if (config.paiementWebhookSecret) features.push('paiement-auto');
   if (config.adminToken) features.push('admin');
 
   res.json({

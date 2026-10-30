@@ -798,6 +798,20 @@
                 </button>
             </div>
 
+            <div id="abo-card" style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,107,0,.08); border:1px solid rgba(255,107,0,.32);">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <h3 style="font-size:14px; font-weight:800;">Mon abonnement</h3>
+                    <span id="abo-badge" style="display:none; font-size:10px; font-weight:800; color:#fbbf24; background:rgba(251,191,36,.18); padding:2px 8px; border-radius:99px;">
+                        👑 Debout
+                    </span>
+                </div>
+                <p id="abo-statut" style="font-size:12px; color:rgba(255,255,255,.6); line-height:1.5;">Chargement…</p>
+                <button class="btn-secondary" id="abo-btn" style="margin-top:12px; display:none;"
+                        onclick="showVipModal('Débloque les likes illimités, le Mode Flirt illimité et les photos de « Qui m\'a aimé ».')" type="button">
+                    <i class="fa-solid fa-crown"></i> Passer en Mode Debout
+                </button>
+            </div>
+
             <div style="margin-top:22px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
                     <h3 style="font-size:14px; font-weight:800;">Profils bloqués</h3>
@@ -1014,22 +1028,56 @@
     </div>
 
     <!-- ==================== Debout (ex-Boss) MODAL ==================== -->
-    <div id="vip-modal">
+    <div id="vip-modal" role="dialog" aria-modal="true" aria-labelledby="vip-titre">
         <div class="vip-card anim-slide-up">
-            <span style="font-size:48px;">👑</span>
-            <h2 style="font-size:22px; font-weight:800; margin-top:12px;" class="gradient-text">Passe en Mode Debout !</h2>
-            <p style="color:rgba(255,255,255,0.6); font-size:14px; margin:12px 0 20px;" id="vip-reason">
-                Tu as utilisé tes 3 Likes du jour. Repasse demain ou débloque les Likes illimités !
+            <span style="font-size:44px;">👑</span>
+            <h2 id="vip-titre" style="font-size:22px; font-weight:800; margin-top:12px;" class="gradient-text">Passe en Mode Debout</h2>
+            <p style="color:rgba(255,255,255,0.6); font-size:14px; margin:12px 0 16px;" id="vip-reason">
+                Tu as utilisé tes 3 Likes du jour. Repasse demain ou débloque les Likes illimités.
             </p>
-            <div style="font-size:36px; font-weight:800; margin-bottom:4px;" class="gradient-text">700 FCFA</div>
-            <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Par mois • Sans renouvellement piégeux</p>
 
-            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
-                <button class="payment-btn" onclick="fakePayment('Wave')" type="button">🐧 Payer avec Wave</button>
-                <button class="payment-btn" onclick="fakePayment('Orange Money')" type="button">🟠 Payer avec Orange Money</button>
-                <button class="payment-btn" onclick="fakePayment('MTN MoMo')" type="button">🟡 Payer avec MTN MoMo</button>
-                <button class="payment-btn" onclick="fakePayment('Moov Money')" type="button">🔵 Payer avec Moov Money</button>
+            <div id="vip-prix-bloc">
+                <div style="font-size:34px; font-weight:800; margin-bottom:2px;" class="gradient-text" id="vip-prix">700 FCFA</div>
+                <p style="color:rgba(255,255,255,0.45); font-size:12px; margin-bottom:16px;" id="vip-duree">
+                    30 jours • sans renouvellement piégeux
+                </p>
             </div>
+
+            <!-- Étape 1 et 2 : payer par Wave, puis coller l'identifiant -->
+            <div id="vip-form" style="display:none; text-align:left;">
+                <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; margin-bottom:14px;">
+                    <p style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.6; margin-bottom:8px;">
+                        <strong style="color:#fff;">1.</strong> Envoie <strong id="vip-montant" style="color:#FF6B00;">700 FCFA</strong>
+                        par <strong style="color:#fff;">Wave</strong> au numéro :
+                    </p>
+                    <p id="vip-numero" style="font-family:ui-monospace,monospace; font-size:20px; font-weight:800; letter-spacing:1px; color:#fff;">—</p>
+                    <p id="vip-nom" style="font-size:12px; color:rgba(255,255,255,.45); margin-top:2px;"></p>
+                    <button class="payment-btn" style="margin-top:10px; padding:10px;" onclick="copierNumeroWave()" type="button">
+                        <i class="fa-solid fa-copy"></i> Copier le numéro
+                    </button>
+                </div>
+
+                <p style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.6; margin-bottom:6px;">
+                    <strong style="color:#fff;">2.</strong> Colle l'identifiant de la transaction reçu dans ton message Wave.
+                </p>
+                <input id="vip-reference" type="text" class="input-field" autocomplete="off" autocapitalize="characters"
+                       placeholder="Ex. TX1234567890" aria-label="Identifiant de la transaction Wave" style="margin-bottom:10px;">
+                <button class="btn-primary" id="vip-envoyer" onclick="envoyerPaiement()" type="button" style="width:100%;">
+                    J'ai payé — envoyer la preuve
+                </button>
+            </div>
+
+            <!-- Demande déjà envoyée : on n'en accepte pas une deuxième -->
+            <div id="vip-attente" style="display:none; background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.4); border-radius:14px; padding:14px; margin-bottom:14px;">
+                <p style="font-size:13px; color:#fbbf24; font-weight:700; margin-bottom:4px;">⏳ Demande en attente</p>
+                <p style="font-size:12px; color:rgba(255,255,255,.6); line-height:1.6;" id="vip-attente-detail">
+                    On vérifie ton paiement. Ton Mode Debout s'active tout seul dès qu'il est reconnu.
+                </p>
+            </div>
+
+            <p id="vip-erreur" role="alert" aria-live="polite"
+               style="display:none; font-size:12px; font-weight:600; color:#fca5a5; line-height:1.5; margin:0 0 12px;"></p>
+
             <button onclick="closeVipModal()" style="background:none; border:none; color:rgba(255,255,255,0.4); font-size:13px; cursor:pointer; font-family:'Outfit';" type="button">
                 Non merci, je reste en mode « coulé » 😅
             </button>
@@ -1774,30 +1822,242 @@
             setTimeout(() => { callInProgress = false; endFakeCall(); }, 3000);
         }
 
-        // ===== Debout (ex-Boss) MODAL =====
+        /* ==================================================================
+           MODE DEBOUT — paiement réel
+
+           Aucun paiement n'est inventé côté navigateur : le prix et le numéro
+           Wave viennent du serveur, la preuve est envoyée au serveur, et c'est
+           la base qui active les 30 jours. Le navigateur ne fait qu'afficher.
+           ================================================================== */
+        let offrePay = null;
+        let paiementEnCours = false;
+
+        function dateFr(iso) {
+            if (!iso) return '';
+            try {
+                return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            } catch (e) { return ''; }
+        }
+
+        function vipErreur(texte, couleur) {
+            const el = document.getElementById('vip-erreur');
+            if (!el) return;
+            el.textContent = texte || '';
+            el.style.color = couleur || '#fca5a5';
+            el.style.display = texte ? 'block' : 'none';
+        }
+
+        async function chargerOffrePay(force) {
+            if (offrePay && !force) return offrePay;
+            if (!window.VCAPI || !window.VCAPI.paiement) return null;
+            try {
+                offrePay = await window.VCAPI.paiement.offre();
+            } catch (e) {
+                offrePay = null;
+            }
+            return offrePay;
+        }
+
         function showVipModal(reason) {
             document.getElementById('vip-reason').textContent = reason;
             document.getElementById('vip-modal').classList.add('active');
+            preparerPaiement();
         }
 
         function closeVipModal() {
             document.getElementById('vip-modal').classList.remove('active');
         }
 
-        function fakePayment(method) {
-            // Simulate payment
-            isVIP = true;
-            likesRemaining = Infinity;
-            document.getElementById('likes-left').textContent = '∞';
+        /** Met la fenêtre dans le bon état : formulaire, attente, déjà Debout… */
+        async function preparerPaiement() {
+            const form = document.getElementById('vip-form');
+            const attente = document.getElementById('vip-attente');
+            const detail = document.getElementById('vip-attente-detail');
+            const prixBloc = document.getElementById('vip-prix-bloc');
+            const bouton = document.getElementById('vip-envoyer');
+            vipErreur('');
 
-            closeVipModal();
+            const serveur = window.VCCompte && VCCompte.mode === 'api' && VCCompte.isLoggedIn() && window.VCAPI;
+            if (!serveur) {
+                form.style.display = 'none';
+                attente.style.display = 'none';
+                bouton.disabled = false;
+                vipErreur("Le paiement s'active une fois ton compte créé sur le serveur.", '#fbbf24');
+                return;
+            }
 
-            // Show success
-            const successMsg = document.createElement('div');
-            successMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;background:linear-gradient(135deg,#34d399,#059669);text-align:center;font-weight:700;font-size:14px;z-index:9999;animation:fadeIn 0.25s ease;';
-            successMsg.textContent = `✅ Paiement ${method} confirmé ! Tu es maintenant Debout 👑`;
-            document.body.appendChild(successMsg);
-            setTimeout(() => successMsg.remove(), 4000);
+            const o = await chargerOffrePay(true);
+            if (!o) {
+                form.style.display = 'none';
+                vipErreur('Impossible de charger le paiement. Vérifie ta connexion et réessaie.', '#fbbf24');
+                return;
+            }
+
+            document.getElementById('vip-prix').textContent = o.prix + ' ' + o.devise;
+            document.getElementById('vip-montant').textContent = o.prix + ' ' + o.devise;
+            document.getElementById('vip-duree').textContent = o.duree_jours + ' jours • sans renouvellement piégeux';
+
+            let moi = null;
+            try { moi = await window.VCAPI.paiement.moi(); } catch (e) { moi = null; }
+
+            if (moi && moi.debout) {
+                prixBloc.style.display = 'none';
+                form.style.display = 'none';
+                attente.style.display = 'block';
+                attente.style.background = 'rgba(52,211,153,.12)';
+                attente.style.borderColor = 'rgba(52,211,153,.4)';
+                attente.querySelector('p').textContent = '👑 Tu es déjà en Mode Debout';
+                attente.querySelector('p').style.color = '#34d399';
+                detail.textContent = moi.fin
+                    ? 'Actif jusqu\'au ' + dateFr(moi.fin) + '. Un nouveau paiement ajoute 30 jours à cette date.'
+                    : 'Ton accès est actif.';
+                return;
+            }
+
+            if (moi && moi.en_attente) {
+                prixBloc.style.display = 'none';
+                form.style.display = 'none';
+                attente.style.display = 'block';
+                attente.style.background = 'rgba(251,191,36,.12)';
+                attente.style.borderColor = 'rgba(251,191,36,.4)';
+                attente.querySelector('p').textContent = '⏳ Demande en attente';
+                attente.querySelector('p').style.color = '#fbbf24';
+                detail.textContent = 'Référence ' + (moi.en_attente.reference || '') +
+                    ' envoyée le ' + dateFr(moi.en_attente.cree_le) +
+                    '. On vérifie ton paiement, ton Mode Debout s\'active tout seul.';
+                return;
+            }
+
+            prixBloc.style.display = 'block';
+            attente.style.display = 'none';
+
+            if (!o.disponible) {
+                form.style.display = 'none';
+                const derniere = moi && moi.historique && moi.historique[0];
+                vipErreur(derniere && derniere.statut === 'rejected'
+                    ? 'Ta dernière demande (' + derniere.reference + ') a été refusée. Le paiement en ligne ouvre très bientôt : écris-nous si tu penses à une erreur.'
+                    : 'Le paiement par Wave ouvre très bientôt. Le numéro qui reçoit les paiements est en cours de configuration.',
+                    '#fbbf24');
+                return;
+            }
+
+            form.style.display = 'block';
+            document.getElementById('vip-numero').textContent = o.numero_lisible || o.numero;
+            document.getElementById('vip-nom').textContent = o.nom ? 'Au nom de ' + o.nom : '';
+            bouton.disabled = false;
+            bouton.textContent = "J'ai payé — envoyer la preuve";
+        }
+
+        async function copierNumeroWave() {
+            const o = offrePay || await chargerOffrePay(true);
+            const numero = (o && (o.numero_lisible || o.numero)) || '';
+            if (!numero) return;
+            try {
+                await navigator.clipboard.writeText(numero);
+                vipErreur('Numéro copié ✓', '#34d399');
+            } catch (e) {
+                vipErreur('Numéro : ' + numero, '#fff');
+            }
+            setTimeout(() => vipErreur(''), 2500);
+        }
+
+        async function envoyerPaiement() {
+            if (paiementEnCours) return;
+            const champ = document.getElementById('vip-reference');
+            const bouton = document.getElementById('vip-envoyer');
+            const reference = (champ.value || '').trim();
+
+            if (reference.replace(/[^A-Za-z0-9-]/g, '').length < 6) {
+                vipErreur("Il faut l'identifiant de la transaction Wave (au moins 6 caractères). Tu le trouves dans ton message Wave.");
+                champ.focus();
+                return;
+            }
+
+            paiementEnCours = true;
+            bouton.disabled = true;
+            bouton.textContent = 'Envoi…';
+            vipErreur('');
+
+            try {
+                await window.VCAPI.paiement.declarer(reference);
+                champ.value = '';
+                await preparerPaiement();
+                if (typeof majAbonnement === 'function') majAbonnement();
+            } catch (err) {
+                const raisons = {
+                    REFERENCE_INVALIDE: "Cet identifiant n'a pas l'air valide. Recopie-le tel qu'il apparaît dans ton message Wave.",
+                    REFERENCE_DEJA_UTILISEE: 'Cet identifiant a déjà servi. Si tu as déjà envoyé la demande, elle est en cours de vérification.',
+                    DEMANDE_EN_ATTENTE: 'Tu as déjà une demande en attente. On la vérifie sous peu.',
+                    PAIEMENT_INDISPONIBLE: 'Le paiement par Wave ouvre très bientôt.',
+                    TROP_DE_DEMANDES: 'Trop de tentatives. Réessaie dans un quart d\'heure.',
+                    RESEAU: 'Pas de connexion. Vérifie ton réseau et réessaie.',
+                    NON_AUTHENTIFIE: 'Ta session a expiré : reconnecte-toi.'
+                };
+                vipErreur(raisons[err.code] || 'Envoi impossible pour le moment. Réessaie dans un instant.');
+                bouton.disabled = false;
+                bouton.textContent = "J'ai payé — envoyer la preuve";
+            } finally {
+                paiementEnCours = false;
+            }
+        }
+
+        /** Carte « Mon abonnement » de l'écran profil. */
+        async function majAbonnement() {
+            const statut = document.getElementById('abo-statut');
+            const bouton = document.getElementById('abo-btn');
+            const badge = document.getElementById('abo-badge');
+            if (!statut) return;
+
+            const serveur = window.VCCompte && VCCompte.mode === 'api' && VCCompte.isLoggedIn() && window.VCAPI;
+            if (!serveur) {
+                statut.textContent = "L'abonnement s'active une fois ton compte créé sur le serveur.";
+                if (bouton) bouton.style.display = 'none';
+                return;
+            }
+
+            try {
+                const moi = await window.VCAPI.paiement.moi();
+                if (moi.debout) {
+                    // On ne peut pas appeler afficherLikes() d'ici : cette
+                    // fonction vit dans le module des discussions. On écrit
+                    // directement le compteur, en gardant la même règle.
+                    isVIP = true;
+                    likesRemaining = Infinity;
+                    const compteur = document.getElementById('likes-left');
+                    if (compteur) compteur.textContent = '∞';
+                    if (badge) badge.style.display = 'inline-block';
+                    statut.innerHTML = '<span style="color:#fbbf24; font-weight:700;">Mode Debout actif</span>' +
+                        (moi.fin ? '<br>Jusqu\'au ' + dateFr(moi.fin) + '.' : '') +
+                        '<br>Likes illimités, Mode Flirt illimité, photos de « Qui m\'a aimé ».';
+                    if (bouton) {
+                        bouton.style.display = 'block';
+                        bouton.innerHTML = '<i class="fa-solid fa-crown"></i> Prolonger de ' + moi.duree_jours + ' jours';
+                    }
+                    return;
+                }
+
+                if (moi.en_attente) {
+                    if (badge) badge.style.display = 'none';
+                    statut.innerHTML = '<span style="color:#fbbf24; font-weight:700;">⏳ Demande en attente</span><br>' +
+                        'Référence ' + (moi.en_attente.reference || '') + ' — on vérifie ton paiement.';
+                    if (bouton) bouton.style.display = 'none';
+                    return;
+                }
+
+                if (badge) badge.style.display = 'none';
+                const refuse = moi.historique && moi.historique[0] && moi.historique[0].statut === 'rejected';
+                statut.innerHTML = '<span style="color:rgba(255,255,255,.7); font-weight:700;">Mode Coulé (gratuit)</span><br>' +
+                    '3 likes par jour. Le Mode Debout coûte ' + moi.prix + ' ' + moi.devise + ' pour ' + moi.duree_jours + ' jours.' +
+                    (refuse ? '<br><span style="color:#fca5a5;">Ta dernière demande a été refusée' +
+                        (moi.historique[0].note ? ' : ' + moi.historique[0].note : '') + '</span>' : '');
+                if (bouton) {
+                    bouton.style.display = 'block';
+                    bouton.innerHTML = '<i class="fa-solid fa-crown"></i> Passer en Mode Debout — ' + moi.prix + ' ' + moi.devise;
+                }
+            } catch (e) {
+                statut.textContent = 'Impossible de charger ton abonnement pour le moment.';
+                if (bouton) bouton.style.display = 'none';
+            }
         }
 
         // Pré-remplit l'écran de profil avec les infos du compte local
@@ -2447,6 +2707,7 @@
                 }
 
                 majCleSecours();
+                if (typeof majAbonnement === 'function') majAbonnement();
             }
 
             /* ---------- Clé de secours et mot de passe ---------- */
