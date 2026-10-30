@@ -1229,11 +1229,21 @@
             C.login(phone, pwd).then(me => {
                 fini();
                 loginError('');
+                /* Une bonne partie de l'application (photos, profil, discussions,
+                   abonnement, envoi de messages) se prépare au chargement de la
+                   page, uniquement si une session est déjà ouverte. Se connecter
+                   ici sans recharger laissait ces écrans inertes — « Mon profil »
+                   ne répondait pas. On relance donc la page avec la session, ce
+                   qui est exactement le chemin d'un utilisateur qui revient. */
                 if (me && me.name) {
                     const el = document.getElementById('setup-name');
                     if (el) el.value = me.name;
                 }
-                ouvrirSelonProfil();
+                try {
+                    location.replace(location.pathname + location.search);
+                } catch (e) {
+                    ouvrirSelonProfil();
+                }
             }).catch(err => {
                 fini();
                 const messages = {

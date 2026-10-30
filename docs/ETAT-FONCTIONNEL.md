@@ -86,7 +86,12 @@ Procédure complète, écran par écran : `PAIEMENT.md`.
 11. **Le service worker pouvait servir un ancien script avec une page neuve.**
     Les pages **et le code** (JS, CSS) passent désormais par le réseau d'abord ;
     seules les images viennent du cache.
-12. **Une base en retard bloquait toute l'application** : si la migration du
+12. **Se connecter par le formulaire laissait l'application à moitié morte.**
+    Les écrans (Mon profil, photos, discussions, abonnement) se préparaient au
+    chargement uniquement si une session existait déjà : après une connexion,
+    l'avatar ne répondait pas (`openMonProfil is not defined`). La page se
+    recharge maintenant avec la session, comme pour un utilisateur qui revient.
+13. **Une base en retard bloquait toute l'application** : si la migration du
     mot de passe n'était pas passée sur Neon, l'inscription marchait mais le
     fil, les matchs et le profil répondaient 500. Les colonnes de la clé de
     secours sont lues de façon tolérante : une base sans migration reste
