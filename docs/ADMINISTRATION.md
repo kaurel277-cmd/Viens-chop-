@@ -41,7 +41,9 @@ Trois `t` = c'est prêt. (Le script peut être relancé sans risque.)
 
 ### c. Ouvrir la console
 
-1. Ouvre **`https://kaurel277-cmd.github.io/Viens-chop-/admin.html`**.
+1. Ouvre **`https://kaurel277-cmd.github.io/Viens-chop-/admin.html`** (la page est
+   déjà en ligne ; tant que `ADMIN_TOKEN` n'est pas défini, elle affiche
+   « la console n'est pas configurée »).
 2. Colle le mot de passe → **Entrer**.
 3. La console reste ouverte 8 h sur cet appareil, puis redemande le mot de passe.
 
