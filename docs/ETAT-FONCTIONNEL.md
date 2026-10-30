@@ -17,6 +17,8 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 | « Qui m'a aimé » | ✅ | Gratuit ; la photo n'apparaît qu'en Mode Debout |
 | Photos et vidéos en vue unique | 🟡 | Tout est en place et testé (envoi, durée, limites, effacement, expiration), **inactif tant que la migration SQL n'est pas passée** (voir plus bas) |
 | Signaler / bloquer | ✅ | Depuis le fil et depuis la discussion ; un profil bloqué disparaît partout |
+| Mot de passe oublié | 🟡 | Clé de secours de 12 caractères (ni SMS ni email) : code prêt et testé, **actif dès que le SQL `MIGRATION-MOT-DE-PASSE.sql` est passé** |
+| Changer son mot de passe (connecté) | 🟡 | Route et écran prêts, même condition : la migration |
 | Faux appel d'urgence | ✅ | Route serveur réelle, quota d'un essai par semaine en Mode Coulé |
 | PWA installable + page hors ligne | ✅ | Manifeste, icônes, service worker, page « tu es hors ligne » |
 | Console d'admin | 🟡 | Existe et fonctionne, **inactive sans `ADMIN_TOKEN`** sur Render |
@@ -48,6 +50,22 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
    livrés : ils sont marqués « bientôt » et le Faux Appel, lui réel, est mis en
    avant.
 
+## Comment marche le « mot de passe oublié »
+
+Il n'y a ni SMS ni email : la preuve d'identité, c'est une **clé de secours**
+de 12 caractères, dans l'alphabet sans pièges (pas de 0/O, ni de 1/I/L).
+
+- donnée **une seule fois**, à l'inscription, et affichée dans un cadre orange ;
+- stockée **hachée** (scrypt) : même en lisant la base, personne ne peut s'en servir ;
+- **utilisable une seule fois** : après dépannage, il faut en générer une nouvelle ;
+- régénérable depuis **Mon profil → Mot de passe & clé de secours**, avec le mot de passe ;
+- 10 essais par quart d'heure et par adresse IP sur la route de récupération ;
+- un mot de passe oublié **déconnecte tous les autres appareils**.
+
+Cas sans clé (compte créé avant le dispositif) : le propriétaire du site lance
+`node tools/nouvelle-cle.js <numéro>` avec la `DATABASE_URL` de Neon, et
+transmet la clé obtenue.
+
 ## Comment marche la vue unique (chat)
 
 - **Photo** : compressée sur l'appareil (280 Ko visés), 400 Ko maximum serveur.
@@ -61,6 +79,10 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 - **Compte à rebours** : 8 s pour une photo, la durée + 2 s pour une vidéo.
 
 ## À faire une fois pour activer le reste
+
+1. `database/MIGRATION-SECURITE.sql` (vue unique, vérification, modération)
+2. `database/MIGRATION-MOT-DE-PASSE.sql` (clé de secours, changement de mot de passe)
+3. La variable `ADMIN_TOKEN` sur Render (console d'admin)
 
 Coller `database/MIGRATION-SECURITE.sql` dans Neon → SQL Editor → Run, puis
 ajouter la variable `ADMIN_TOKEN` sur Render. La requête de contrôle finale doit

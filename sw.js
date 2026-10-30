@@ -17,6 +17,7 @@ const COQUILLE = [
   './index.html',
   './app.html',
   './inscription.html',
+  './mot-de-passe-oublie.html',
   './comment-ca-marche.html',
   './securite.html',
   './tarifs.html',

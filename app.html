@@ -502,7 +502,13 @@
 
                 <button class="btn-primary" onclick="loginCompte()" type="button">Se connecter</button>
 
-                <p style="text-align:center; margin-top:18px; color:rgba(255,255,255,0.5); font-size:13px;">
+                <p style="text-align:center; margin-top:14px;">
+                    <a href="mot-de-passe-oublie.html" style="color:rgba(255,255,255,0.65); font-size:13px; font-weight:600; text-decoration:none;">
+                        Mot de passe oublié ?
+                    </a>
+                </p>
+
+                <p style="text-align:center; margin-top:14px; color:rgba(255,255,255,0.5); font-size:13px;">
                     Pas encore de compte ?
                     <a href="inscription.html" style="color:#FF6B00; font-weight:700; text-decoration:none;">S'inscrire</a>
                 </p>
@@ -761,6 +767,34 @@
                 </button>
             </div>
 
+            <div id="securite-compte" style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
+                <h3 style="font-size:14px; font-weight:800; margin-bottom:6px;">Mot de passe &amp; clé de secours</h3>
+                <p id="cle-statut" style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.5;">Chargement…</p>
+
+                <div id="cle-affichee" style="display:none; margin-top:12px; padding:14px; border-radius:12px; background:rgba(255,107,0,.12); border:1px dashed rgba(255,107,0,.5);">
+                    <p style="font-size:11px; font-weight:700; color:#FF6B00; text-transform:uppercase; letter-spacing:.5px;">Ta nouvelle clé de secours</p>
+                    <p id="cle-valeur" style="font-family:ui-monospace,monospace; font-size:19px; font-weight:800; letter-spacing:2px; margin:8px 0; color:#fff;"></p>
+                    <p style="font-size:11px; color:rgba(255,255,255,.6); line-height:1.5;">
+                        Note-la maintenant : elle ne sera plus jamais affichée.
+                    </p>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button class="btn-secondary" style="flex:1; margin:0; padding:10px;" onclick="copierCleSecours()" type="button">
+                            <i class="fa-solid fa-copy"></i> Copier
+                        </button>
+                        <button class="btn-secondary" style="flex:1; margin:0; padding:10px;" onclick="masquerCleSecours()" type="button">
+                            Je l'ai notée
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-secondary" id="btn-cle" style="margin-top:12px;" onclick="demanderNouvelleCle()" type="button">
+                    <i class="fa-solid fa-key"></i> Générer une clé de secours
+                </button>
+                <button class="btn-secondary" style="margin-top:10px;" onclick="ouvrirChangementMdp()" type="button">
+                    <i class="fa-solid fa-lock"></i> Changer mon mot de passe
+                </button>
+            </div>
+
             <div style="margin-top:22px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
                     <h3 style="font-size:14px; font-weight:800;">Profils bloqués</h3>
@@ -775,6 +809,31 @@
                 <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
             </button>
 
+        </div>
+    </div>
+
+    <!-- Changement de mot de passe / génération de clé : saisie du mot de passe -->
+    <div id="mdp-sheet" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,.72); align-items:center; justify-content:center; padding:20px;">
+        <div style="width:100%; max-width:400px; background:#141414; border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:22px;">
+            <h3 id="mdp-titre" style="font-size:17px; font-weight:800; margin-bottom:6px;">Mot de passe</h3>
+            <p id="mdp-aide" style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.5; margin-bottom:14px;"></p>
+
+            <label for="mdp-ancien" id="mdp-ancien-label" style="display:block; font-size:11px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">Ton mot de passe actuel</label>
+            <input type="password" id="mdp-ancien" class="input-field" autocomplete="current-password" aria-label="Mot de passe actuel">
+
+            <div id="mdp-nouveaux" style="display:none;">
+                <label for="mdp-nouveau" style="display:block; font-size:11px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.5px; margin:12px 0 6px;">Nouveau mot de passe</label>
+                <input type="password" id="mdp-nouveau" class="input-field" autocomplete="new-password">
+                <label for="mdp-nouveau2" style="display:block; font-size:11px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.5px; margin:12px 0 6px;">Confirme le nouveau mot de passe</label>
+                <input type="password" id="mdp-nouveau2" class="input-field" autocomplete="new-password" aria-label="Confirmation du nouveau mot de passe">
+            </div>
+
+            <p id="mdp-erreur" role="alert" style="display:none; color:#fca5a5; font-size:12px; font-weight:600; margin-top:12px;"></p>
+
+            <div style="display:flex; gap:8px; margin-top:18px;">
+                <button class="btn-secondary" style="flex:1; margin:0;" onclick="fermerFeuilleMdp()" type="button">Annuler</button>
+                <button class="btn-primary" style="flex:1; margin:0;" id="mdp-valider" onclick="validerFeuilleMdp()" type="button">Valider</button>
+            </div>
         </div>
     </div>
 
@@ -1110,8 +1169,14 @@
                 ouvrirSelonProfil();
             }).catch(err => {
                 const messages = {
+                    // Le serveur répond volontairement la même chose pour un
+                    // numéro inconnu et un mauvais mot de passe.
+                    IDENTIFIANTS_INCORRECTS: 'Numéro ou mot de passe incorrect.',
                     COMPTE_INTROUVABLE: "Aucun compte avec ce numéro. Inscris-toi d'abord.",
-                    MOT_DE_PASSE_INCORRECT: 'Mot de passe incorrect.'
+                    MOT_DE_PASSE_INCORRECT: 'Mot de passe incorrect.',
+                    TELEPHONE_INVALIDE: 'Entre tes 10 chiffres, par exemple 07 00 00 00 00.',
+                    TROP_D_ESSAIS: "Trop d'essais. Patiente quelques minutes.",
+                    RESEAU: 'Impossible de joindre le serveur. Vérifie ta connexion.'
                 };
                 loginError(messages[err.code] || 'Connexion impossible. Réessaie.');
             });
@@ -2279,7 +2344,155 @@
                         document.getElementById('my-quota-bar').style.width = st.pct + '%';
                     });
                 }
+
+                majCleSecours();
             }
+
+            /* ---------- Clé de secours et mot de passe ---------- */
+            let actionMdp = 'cle';          // 'cle' ou 'mdp'
+
+            /* Petit bandeau de confirmation, autonome : ce module-ci n'a pas
+               accès aux messages du module de sécurité. */
+            function petitToast(texte, couleur) {
+                const d = document.createElement('div');
+                d.setAttribute('role', 'status');
+                d.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:14px;z-index:10000;text-align:center;' +
+                    'font-weight:700;font-size:14px;color:#fff;background:' + (couleur || '#059669') + ';animation:fadeIn .25s ease;';
+                d.textContent = texte;
+                document.body.appendChild(d);
+                setTimeout(() => d.remove(), 4000);
+            }
+
+            async function majCleSecours() {
+                const statut = document.getElementById('cle-statut');
+                const bouton = document.getElementById('btn-cle');
+                if (!statut) return;
+
+                if (!SERVEUR) {
+                    statut.textContent = "La clé de secours s'active une fois ton compte créé sur le serveur.";
+                    if (bouton) bouton.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const me = await window.VCAPI.auth.me();
+                    const u = me.user || {};
+                    if (u.a_cle_secours) {
+                        statut.innerHTML = '<span style="color:#34d399; font-weight:700;">✓ Clé de secours active</span><br>' +
+                            "C'est elle qui te permettra de changer ton mot de passe si tu l'oublies.";
+                        if (bouton) bouton.innerHTML = '<i class="fa-solid fa-key"></i> Remplacer ma clé de secours';
+                    } else if (u.cle_utilisee_le) {
+                        statut.innerHTML = '<span style="color:#fbbf24; font-weight:700;">Ta clé a servi</span><br>' +
+                            'Génère-en une nouvelle, sinon tu n\'as plus de secours.';
+                        if (bouton) bouton.innerHTML = '<i class="fa-solid fa-key"></i> Générer ma clé de secours';
+                    } else {
+                        statut.innerHTML = '<span style="color:#fbbf24; font-weight:700;">Pas encore de clé</span><br>' +
+                            'Sans elle, un mot de passe oublié est définitif. Génère-la et note-la.';
+                        if (bouton) bouton.innerHTML = '<i class="fa-solid fa-key"></i> Générer ma clé de secours';
+                    }
+                } catch (e) {
+                    statut.textContent = 'Statut indisponible pour le moment.';
+                }
+            }
+            window.majCleSecours = majCleSecours;
+
+            function ouvrirFeuilleMdp(mode) {
+                actionMdp = mode;
+                const feuille = document.getElementById('mdp-sheet');
+                const titre = document.getElementById('mdp-titre');
+                const aide = document.getElementById('mdp-aide');
+                const nouveaux = document.getElementById('mdp-nouveaux');
+                const labelAncien = document.getElementById('mdp-ancien-label');
+                const err = document.getElementById('mdp-erreur');
+                const champ = document.getElementById('mdp-ancien');
+
+                err.style.display = 'none';
+                champ.value = '';
+                document.getElementById('mdp-nouveau').value = '';
+                document.getElementById('mdp-nouveau2').value = '';
+
+                if (mode === 'cle') {
+                    titre.textContent = 'Générer une clé de secours';
+                    aide.textContent = 'Ta clé remplace l\'ancienne. Elle ne sera affichée qu\'une seule fois : note-la.';
+                    nouveaux.style.display = 'none';
+                    labelAncien.textContent = 'Ton mot de passe';
+                } else {
+                    titre.textContent = 'Changer mon mot de passe';
+                    aide.textContent = 'Les autres appareils seront déconnectés.';
+                    nouveaux.style.display = 'block';
+                    labelAncien.textContent = 'Ton mot de passe actuel';
+                }
+
+                feuille.style.display = 'flex';
+                setTimeout(() => champ.focus(), 60);
+            }
+
+            window.demanderNouvelleCle = () => ouvrirFeuilleMdp('cle');
+            window.ouvrirChangementMdp = () => ouvrirFeuilleMdp('mdp');
+            window.fermerFeuilleMdp = () => { document.getElementById('mdp-sheet').style.display = 'none'; };
+
+            window.validerFeuilleMdp = async function () {
+                const err = document.getElementById('mdp-erreur');
+                const bouton = document.getElementById('mdp-valider');
+                const ancien = document.getElementById('mdp-ancien').value;
+                const nouveau = document.getElementById('mdp-nouveau').value;
+                const nouveau2 = document.getElementById('mdp-nouveau2').value;
+                const montre = m => { err.textContent = m; err.style.display = 'block'; };
+
+                err.style.display = 'none';
+                if (!ancien) { montre('Entre ton mot de passe.'); return; }
+                if (actionMdp === 'mdp') {
+                    if (nouveau.length < 6) { montre('Le nouveau mot de passe doit faire au moins 6 caractères.'); return; }
+                    if (nouveau !== nouveau2) { montre('Les deux mots de passe ne sont pas identiques.'); return; }
+                }
+
+                bouton.disabled = true;
+                bouton.textContent = 'Un instant…';
+                try {
+                    if (actionMdp === 'cle') {
+                        const rep = await window.VCAPI.auth.nouvelleCleSecours(ancien);
+                        fermerFeuilleMdp();
+                        afficherCleSecours(rep.cle_secours);
+                        majCleSecours();
+                    } else {
+                        await window.VCAPI.auth.changerMotDePasse(ancien, nouveau);
+                        fermerFeuilleMdp();
+                        petitToast('Mot de passe changé. Les autres appareils sont déconnectés.', '#065f46');
+                    }
+                } catch (e) {
+                    const messages = {
+                        MOT_DE_PASSE_INCORRECT: 'Mot de passe incorrect.',
+                        MEME_MOT_DE_PASSE: "Choisis un mot de passe différent de l'ancien.",
+                        MOT_DE_PASSE_COURT: 'Au moins 6 caractères.',
+                        RECUPERATION_INDISPONIBLE: "La clé de secours s'active dès que la base est à jour.",
+                        TROP_D_ESSAIS: 'Trop d\'essais. Patiente un instant.'
+                    };
+                    montre(messages[e.code] || 'Action impossible : ' + (e.message || 'réessaie.'));
+                } finally {
+                    bouton.disabled = false;
+                    bouton.textContent = 'Valider';
+                }
+            };
+
+            function afficherCleSecours(cle) {
+                document.getElementById('cle-valeur').textContent = cle;
+                document.getElementById('cle-affichee').style.display = 'block';
+            }
+
+            window.masquerCleSecours = function () {
+                document.getElementById('cle-affichee').style.display = 'none';
+                petitToast('Clé notée. Garde-la quelque part de sûr.', '#065f46');
+            };
+
+            window.copierCleSecours = async function () {
+                const cle = document.getElementById('cle-valeur').textContent;
+                try {
+                    await navigator.clipboard.writeText(cle);
+                    petitToast('Clé copiée. Colle-la dans tes notes.', '#065f46');
+                } catch (e) {
+                    petitToast('Copie-la à la main : ' + cle, '#37474f');
+                }
+            };
 
             window.addMyPhoto = async function () {
                 const compte = C.current();

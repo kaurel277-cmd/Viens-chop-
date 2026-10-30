@@ -55,6 +55,16 @@ if (config.rateLimitEnabled) {
     message: { error: { code: 'TROP_DE_COMPTES', message: 'Trop d\'inscriptions depuis ce réseau.' } }
   }));
 
+  // Récupération de compte : 10 essais / 15 min / IP. Une clé de secours a
+  // 10^17 combinaisons, mais on ne laisse pas non plus marteler la route.
+  app.use('/api/auth/recuperation', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: config.recuperationRateLimitMax,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: { code: 'TROP_D_ESSAIS', message: 'Trop d\'essais. Réessaie dans un quart d\'heure.' } }
+  }));
+
 }
 
 // /api/health = le processus répond. /api/health/db = la base répond vraiment.

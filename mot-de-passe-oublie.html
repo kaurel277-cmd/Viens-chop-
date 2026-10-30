@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mot de passe oublié</title>
+    <meta name="description" content="Retrouve ton compte Viens chop sans SMS et sans email : entre ton numéro, ta clé de secours et un nouveau mot de passe.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Viens chop">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:url" content="https://kaurel277-cmd.github.io/Viens-chop-/mot-de-passe-oublie.html">
+    <meta property="og:title" content="Mot de passe oublié">
+    <meta property="og:description" content="Ta clé de secours récupère ton compte, sans SMS ni email.">
+    <meta property="og:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mot de passe oublié">
+    <meta name="twitter:description" content="Ta clé de secours récupère ton compte, sans SMS ni email.">
+    <meta name="twitter:image" content="https://kaurel277-cmd.github.io/Viens-chop-/assets/img/og-card.jpg">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32">
+    <link rel="icon" href="assets/img/icon-192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Viens chop">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;display=swap"></noscript>
+    <style>
+        .bg-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); }
+        .text-brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FF1E56 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .field { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .75rem; padding: .8rem 1rem; font-size: .875rem; color: #1e293b; transition: border-color .15s, box-shadow .15s; }
+        .field:focus { outline: none; border-color: #FF1E56; box-shadow: 0 0 0 3px rgba(255, 30, 86, .12); }
+        .field.invalid { border-color: #ef4444; }
+        .cle-input { letter-spacing: .18em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; text-transform: uppercase; }
+        .eye { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; color: #94a3b8; border-radius: .5rem; background: none; border: none; cursor: pointer; }
+        .eye:hover { color: #FF1E56; background: #fff1f2; }
+        .step-dot { height: 4px; border-radius: 4px; background: #e2e8f0; flex: 1; }
+        .step-dot.active { background: linear-gradient(90deg, #FF6B00, #FF1E56); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- ===== EN-TÊTE ===== -->
+    <header class="hero-bg text-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-10">
+            <div class="flex items-center justify-between mb-8">
+                <a href="index.html" class="flex items-center gap-2 font-extrabold text-lg">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">🥒</span>
+                    Viens chop
+                </a>
+                <a href="app.html" class="text-sm font-bold bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl px-4 py-2 transition">
+                    Se connecter
+                </a>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-3">Mot de passe oublié</h1>
+            <p class="text-white/90 text-sm sm:text-base max-w-lg">
+                Pas de SMS, pas d'email : chez Viens chop, ton filet de sécurité c'est ta
+                <strong>clé de secours</strong> — les 12 caractères notés à l'inscription.
+            </p>
+        </div>
+    </header>
+
+    <!-- ===== FORMULAIRE ===== -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+
+            <div class="flex gap-2 mb-8">
+                <span class="step-dot active" id="dot1"></span>
+                <span class="step-dot" id="dot2"></span>
+                <span class="step-dot" id="dot3"></span>
+            </div>
+
+            <!-- ÉTAPE 1 : le numéro -->
+            <form id="etape-1" novalidate>
+                <h2 class="text-xl font-extrabold mb-1">Ton numéro de téléphone</h2>
+                <p class="text-sm text-slate-500 mb-6">Celui avec lequel tu t'es inscrit(e).</p>
+
+                <label for="phone" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Numéro</label>
+                <div class="flex gap-2">
+                    <span class="bg-slate-50 border border-slate-200 rounded-xl px-3 flex items-center font-bold text-sm text-slate-600">+225</span>
+                    <input id="phone" name="tel" type="tel" inputmode="numeric" autocomplete="tel"
+                           placeholder="07 XX XX XX XX" class="field flex-1" aria-describedby="err-phone">
+                </div>
+                <p id="err-phone" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
+
+                <button type="submit" class="w-full mt-6 bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
+                    Continuer →
+                </button>
+
+                <p class="text-center text-sm text-slate-500 mt-5">
+                    Pas encore de compte ? <a href="inscription.html" class="text-brandPink font-bold hover:underline">S'inscrire</a>
+                </p>
+            </form>
+
+            <!-- ÉTAPE 2 : la clé + le nouveau mot de passe -->
+            <form id="etape-2" novalidate class="hidden">
+                <h2 class="text-xl font-extrabold mb-1">Ta clé de secours</h2>
+                <p class="text-sm text-slate-500 mb-6">
+                    Elle ressemble à <span class="font-mono font-bold text-slate-700">ABCD-EFGH-JKMN</span>.
+                    Tu l'as notée à l'inscription, ou générée depuis ton profil.
+                </p>
+
+                <label for="cle" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Clé de secours</label>
+                <input id="cle" name="cle" type="text" inputmode="text" autocomplete="off" spellcheck="false"
+                       maxlength="14" placeholder="ABCD-EFGH-JKMN" class="field cle-input text-center text-lg"
+                       aria-describedby="err-cle">
+                <p id="err-cle" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
+
+                <div class="mt-5">
+                    <label for="mdp" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Nouveau mot de passe</label>
+                    <div class="relative">
+                        <input id="mdp" name="new-password" type="password" autocomplete="new-password"
+                               placeholder="6 caractères minimum" class="field pr-12" aria-describedby="err-mdp">
+                        <button type="button" class="eye" data-target="mdp" aria-label="Afficher le mot de passe" aria-pressed="false">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="err-mdp" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
+                </div>
+
+                <div class="mt-4">
+                    <label for="mdp2" class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Confirme le mot de passe</label>
+                    <div class="relative">
+                        <input id="mdp2" name="confirm-password" type="password" autocomplete="new-password"
+                               placeholder="Retape le même mot de passe" class="field pr-12" aria-describedby="err-mdp2">
+                        <button type="button" class="eye" data-target="mdp2" aria-label="Afficher le mot de passe" aria-pressed="false">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="err-mdp2" role="alert" class="hidden text-xs font-semibold text-red-500 mt-2"></p>
+                </div>
+
+                <p id="err-form" role="alert" aria-live="polite"
+                   class="hidden text-sm font-semibold text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mt-5"></p>
+
+                <button type="submit" id="btn-reset"
+                        class="w-full mt-6 bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition disabled:opacity-60">
+                    Réinitialiser mon mot de passe
+                </button>
+
+                <button type="button" onclick="retourEtape1()" class="w-full mt-3 text-sm font-bold text-slate-500 hover:text-brandPink">
+                    ← Ce n'est pas mon numéro
+                </button>
+            </form>
+
+            <!-- ÉTAPE 3 : c'est fait -->
+            <div id="etape-3" class="hidden text-center py-4">
+                <p class="text-5xl mb-3">✅</p>
+                <h2 class="text-xl font-extrabold mb-2">Mot de passe changé</h2>
+                <p class="text-sm text-slate-500 mb-6">
+                    Tu es reconnecté(e). Les autres appareils ont été déconnectés.
+                </p>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left mb-6">
+                    <p class="text-sm font-extrabold text-amber-900 mb-1">⚠️ Ta clé de secours a servi</p>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                        Une clé ne sert qu'une fois. Pense à en générer une nouvelle depuis
+                        <strong>Mon profil → Mot de passe &amp; clé de secours</strong>, sinon tu n'auras plus de secours la prochaine fois.
+                    </p>
+                </div>
+
+                <a href="app.html" id="lien-app"
+                   class="inline-block w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
+                    Entrer dans l'application 🚀
+                </a>
+            </div>
+        </div>
+
+        <!-- Sans clé : on dit la vérité -->
+        <div class="mt-6 bg-white rounded-3xl border border-slate-200 p-6">
+            <h3 class="font-extrabold mb-2">Je n'ai plus ma clé de secours</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Sans elle, personne ne peut rouvrir ton compte : c'est le prix d'une inscription
+                sans SMS et sans email, où personne d'autre ne détient la clé — ni nous.
+            </p>
+            <p class="text-sm text-slate-600 leading-relaxed mt-2">
+                <strong>Un espoir :</strong> si tu es encore connecté(e) sur un autre téléphone,
+                va dans <strong>Mon profil → Mot de passe &amp; clé de secours</strong> et génère-y une clé :
+                elle te servira immédiatement ici.
+            </p>
+            <p class="text-sm text-slate-600 leading-relaxed mt-2">
+                Sinon, le plus simple est de <a href="inscription.html" class="text-brandPink font-bold hover:underline">créer un nouveau compte</a>
+                avec un autre numéro.
+            </p>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 mt-8 py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center text-xs text-slate-400">
+            <a href="index.html" class="hover:text-brandPink">Accueil</a> ·
+            <a href="faq.html" class="hover:text-brandPink">FAQ</a> ·
+            <a href="securite.html" class="hover:text-brandPink">Sécurité</a> ·
+            <a href="mentions-legales.html" class="hover:text-brandPink">Mentions légales</a>
+        </div>
+    </footer>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/compte.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            const $ = id => document.getElementById(id);
+            const API_CIBLE = new URLSearchParams(location.search).get('api');
+
+            function erreur(id, message) {
+                const el = $(id);
+                if (!el) return;
+                el.textContent = message || '';
+                el.classList.toggle('hidden', !message);
+            }
+            function champInvalide(id, mauvais) {
+                const el = $(id);
+                if (el) el.classList.toggle('invalid', !!mauvais);
+            }
+
+            /* --- formatage de la clé : ABCD-EFGH-JKMN --- */
+            const cleInput = $('cle');
+            cleInput.addEventListener('input', () => {
+                const brut = cleInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+                cleInput.value = brut.replace(/(.{4})(?=.)/g, '$1-');
+                erreur('err-cle', '');
+                champInvalide('cle', false);
+            });
+
+            /* --- voir / cacher les mots de passe --- */
+            document.querySelectorAll('.eye').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = $(btn.dataset.target);
+                    if (!input) return;
+                    const montre = input.type === 'password';
+                    input.type = montre ? 'text' : 'password';
+                    btn.setAttribute('aria-pressed', String(montre));
+                    btn.setAttribute('aria-label', montre ? 'Cacher le mot de passe' : 'Afficher le mot de passe');
+                    btn.innerHTML = '<i class="fa-solid fa-eye' + (montre ? '-slash' : '') + '"></i>';
+                });
+            });
+
+            function etape(n) {
+                $('etape-1').classList.toggle('hidden', n !== 1);
+                $('etape-2').classList.toggle('hidden', n !== 2);
+                $('etape-3').classList.toggle('hidden', n !== 3);
+                $('dot1').classList.toggle('active', n >= 1);
+                $('dot2').classList.toggle('active', n >= 2);
+                $('dot3').classList.toggle('active', n >= 3);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            window.retourEtape1 = () => etape(1);
+
+            let telephone = '';
+
+            /* --- étape 1 --- */
+            $('etape-1').addEventListener('submit', e => {
+                e.preventDefault();
+                erreur('err-phone', '');
+                champInvalide('phone', false);
+
+                const C = window.VCCompte;
+                const valeur = $('phone').value;
+                if (!C || !C.isValidPhone(valeur)) {
+                    champInvalide('phone', true);
+                    erreur('err-phone', 'Entre tes 10 chiffres, par exemple 07 00 00 00 00.');
+                    return;
+                }
+                telephone = valeur;
+                etape(2);
+                $('cle').focus();
+            });
+
+            /* --- étape 2 --- */
+            $('etape-2').addEventListener('submit', async e => {
+                e.preventDefault();
+                const C = window.VCCompte;
+                const cle = cleInput.value.trim();
+                const mdp = $('mdp').value;
+                const mdp2 = $('mdp2').value;
+
+                erreur('err-cle', ''); erreur('err-mdp', ''); erreur('err-mdp2', ''); erreur('err-form', '');
+                champInvalide('cle', false); champInvalide('mdp', false); champInvalide('mdp2', false);
+
+                if (cle.replace(/-/g, '').length !== 12) {
+                    champInvalide('cle', true);
+                    erreur('err-cle', 'La clé fait 12 caractères (4 groupes de 4).');
+                    return;
+                }
+                if (mdp.length < 6) {
+                    champInvalide('mdp', true);
+                    erreur('err-mdp', 'Au moins 6 caractères.');
+                    return;
+                }
+                if (mdp !== mdp2) {
+                    champInvalide('mdp2', true);
+                    erreur('err-mdp2', 'Les deux mots de passe ne sont pas identiques.');
+                    return;
+                }
+
+                const bouton = $('btn-reset');
+                bouton.disabled = true;
+                bouton.textContent = 'Vérification...';
+                try {
+                    await C.configure({ api: API_CIBLE });
+                    if (C.mode !== 'api') {
+                        erreur('err-form', "Le serveur ne répond pas. Vérifie ta connexion et réessaie.");
+                        return;
+                    }
+                    await window.VCAPI.auth.recuperer(telephone, cle, mdp);
+                    // On recharge le profil tout de suite : sinon l'application
+                    // ne verrait pas la session et redemanderait de se connecter.
+                    try { await C.recharger(); } catch (e) { /* le mot de passe est changé quand même */ }
+                    etape(3);
+                    setTimeout(() => { location.href = 'app.html'; }, 20000);
+                } catch (err) {
+                    const messages = {
+                        CLE_INVALIDE: 'Numéro ou clé de secours incorrecte. Vérifie ta clé, lettre par lettre.',
+                        CLE_DEJA_UTILISEE: 'Cette clé a déjà servi. Utilise la plus récente, ou celle de ton profil.',
+                        RECUPERATION_INDISPONIBLE: "La récupération de compte s'active dans quelques instants. Réessaie dans une minute.",
+                        MOT_DE_PASSE_COURT: 'Ton nouveau mot de passe doit faire au moins 6 caractères.',
+                        TROP_D_ESSAIS: 'Trop d\'essais. Patiente un quart d\'heure avant de réessayer.',
+                        RESEAU: 'Impossible de joindre le serveur. Vérifie ta connexion.'
+                    };
+                    erreur('err-form', messages[err.code] || ('Réinitialisation impossible : ' + (err.message || 'réessaie.')));
+                } finally {
+                    bouton.disabled = false;
+                    bouton.textContent = 'Réinitialiser mon mot de passe';
+                }
+            });
+        })();
+    </script>
+    <script src="assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -154,6 +154,32 @@
       return request('/api/auth/me');
     },
 
+    /* « J'ai oublié mon mot de passe » : numéro + clé de secours + nouveau
+       mot de passe. Aucun SMS, aucun email. */
+    async recuperer(phone, cleSecours, nouveauMotDePasse) {
+      const local = String(phone).replace(/\D/g, '').replace(/^225/, '');
+      const d = await request('/api/auth/recuperation', {
+        method: 'POST', auth: false,
+        body: { phone: local, cle_secours: cleSecours, password: nouveauMotDePasse }
+      });
+      saveSession(d.access_token, d.refresh_token);
+      return d;
+    },
+
+    /* Nouvelle clé de secours (connecté, mot de passe demandé). */
+    nouvelleCleSecours(motDePasse) {
+      return request('/api/auth/cle-secours', { method: 'POST', body: { password: motDePasse } });
+    },
+
+    /* Changement de mot de passe depuis Mon profil. */
+    async changerMotDePasse(ancien, nouveau) {
+      const d = await request('/api/auth/changer-mot-de-passe', {
+        method: 'POST', body: { ancien_mot_de_passe: ancien, password: nouveau }
+      });
+      saveSession(d.access_token, d.refresh_token);
+      return d;
+    },
+
     async logout() {
       if (state.refresh) {
         try {

@@ -18,7 +18,8 @@ const cache = {
   verifications: null, verificationsAt: 0,
   moderation: null, moderationAt: 0,
   adminActions: null, adminActionsAt: 0,
-  chatMedia: null, chatMediaAt: 0
+  chatMedia: null, chatMediaAt: 0,
+  recuperation: null, recuperationAt: 0
 };
 
 function encoreValable(valeur, at) {
@@ -68,6 +69,24 @@ export async function aModeration() {
 
 export async function aChatMedia() {
   return capacite('chatMedia', () => tableExiste('chat_media'));
+}
+
+/* Colonne qui porte la clé de secours : sans elle, pas de « mot de passe
+   oublié ». On regarde la colonne, pas une table, pour rester au plus près
+   du SQL fourni. */
+export async function aRecuperation() {
+  return capacite('recuperation', async () => {
+    try {
+      const { rows } = await query(
+        `select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'users'
+            and column_name = 'recovery_hash' limit 1`
+      );
+      return rows.length > 0;
+    } catch {
+      return false;
+    }
+  });
 }
 
 /** Réinitialise le cache (utilisé par les tests). */

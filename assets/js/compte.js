@@ -200,6 +200,9 @@ window.VCCompte = (function () {
     async function createServeur({ phone, password, birth }) {
         const res = await window.VCAPI.auth.register(normalizePhone(phone), password, birth);
         const profil = versProfil(res.user);
+        // La clé de secours n'est montrée qu'ici, une seule fois : on la fait
+        // remonter telle quelle pour que l'inscription puisse l'afficher.
+        if (res.cle_secours) profil.cle_secours = res.cle_secours;
         cacheProfil(profil);
         return profil;
     }
@@ -398,6 +401,28 @@ window.VCCompte = (function () {
         return publicView(list[i]);
     }
 
+    /* Relit le profil sur le serveur et remplit le cache local.
+       Utilisé juste après une récupération de compte, pour arriver dans
+       l'application déjà connecté. */
+    async function recharger() {
+        if (mode === 'api') {
+            const me = await window.VCAPI.auth.me();
+            if (me && me.user) {
+                let photos = [];
+                try {
+                    const liste = await window.VCAPI.photos.list();
+                    photos = (liste.photos || []).map(ph => ph.url);
+                } catch (e) { /* pas bloquant */ }
+                const profil = versProfil(Object.assign({}, me.user, { photos }));
+                cacheProfil(profil);
+                return profil;
+            }
+            return profilEnCache();
+        }
+        const id = store.get(KEY_SESSION);
+        return publicView(readAll().find(a => a.id === id) || null);
+    }
+
     function remove(phone) {
         const p = normalizePhone(phone);
         writeAll(readAll().filter(a => a.phone !== p));
@@ -405,7 +430,10 @@ window.VCCompte = (function () {
     }
 
     async function changePassword(oldPassword, newPassword) {
-        if (mode === 'api') fail('NON_DISPONIBLE', 'Le changement de mot de passe se fera depuis le serveur.');
+        if (mode === 'api') {
+            await window.VCAPI.auth.changerMotDePasse(oldPassword, newPassword);
+            return true;
+        }
         const id = store.get(KEY_SESSION);
         const list = readAll();
         const a = list.find(x => x.id === id);
@@ -462,7 +490,7 @@ window.VCCompte = (function () {
         get mode() { return mode; },
         normalizePhone, isValidPhone, formatPhone, operatorOf,
         ageFrom, lastBirthDate, toISO,
-        create, login, logout, current, all, isLoggedIn, update, remove, changePassword, photos,
+        create, login, logout, current, all, isLoggedIn, update, remove, changePassword, recharger, photos,
         exists: phone => !!find(phone),
         find: phone => publicView(find(phone)),
         storagePersistant: store.persistant

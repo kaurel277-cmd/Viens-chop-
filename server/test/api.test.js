@@ -52,7 +52,7 @@ async function signup(phone, pseudo, extra = {}) {
     }
   });
   assert.equal(p.status, 200, `profil : ${JSON.stringify(p.json)}`);
-  return { token, id: p.json.user.id, refresh: v.json.refresh_token };
+  return { token, id: p.json.user.id, refresh: v.json.refresh_token, cle_secours: v.json.cle_secours };
 }
 
 /** Donne une photo principale à un utilisateur (contourne l'upload multipart). */
@@ -654,6 +654,128 @@ test('vidéos en vue unique : format, durée et expiration vérifiés', async ()
   const contenu = await query('select data from public.chat_media where id = $1', [vieux.rows[0].id]);
   assert.equal(contenu.rows[0].data, null);
   ok('le fichier expiré est effacé de la base');
+});
+
+test('mot de passe oublié : la clé de secours récupère le compte', async () => {
+  const tel = '+2250701000150';
+  const a = await signup(tel, 'OubliA', { gender: 'F' });
+
+  // 1. La clé est donnée une seule fois, à l'inscription, et hachée en base
+  assert.match(String(a.cle_secours), /^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/);
+  ok('l\'inscription donne une clé de secours', a.cle_secours);
+
+  const enBase = await query('select recovery_hash from public.users where phone = $1', [tel]);
+  assert.ok(enBase.rows[0].recovery_hash);
+  assert.ok(!String(enBase.rows[0].recovery_hash).includes(a.cle_secours.replace(/-/g, '')));
+  ok('la clé est stockée hachée, jamais en clair');
+
+  // 2. Mauvaise clé : refus, et rien ne change
+  const mauvaise = await api('/api/auth/recuperation', {
+    method: 'POST', auth: false,
+    body: { phone: tel, cle_secours: 'AAAA-BBBB-CCCC', password: 'Nouveau2026!' }
+  });
+  assert.equal(mauvaise.status, 401);
+  assert.equal(mauvaise.json.error.code, 'CLE_INVALIDE');
+  ok('une mauvaise clé est refusée');
+
+  const ancienMarche = await api('/api/auth/login', {
+    method: 'POST', auth: false, body: { phone: tel, password: 'Chop2026!' }
+  });
+  assert.equal(ancienMarche.status, 200);
+  ok('le mot de passe n\'a pas bougé après un échec');
+
+  // 3. Numéro inconnu : même message, on n'indique pas si le compte existe
+  const inconnu = await api('/api/auth/recuperation', {
+    method: 'POST', auth: false,
+    body: { phone: '+2250701000999', cle_secours: 'AAAA-BBBB-CCCC', password: 'Nouveau2026!' }
+  });
+  assert.equal(inconnu.status, 401);
+  assert.equal(inconnu.json.message, mauvaise.json.message);
+  ok('un numéro inconnu reçoit exactement le même message');
+
+  // 4. Bonne clé : le compte est récupéré, les autres sessions tombent
+  const avant = await api('/api/auth/login', {
+    method: 'POST', auth: false, body: { phone: tel, password: 'Chop2026!' }
+  });
+  const vieuxRefresh = avant.json.refresh_token;
+
+  const reussite = await api('/api/auth/recuperation', {
+    method: 'POST', auth: false,
+    body: { phone: tel, cle_secours: a.cle_secours.toLowerCase().replace(/-/g, ' '), password: 'Nouveau2026!' }
+  });
+  assert.equal(reussite.status, 200, JSON.stringify(reussite.json));
+  assert.ok(reussite.json.access_token);
+  ok('la bonne clé récupère le compte (majuscules/tirets indifférents)');
+
+  const vieux = await api('/api/auth/refresh', {
+    method: 'POST', auth: false, body: { refresh_token: vieuxRefresh }
+  });
+  assert.equal(vieux.status, 401);
+  ok('les sessions ouvertes ailleurs sont déconnectées');
+
+  const ancien = await api('/api/auth/login', {
+    method: 'POST', auth: false, body: { phone: tel, password: 'Chop2026!' }
+  });
+  assert.equal(ancien.status, 401);
+  const nouveau = await api('/api/auth/login', {
+    method: 'POST', auth: false, body: { phone: tel, password: 'Nouveau2026!' }
+  });
+  assert.equal(nouveau.status, 200);
+  ok('l\'ancien mot de passe est mort, le nouveau fonctionne');
+
+  // 5. La clé ne sert qu'une fois
+  const rejoue = await api('/api/auth/recuperation', {
+    method: 'POST', auth: false,
+    body: { phone: tel, cle_secours: a.cle_secours, password: 'Encore2026!' }
+  });
+  assert.equal(rejoue.status, 401);
+  assert.equal(rejoue.json.error.code, 'CLE_DEJA_UTILISEE');
+  ok('la même clé ne peut pas resservir', rejoue.json.error.code);
+
+  // 6. On en génère une nouvelle depuis le compte, avec le mot de passe
+  const refusCle = await api('/api/auth/cle-secours', {
+    method: 'POST', token: reussite.json.access_token, body: { password: 'Mauvais2026!' }
+  });
+  assert.equal(refusCle.status, 401);
+  ok('sans le mot de passe, impossible de fabriquer une clé');
+
+  const cle2 = await api('/api/auth/cle-secours', {
+    method: 'POST', token: reussite.json.access_token, body: { password: 'Nouveau2026!' }
+  });
+  assert.equal(cle2.status, 200);
+  assert.match(cle2.json.cle_secours, /^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/);
+  ok('une nouvelle clé est générée', cle2.json.cle_secours);
+
+  const me = await api('/api/auth/me', { token: reussite.json.access_token });
+  assert.equal(me.json.user.a_cle_secours, true);
+  ok('le profil indique qu\'une clé existe');
+
+  // 7. Changer son mot de passe en étant connecté
+  const mauvais = await api('/api/auth/changer-mot-de-passe', {
+    method: 'POST', token: reussite.json.access_token,
+    body: { ancien_mot_de_passe: 'Faux2026!', password: 'Final2026!' }
+  });
+  assert.equal(mauvais.status, 401);
+  ok('changer le mot de passe exige l\'ancien');
+
+  const change = await api('/api/auth/changer-mot-de-passe', {
+    method: 'POST', token: reussite.json.access_token,
+    body: { ancien_mot_de_passe: 'Nouveau2026!', password: 'Final2026!' }
+  });
+  assert.equal(change.status, 200);
+  const avecFinal = await api('/api/auth/login', {
+    method: 'POST', auth: false, body: { phone: tel, password: 'Final2026!' }
+  });
+  assert.equal(avecFinal.status, 200);
+  ok('le nouveau mot de passe remplace l\'ancien');
+
+  // 8. La clé générée à l'étape 6 marche toujours
+  const secours = await api('/api/auth/recuperation', {
+    method: 'POST', auth: false,
+    body: { phone: tel, cle_secours: cle2.json.cle_secours, password: 'Dernier2026!' }
+  });
+  assert.equal(secours.status, 200);
+  ok('la clé générée depuis le profil sert bien de secours');
 });
 
 test('jeton : accès sans jeton refusé, refresh fonctionnel', async () => {

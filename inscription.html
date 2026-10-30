@@ -237,6 +237,27 @@
                     <p class="text-5xl mb-3">🎉</p>
                     <h3 class="text-xl font-extrabold mb-1">Bienvenue, <span id="done-name" class="text-brand-gradient"></span> !</h3>
                     <p class="text-sm text-slate-500 mb-5">Ton compte est prêt. Direction l'application.</p>
+
+                    <!-- Clé de secours : le seul moyen de récupérer le compte -->
+                    <div id="zone-cle" class="hidden text-left bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 mb-5">
+                        <p class="text-sm font-extrabold text-amber-900 mb-1">🔑 Ta clé de secours</p>
+                        <p class="text-xs text-amber-800 leading-relaxed mb-3">
+                            C'est le <strong>seul</strong> moyen de retrouver ton compte si tu oublies ton mot de passe.
+                            Il n'y a ni SMS ni email chez Viens chop. Note-la maintenant.
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <code id="cle-valeur" class="flex-1 text-center font-mono font-extrabold text-lg tracking-[.18em] text-slate-800 bg-white border border-amber-200 rounded-xl py-3 select-all"></code>
+                            <button type="button" id="btn-copier" class="shrink-0 bg-white border border-amber-300 text-amber-900 font-bold text-xs px-3 py-3 rounded-xl hover:bg-amber-100 transition">
+                                Copier
+                            </button>
+                        </div>
+                        <p id="copie-dit" class="hidden text-xs font-bold text-emerald-600 mt-2">Copiée ✓</p>
+                        <label class="flex items-start gap-2 mt-3 text-xs text-amber-900 cursor-pointer">
+                            <input type="checkbox" id="cle-notee" class="mt-0.5">
+                            <span>J'ai noté ma clé dans un endroit sûr.</span>
+                        </label>
+                    </div>
+
                     <a id="done-link" href="app.html" class="inline-block w-full bg-brand-gradient text-white font-extrabold py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
                         Entrer dans l'application 🚀
                     </a>
@@ -245,6 +266,7 @@
 
                 <p class="text-center text-sm text-slate-500 mt-6">
                     Déjà un compte ? <a href="app.html" class="text-brandPink font-bold hover:underline">Se connecter</a>
+                    · <a href="mot-de-passe-oublie.html" class="text-slate-500 hover:text-brandPink hover:underline">Mot de passe oublié</a>
                 </p>
 
                 <p class="text-[11px] text-center text-slate-400 mt-4 leading-relaxed">
@@ -655,7 +677,29 @@
                     form.classList.add('hidden');
                     $('signup-done').classList.remove('hidden');
                     $('done-name').textContent = account.name || ('+' + C.formatPhone(account.phone));
-                    setTimeout(() => { location.href = 'app.html'; }, 2600);
+
+                    if (account.cle_secours) {
+                        // On ne redirige plus tout de suite : la clé ne sera
+                        // plus jamais affichée, la personne doit pouvoir la noter.
+                        $('zone-cle').classList.remove('hidden');
+                        $('cle-valeur').textContent = account.cle_secours;
+                        $('btn-copier').addEventListener('click', async () => {
+                            try {
+                                await navigator.clipboard.writeText(account.cle_secours);
+                            } catch (e) {
+                                const r = document.createRange();
+                                r.selectNodeContents($('cle-valeur'));
+                                const sel = window.getSelection();
+                                sel.removeAllRanges(); sel.addRange(r);
+                            }
+                            $('copie-dit').classList.remove('hidden');
+                        });
+                        $('cle-notee').addEventListener('change', () => {
+                            $('done-link').classList.toggle('opacity-50', !$('cle-notee').checked);
+                        });
+                    } else {
+                        setTimeout(() => { location.href = 'app.html'; }, 2600);
+                    }
                 } catch (err) {
                     setLoading(false);
                     const messages = {

@@ -41,7 +41,9 @@ export async function requireAuth(req, _res, next) {
     const { rows } = await query(
       `select id, phone, pseudo, gender, seeking, age, birth_date, commune, artists,
               bio, photo_url, selfie_url, is_certified, plan, plan_expires_at,
-              fake_call_last_used, likes_today, likes_reset_at, last_seen_at
+              fake_call_last_used, likes_today, likes_reset_at, last_seen_at,
+              (recovery_hash is not null) as a_cle_secours,
+              recovery_used_at
          from public.users where id = $1`,
       [payload.sub]
     );

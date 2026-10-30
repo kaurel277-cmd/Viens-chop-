@@ -35,5 +35,6 @@ export const config = {
   // Pendant la bêta, plusieurs comptes peuvent être créés depuis le même
   // réseau (cybercafé, partage de connexion). Réglable sur Render.
   registerRateLimitMax: Number(process.env.REGISTER_RATE_LIMIT_MAX || 40),
-  loginRateLimitMax: Number(process.env.LOGIN_RATE_LIMIT_MAX || 40)
+  loginRateLimitMax: Number(process.env.LOGIN_RATE_LIMIT_MAX || 40),
+  recuperationRateLimitMax: Number(process.env.RECUPERATION_RATE_LIMIT_MAX || 10)
 };
