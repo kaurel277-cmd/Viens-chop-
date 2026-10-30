@@ -11,19 +11,19 @@ Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
 |---|---|---|
 | Inscription au numéro + mot de passe (sans SMS) | ✅ | `POST /api/auth/register` crée le compte, puis l'écran de profil demande prénom, date, commune, genre, « je cherche » et artistes |
 | Connexion / déconnexion / jetons | ✅ | Jeton d'accès + jeton de rafraîchissement, rotation à chaque renouvellement |
-| Fil de profils | ✅ | Vraies personnes, photos visibles, tri par commune puis par activité |
+| Fil de profils | ✅ | Vraies personnes, photos visibles, ta commune d'abord puis les profils vus récemment |
 | 3 likes par jour (Mode Coulé) | ✅ | Compteur appliqué par le serveur, pas seulement par l'écran |
-| Match et discussions | ✅ | Messages enregistrés en base, rafraîchis toutes les 2 secondes |
+| Match et discussions | ✅ | Messages enregistrés en base, rafraîchis toutes les 3 secondes |
 | « Qui m'a aimé » | ✅ | Gratuit ; la photo n'apparaît qu'en Mode Debout |
-| Photos et vidéos en vue unique | 🟡 | Tout est en place et testé (envoi, durée, limites, effacement, expiration), **inactif tant que la migration SQL n'est pas passée** (voir plus bas) |
+| Photos et vidéos en vue unique | ✅ | Envoi, durée limite, effacement après la première ouverture, expiration à 30 jours. La migration est passée : `/api/health` annonce `chat-media` |
 | Signaler / bloquer | ✅ | Depuis le fil et depuis la discussion ; un profil bloqué disparaît partout |
-| Mot de passe oublié | 🟡 | Clé de secours de 12 caractères (ni SMS ni email) : code prêt et testé, **actif dès que le SQL `MIGRATION-MOT-DE-PASSE.sql` est passé** |
-| Changer son mot de passe (connecté) | 🟡 | Route et écran prêts, même condition : la migration |
+| Mot de passe oublié | ✅ | Clé de secours de 12 caractères (ni SMS ni email), hachée et à usage unique. Vérifié en production : bonne clé `200`, mauvaise `401 CLE_INVALIDE`, rejeu `401 CLE_DEJA_UTILISEE` |
+| Changer son mot de passe (connecté) | ✅ | Depuis **Mon profil → Mot de passe & clé de secours** ; la clé de secours est régénérée au passage |
 | Faux appel d'urgence | ✅ | Route serveur réelle, quota d'un essai par semaine en Mode Coulé |
 | PWA installable + page hors ligne | ✅ | Manifeste, icônes, service worker, page « tu es hors ligne » |
-| Console d'admin | 🟡 | Existe et fonctionne, **inactive sans `ADMIN_TOKEN`** sur Render |
-| Vérification selfie | 🟡 | Code complet, attend la migration SQL + `ADMIN_TOKEN` |
-| Modération des photos | 🟡 | Détection de peau automatique, attend la migration SQL |
+| Console d'admin | ✅ | `admin.html` : statistiques, signalements, selfies, photos à modérer, journal. `ADMIN_TOKEN` est posé (`/api/admin/etat` → `configuree: true`) |
+| Vérification selfie | ✅ | Envoi du selfie depuis le profil, file d'attente et décision dans la console d'admin, badge « Vérifié » affiché **uniquement** si le serveur dit `is_certified` |
+| Modération des photos | ✅ | Détection automatique de peau à l'envoi, file de validation et décision dans la console d'admin |
 
 ## Ce qui n'est pas encore une vraie fonctionnalité
 
@@ -120,12 +120,28 @@ serveur et la base savent faire :
 Un repère absent = une chose à faire. Réponse garantie en moins d'une seconde,
 même si la base est injoignable.
 
-## À faire une fois pour activer le reste
+## Les trois étapes d'activation : faites
 
-1. `database/MIGRATION-SECURITE.sql` (vue unique, vérification, modération)
-2. `database/MIGRATION-MOT-DE-PASSE.sql` (clé de secours, changement de mot de passe)
-3. La variable `ADMIN_TOKEN` sur Render (console d'admin)
+1. `database/MIGRATION-SECURITE.sql` (vue unique, vérification, modération) — **passée**
+2. `database/MIGRATION-MOT-DE-PASSE.sql` (clé de secours, changement de mot de passe) — **passée**
+3. La variable `ADMIN_TOKEN` sur Render (console d'admin) — **posée**
 
-Coller `database/MIGRATION-SECURITE.sql` dans Neon → SQL Editor → Run, puis
-ajouter la variable `ADMIN_TOKEN` sur Render. La requête de contrôle finale doit
-renvoyer `t | t | t | t`.
+Preuve en direct : `GET /api/health` renvoie les 7 repères
+(`password-auth`, `photos`, `recuperation`, `chat-media`, `verifications`,
+`moderation`, `admin`) et `GET /api/admin/etat` répond
+`{"configuree":true,"verifications":true,"moderation":true,"chatMedia":true}`.
+
+## Avancement par bloc
+
+| Bloc | État | Détail |
+|---|---|---|
+| Inscription, connexion, profil | ✅ 100 % | Pas de SMS, mot de passe + clé de secours, profil complet, photos |
+| Découvrir, liker, matcher | ✅ 100 % | 3 likes/jour tenus par la base, fil trié, matchs automatiques |
+| Discuter | ✅ 100 % | Messages en base, rafraîchissement, photos/vidéos en vue unique |
+| Sécurité minimum avant lancement | ✅ 100 % | Signaler + bloquer partout, faux appel, modération des photos, selfie |
+| Console d'administration | ✅ 100 % | Stats, signalements, selfies, photos, journal |
+| Plateforme (PWA, hors ligne, vitesse) | ✅ 100 % | Installable, page hors ligne, service worker v2 |
+| Monétisation (Mode Debout) | ⛔ 20 % | Les écrans existent, **aucun encaissement** et aucune route pour activer un compte |
+| Extras annoncés (SOS, Check-In, Incognito) | ⛔ 0 % | Annoncés « bientôt » sur les pages, pas de code serveur |
+| Quiz Mode Flirt | 🟡 60 % | Jouable, mais questions écrites dans la page ; la route `/api/safety/quiz` existe sans être utilisée |
+| Répertoire des maquis | 🟡 40 % | Page et formulaire de proposition ; pas encore de liste de lieux en base |
