@@ -24,6 +24,49 @@ export const suggestionsRouter = Router();
 export const lieuxPublicRouter = Router();
 
 const TYPES = ['maquis', 'restaurant', 'cafe', 'lounge', 'terrasse', 'autre'];
+/* Photo d'un lieu : même circuit que les photos de profil des membres.
+   140 Ko décodés : une photo de terrasse reste nette sur un téléphone. */
+const PHOTO_MAX_BYTES = 140 * 1024;
+const PHOTO_MIMES = ['image/webp', 'image/jpeg'];
+
+/** Vérifie la signature réelle du fichier, pas seulement le type annoncé. */
+function signaturePhoto(buf) {
+  if (!buf || buf.length < 12) return null;
+  const estJpeg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+  if (estJpeg) return 'image/jpeg';
+  const estWebp = buf.slice(0, 4).toString('latin1') === 'RIFF' &&
+                  buf.slice(8, 12).toString('latin1') === 'WEBP';
+  if (estWebp) return 'image/webp';
+  return null;
+}
+
+function decodePhoto(data, mime) {
+  if (!PHOTO_MIMES.includes(mime)) {
+    throw new AppError(400, 'FORMAT_INVALIDE', 'Formats acceptés : WebP ou JPEG.');
+  }
+  const clean = String(data || '').replace(/^data:[^;]+;base64,/, '');
+  // 140 Ko décodés ≈ 187 000 caractères en base64
+  if (clean.length > 200000) {
+    throw new AppError(413, 'PHOTO_TROP_LOURDE', 'Photo trop lourde (140 Ko maximum).');
+  }
+  if (!/^[A-Za-z0-9+/=\s]+$/.test(clean)) {
+    throw new AppError(400, 'PHOTO_INVALIDE', 'Image illisible.');
+  }
+  const buf = Buffer.from(clean, 'base64');
+  if (!buf.length) throw new AppError(400, 'PHOTO_VIDE', 'Image vide.');
+  if (buf.length > PHOTO_MAX_BYTES) {
+    throw new AppError(413, 'PHOTO_TROP_LOURDE', 'Photo trop lourde (140 Ko maximum).');
+  }
+  const reel = signaturePhoto(buf);
+  if (!reel) throw new AppError(400, 'PHOTO_INVALIDE', "Ce fichier n'est pas une image WebP ou JPEG.");
+  return { buf, mime: reel };
+}
+
+/** Le message quand la base n'a pas encore les colonnes photo. */
+function photoIndisponible(err) {
+  return err && err.code === '42703';   // colonne inexistante
+}
+
 const AMBIANCES = ['calme', 'anime', 'terrasse', 'famille'];
 
 const net = (v, max) => String(v == null ? '' : v).trim().replace(/\s+/g, ' ').slice(0, max);
@@ -156,14 +199,29 @@ promoteursRouter.use(requirePromoteur);
    --------------------------------------------------------------------------- */
 promoteursRouter.get('/moi', async (req, res, next) => {
   try {
-    const { rows } = await query(
+    const lire = async (avecPhoto) => await query(
       `select id, nom, type, commune, quartier, repere, telephone, horaires, budget,
               ambiance, description, statut, motif_refus, certifie, code_visite,
-              prix_visite, published_at, updated_at
-         from public.lieux where promoteur_id = $1
+              prix_visite, published_at, updated_at` +
+      (avecPhoto
+        ? `,
+              (photo is not null) as a_photo,
+              extract(epoch from photo_at)::bigint as photo_v`
+        : ``) +
+      ` from public.lieux where promoteur_id = $1
         order by created_at asc limit 1`,
       [req.promoteur.id]
     );
+
+    // Tant que MIGRATION-PHOTOS-LIEUX.sql n'est pas passée, on lit la fiche
+    // sans les colonnes photo : l'espace promoteur reste utilisable.
+    let rows;
+    try {
+      ({ rows } = await lire(true));
+    } catch (err) {
+      if (!photoIndisponible(err)) throw err;
+      ({ rows } = await lire(false));
+    }
 
     const lieu = rows[0] || null;
     let visites = { total: 0, du: 0, montant_du: 0, ce_mois: 0 };
@@ -184,6 +242,11 @@ promoteursRouter.get('/moi', async (req, res, next) => {
         ce_mois: v[0].ce_mois
       };
     }
+
+    if (lieu && lieu.a_photo) {
+      lieu.photo_url = '/api/lieux/' + lieu.id + '/photo?v=' + (lieu.photo_v || 0);
+    }
+    if (lieu) { delete lieu.a_photo; delete lieu.photo_v; }
 
     res.json({
       ok: true,
@@ -265,6 +328,77 @@ promoteursRouter.post('/lieu', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/* ---------------------------------------------------------------------------
+   La photo du lieu
+
+   POST   /api/promoteurs/photo  { data, mime }   envoie ou remplace la photo
+   DELETE /api/promoteurs/photo                   retire la photo
+
+   La photo est stockée dans Neon, comme les photos de profil : le disque de
+   Render est effacé à chaque déploiement.
+
+   Envoyer une photo renvoie la fiche en vérification (même règle que pour le
+   reste de la fiche) : une image publiée ne change pas sans être relue.
+   --------------------------------------------------------------------------- */
+promoteursRouter.post('/photo', async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const { buf, mime } = decodePhoto(b.data, b.mime);
+
+    const { rows: fiche } = await query(
+      'select id, statut from public.lieux where promoteur_id = $1 order by created_at asc limit 1',
+      [req.promoteur.id]
+    );
+    if (!fiche.length) {
+      throw new AppError(404, 'FICHE_ABSENTE', "Remplis d'abord la fiche de ton lieu, puis ajoute la photo.");
+    }
+
+    let statut = fiche[0].statut;
+    try {
+      const { rows } = await query(
+        `update public.lieux
+            set photo = $2, photo_mime = $3, photo_bytes = $4, photo_at = now(),
+                statut = case when statut = 'publie' then 'en_attente' else statut end,
+                reviewed_at = case when statut = 'publie' then null else reviewed_at end,
+                updated_at = now()
+          where id = $1
+          returning statut, extract(epoch from photo_at)::bigint as v`,
+        [fiche[0].id, buf, mime, buf.length]
+      );
+      statut = rows[0].statut;
+      res.status(201).json({
+        ok: true,
+        photo: { url: '/api/lieux/' + fiche[0].id + '/photo?v=' + rows[0].v, bytes: buf.length, mime },
+        statut
+      });
+    } catch (err) {
+      if (!photoIndisponible(err)) throw err;
+      throw new AppError(503, 'PHOTOS_NON_ACTIVEES',
+        "L'envoi de photos sera actif dès que la base est mise à jour (voir database/MIGRATION-PHOTOS-LIEUX.sql).");
+    }
+  } catch (err) { next(err); }
+});
+
+promoteursRouter.delete('/photo', async (req, res, next) => {
+  try {
+    try {
+      const { rows } = await query(
+        `update public.lieux
+            set photo = null, photo_mime = null, photo_bytes = null, photo_at = null,
+                updated_at = now()
+          where promoteur_id = $1
+          returning id`,
+        [req.promoteur.id]
+      );
+      if (!rows.length) throw new AppError(404, 'FICHE_ABSENTE', 'Aucune fiche à modifier.');
+      res.json({ ok: true });
+    } catch (err) {
+      if (!photoIndisponible(err)) throw err;
+      throw new AppError(503, 'PHOTOS_NON_ACTIVEES', "Les photos ne sont pas encore activées en base.");
+    }
+  } catch (err) { next(err); }
+});
+
 /* ===========================================================================
    VISITES — le client saisit le code affiché au comptoir
    =========================================================================== */
@@ -319,10 +453,13 @@ lieuxPublicRouter.get('/', async (req, res, next) => {
     const commune = net(req.query.commune, 50);
     const quartier = net(req.query.quartier, 80);
 
-    const { rows } = await query(
+    const lire = async (avecPhoto) => await query(
       `select nom, type, commune, quartier, repere, horaires, budget, ambiance,
-              description, certifie, id
-         from public.lieux
+              description, certifie, id` +
+      (avecPhoto ? `,
+              (photo is not null) as photo,
+              coalesce(extract(epoch from photo_at)::bigint, 0) as photo_v` : ``) +
+      ` from public.lieux
         where statut = 'publie'
           and ($1 = '' or commune = $1)
           and ($2 = '' or quartier = $2)
@@ -330,6 +467,16 @@ lieuxPublicRouter.get('/', async (req, res, next) => {
         limit 200`,
       [commune, quartier]
     );
+
+    // Sans les colonnes photo (migration pas encore passée), la liste
+    // s'affiche quand même : aucune photo, simplement.
+    let rows;
+    try {
+      ({ rows } = await lire(true));
+    } catch (err) {
+      if (!photoIndisponible(err)) throw err;
+      ({ rows } = await lire(false));
+    }
 
     // Les communes qui ont au moins un lieu : la liste déroulante ne propose
     // que ce qui existe vraiment, sans jamais bloquer sur une liste vide.
@@ -339,6 +486,41 @@ lieuxPublicRouter.get('/', async (req, res, next) => {
     );
 
     res.json({ ok: true, lieux: rows, communes });
+  } catch (err) { next(err); }
+});
+
+/* ---------------------------------------------------------------------------
+   GET /api/lieux/:id/photo — sert la photo d'un lieu
+   Pas de jeton : une balise <img> ne peut pas envoyer d'en-tête. L'identifiant
+   est un UUID aléatoire, impossible à deviner (même règle que les photos de
+   profil des membres).
+   --------------------------------------------------------------------------- */
+lieuxPublicRouter.get('/:id/photo', async (req, res, next) => {
+  try {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
+      throw new AppError(400, 'ID_INVALIDE', 'Identifiant invalide.');
+    }
+    let rows;
+    try {
+      ({ rows } = await query(
+        'select photo_mime, photo from public.lieux where id = $1',
+        [req.params.id]
+      ));
+    } catch (err) {
+      if (!photoIndisponible(err)) throw err;
+      rows = [];
+    }
+    if (!rows.length || !rows[0].photo) {
+      throw new AppError(404, 'PHOTO_ABSENTE', "Ce lieu n'a pas de photo.");
+    }
+    res.set('Content-Type', rows[0].photo_mime || 'image/jpeg');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.set('X-Content-Type-Options', 'nosniff');
+    // L'API (onrender.com) et le site (github.io) sont deux domaines
+    // différents : sans cet en-tête, le navigateur refuse l'image
+    // (helmet met « same-origin » par défaut).
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.send(rows[0].photo);
   } catch (err) { next(err); }
 });
 

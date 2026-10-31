@@ -246,3 +246,52 @@ Cinq corrections, toutes vérifiées : le détail est dans
 Reste à trancher : l'offre « 1 mois Debout offert aux 100 premiers » n'a pas
 d'automatisme en base ; `CORS_ORIGIN` n'est pas encore renseigné sur Render ;
 deux fiches de test sont encore publiées.
+
+## Version 16 — la photo du lieu (31/10)
+
+Un gérant peut maintenant **ajouter une photo de son maquis, de son bar ou de
+son restaurant** depuis son espace (promoteur.html → « Ma fiche » → *Ajouter
+une photo*).
+
+Comment ça marche :
+
+1. Il choisit la photo sur son téléphone. Le navigateur la redimensionne
+   (1400 px de côté maximum) et la compresse **sous 140 Ko** avant l'envoi :
+   important sur un réseau ivoirien, où envoyer 4 Mo prendrait une minute.
+2. L'API vérifie la signature réelle du fichier (pas seulement le type
+   annoncé) : seuls WebP et JPEG passent.
+3. L'image est stockée **dans Neon**, comme les photos de profil des membres.
+   Le disque de Render est effacé à chaque déploiement : c'est pour cela que
+   rien ne va dessus.
+4. Envoyer ou changer la photo **renvoie la fiche en vérification**, comme
+   toute autre modification : une image publiée ne change pas sans relecture.
+   Le gérant peut aussi **retirer** sa photo.
+
+Affichage :
+
+| Où | Quoi |
+|---|---|
+| maquis.html (site) | bandeau photo en haut de la carte, chargement différé |
+| app.html → Coins Chill | bandeau 16/9 en haut de la carte, chargement différé |
+| admin.html → Coins Chill | vignette carrée dans la fiche, pour valider |
+| promoteur.html | aperçu immédiat, dans la fiche |
+
+Routes ajoutées :
+
+```
+POST   /api/promoteurs/photo   { data: base64, mime }   (jeton promoteur)
+DELETE /api/promoteurs/photo                            (jeton promoteur)
+GET    /api/lieux/:id/photo                             (public, UUID seul)
+```
+
+`GET /api/lieux` renvoie désormais `photo` (vrai/faux) et `photo_v` (la date
+du dernier envoi, pour forcer le rechargement de l'image) : aucune ligne de
+plus ne pèse sur la réponse de la liste.
+
+**Activation** : passer `database/MIGRATION-PHOTOS-LIEUX.sql` dans Neon
+(4 colonnes ajoutées à `public.lieux`). Tant que ce n'est pas fait, tout le
+reste fonctionne : l'envoi de photo répond simplement
+« L'envoi de photos sera actif dès que la base est mise à jour ».
+
+Capacité : 140 Ko par lieu. Avec les 0,5 Go de Neon, cela représente plus de
+3 000 lieux photographiés.

@@ -93,6 +93,24 @@
         ul.avantages li { margin-bottom: 8px; padding-left: 22px; position: relative; }
         ul.avantages li::before { content: '✓'; position: absolute; left: 0; color: var(--vert); font-weight: 800; }
         .cache { display: none !important; }
+
+        /* ---------- Photo du lieu ---------- */
+        .photo-bloc {
+            border: 1px dashed rgba(255,255,255,.28); border-radius: 14px;
+            padding: 14px; text-align: center; background: rgba(255,255,255,.03);
+        }
+        .photo-bloc img {
+            width: 100%; max-height: 230px; object-fit: cover;
+            border-radius: 10px; display: block; margin-bottom: 10px;
+        }
+        .photo-bloc .vide { font-size: 30px; margin-bottom: 6px; }
+        .photo-bloc p { font-size: 12.5px; color: var(--doux); margin-bottom: 10px; }
+        .photo-bloc .btn { font-size: 14px; padding: 12px; }
+        .photo-bloc .rangee { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        @media (max-width: 560px) { .photo-bloc .rangee { grid-template-columns: 1fr; } }
+        .photo-etat { font-size: 12.5px; margin-top: 8px; min-height: 17px; }
+        .photo-etat.ok { color: var(--vert); }
+        .photo-etat.ko { color: #FF8B8E; }
         .lien-bas { text-align: center; font-size: 12px; color: var(--doux); margin-top: 22px; }
         .lien-bas a { color: var(--orange); text-decoration: none; font-weight: 700; }
         @media (min-width: 560px) { h2 { font-size: 25px; } }
@@ -223,6 +241,25 @@
             <div class="carte">
                 <h3 id="titre-fiche">Ma fiche</h3>
 
+                <!-- ---------- Photo du lieu ---------- -->
+                <div class="photo-bloc" style="margin-bottom:16px;">
+                    <div id="photo-vide">
+                        <div class="vide">📷</div>
+                        <p>Une photo de ton lieu : la terrasse, la salle, ce qu'on voit en arrivant.
+                           Elle s'affiche dans Coins Chill, sur le site et dans l'application.</p>
+                    </div>
+                    <img id="photo-apercu" alt="Photo de ton lieu" class="cache"
+                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                    <input id="f-photo" type="file" accept="image/*" class="cache">
+                    <div class="rangee">
+                        <label for="f-photo" class="btn" id="photo-ajouter" style="margin:0; text-align:center;">
+                            Ajouter une photo
+                        </label>
+                        <button type="button" id="photo-retirer" class="btn secondaire cache">Retirer la photo</button>
+                    </div>
+                    <p class="photo-etat" id="photo-etat" role="status"></p>
+                </div>
+
                 <label for="f-nom">Nom du lieu</label>
                 <input id="f-nom" type="text" placeholder="Ex : Maquis Chez Kouassi" required>
 
@@ -294,6 +331,7 @@
     </p>
 </main>
 
+<script src="assets/js/media.js"></script>
 <script src="assets/js/villes.js"></script>
 <script>
 (function () {
@@ -475,6 +513,76 @@
         refuse:     ['refuse',  'Refusé']
     };
 
+    /* ---------------- Photo du lieu ---------------- */
+    let photoUrlLocale = '';   // aperçu local avant envoi
+
+    function afficherPhoto(url) {
+        const img = $('photo-apercu');
+        if (url) {
+            img.src = url;
+            img.classList.remove('cache');
+            $('photo-vide').classList.add('cache');
+            $('photo-retirer').classList.remove('cache');
+        } else {
+            img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            img.classList.add('cache');
+            $('photo-vide').classList.remove('cache');
+            $('photo-retirer').classList.add('cache');
+        }
+        $('photo-ajouter').textContent = url ? 'Changer la photo' : 'Ajouter une photo';
+    }
+
+    function direPhoto(texte, ok) {
+        const p = $('photo-etat');
+        p.textContent = texte || '';
+        p.className = 'photo-etat' + (texte ? (ok ? ' ok' : ' ko') : '');
+    }
+
+    // Le navigateur ramène la photo sous 130 Ko avant l'envoi : sur un réseau
+    // ivoirien, envoyer 4 Mo depuis l'appareil photo prendrait une minute.
+    async function envoyerPhoto(fichier) {
+        if (!fichier) return;
+        direPhoto('Préparation de la photo…', true);
+        $('photo-ajouter').classList.add('cache');
+
+        let compresse;
+        try {
+            compresse = await VCMedia.compressImage(fichier, { maxSide: 1400, target: 130 * 1024 });
+        } catch (e) {
+            direPhoto("Cette image est illisible. Essaie une autre photo.", false);
+            $('photo-ajouter').classList.remove('cache');
+            return;
+        }
+
+        if (!compresse.blob || compresse.bytes > 140 * 1024) {
+            direPhoto('Photo trop lourde. Essaie une photo plus simple, ou réduis-la.', false);
+            $('photo-ajouter').classList.remove('cache');
+            return;
+        }
+
+        const data = await new Promise(resolve => {
+            const lecteur = new FileReader();
+            lecteur.onload = () => resolve(String(lecteur.result));
+            lecteur.readAsDataURL(compresse.blob);
+        });
+
+        try {
+            const r = await appel('/api/promoteurs/photo', {
+                method: 'POST',
+                body: { data, mime: compresse.type }
+            });
+            afficherPhoto(base + r.photo.url);
+            direPhoto(r.statut === 'publie'
+                ? 'Photo enregistrée.'
+                : 'Photo enregistrée. Ta fiche repasse en vérification.', true);
+        } catch (e) {
+            direPhoto(e.message, false);
+        } finally {
+            $('photo-ajouter').classList.remove('cache');
+            $('f-photo').value = '';
+        }
+    }
+
     function remplirFiche(lieu) {
         if (!lieu) return;
         $('f-nom').value = lieu.nom || '';
@@ -508,6 +616,8 @@
         const [classe, libelle] = LIBELLES[lieu ? lieu.statut : 'en_attente'] || LIBELLES.en_attente;
         pill.className = 'pill ' + classe;
         pill.textContent = lieu ? libelle : 'Fiche à remplir';
+
+        afficherPhoto(lieu && lieu.photo_url ? base + lieu.photo_url : '');
 
         if (!lieu) {
             $('texte-statut').textContent = 'Remplis la fiche de ton établissement en bas de page : elle sera vérifiée avant publication.';
@@ -576,6 +686,26 @@
             err.textContent = e2.message;
         } finally {
             $('btn-fiche').disabled = false;
+        }
+    });
+
+    /* ---------------- Photo : sélection et retrait ---------------- */
+    $('f-photo').addEventListener('change', (e) => {
+        const fichier = e.target.files && e.target.files[0];
+        if (fichier) envoyerPhoto(fichier);
+    });
+
+    $('photo-retirer').addEventListener('click', async () => {
+        if (!confirm('Retirer la photo de ton lieu ?')) return;
+        $('photo-retirer').disabled = true;
+        try {
+            await appel('/api/promoteurs/photo', { method: 'DELETE' });
+            afficherPhoto('');
+            direPhoto('Photo retirée.', true);
+        } catch (e) {
+            direPhoto(e.message, false);
+        } finally {
+            $('photo-retirer').disabled = false;
         }
     });
 

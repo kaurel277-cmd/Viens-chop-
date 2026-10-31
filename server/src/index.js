@@ -26,6 +26,8 @@ app.use(cors({ origin: config.corsOrigin }));
 // (une image de 110 Ko pèse ~147 Ko une fois encodée en base64).
 app.use('/api/photos', express.json({ limit: '600kb' }));
 app.use('/api/certification', express.json({ limit: '600kb' }));
+// La photo d'un lieu part aussi en base64 : 140 Ko décodés ≈ 190 Ko encodés.
+app.use('/api/promoteurs', express.json({ limit: '600kb' }));
 // Les médias de discussion montent à 3 Mo (vidéo). En base64 un fichier pèse
 // ~4,1 Mo : on laisse 5 Mo de marge, sinon Express refuserait la vidéo avant
 // même d'arriver à la route.

@@ -362,11 +362,16 @@ adminRouter.post('/reglages', async (req, res, next) => {
    --------------------------------------------------------------------------- */
 adminRouter.get('/lieux', async (_req, res, next) => {
   try {
-    const { rows } = await query(
+    const lire = async (avecPhoto) => await query(
       `select l.id, l.nom, l.type, l.commune, l.quartier, l.repere, l.telephone,
               l.horaires, l.budget, l.ambiance, l.description, l.statut,
               l.motif_refus, l.certifie, l.code_visite, l.prix_visite,
-              l.created_at, l.updated_at, l.published_at,
+              l.created_at, l.updated_at, l.published_at` +
+      (avecPhoto
+        ? `, (l.photo is not null) as photo,
+              coalesce(extract(epoch from l.photo_at)::bigint, 0) as photo_v`
+        : `, false as photo, 0 as photo_v`) +
+      `,
               p.nom_gerant, p.phone as promoteur_phone,
               (select count(*)::int from public.visites v where v.lieu_id = l.id) as visites,
               (select coalesce(sum(v.prix), 0)::int from public.visites v
@@ -376,8 +381,19 @@ adminRouter.get('/lieux', async (_req, res, next) => {
          from public.lieux l
          join public.promoteurs p on p.id = l.promoteur_id
         order by (l.statut = 'en_attente') desc, l.created_at desc
-        limit 300`
+        limit 300`,
+      []
     );
+
+    // Si MIGRATION-PHOTOS-LIEUX.sql n'est pas encore passée, la console
+    // continue de fonctionner, sans vignette.
+    let rows;
+    try {
+      ({ rows } = await lire(true));
+    } catch (err) {
+      if (err.code !== '42703') throw err;
+      ({ rows } = await lire(false));
+    }
     res.json({ ok: true, lieux: rows });
   } catch (err) { next(err); }
 });

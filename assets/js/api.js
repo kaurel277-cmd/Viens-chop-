@@ -343,6 +343,9 @@
     ApiError,
     configure,
     enabled,
+    // Adresse du serveur ('' en mode local). Sert aux balises <img>, qui ne
+    // peuvent pas passer par request() : la photo d'un lieu, par exemple.
+    origine: () => state.base,
     isLoggedIn,
     clearSession,
     request,

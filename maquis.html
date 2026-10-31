@@ -677,8 +677,15 @@
             const morceaux = [];
             if (l.quartier) morceaux.push(echapper(l.quartier));
             morceaux.push(echapper(String(l.commune || '').replace(/^Abidjan — /, '')));
+            const photo = (l.photo && l.id)
+                ? '<img src="' + API + '/api/lieux/' + l.id + '/photo?v=' + (l.photo_v || 0) + '"' +
+                  ' alt="' + echapper(l.nom) + '" loading="lazy" decoding="async"' +
+                  ' class="w-full h-40 object-cover">'
+                : '';
             return `
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col">
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                    ${photo}
+                    <div class="p-5 flex flex-col flex-1">
                     <div class="flex items-start justify-between gap-3 mb-2">
                         <h3 class="font-extrabold text-lg leading-tight">${echapper(l.nom)}</h3>
                         ${l.certifie ? '<span class="shrink-0 text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-full">Certifié</span>' : ''}
@@ -697,6 +704,7 @@
                             class="mt-auto w-full bg-brand-gradient text-white font-extrabold py-3 rounded-xl shadow-md hover:opacity-90 transition">
                         J’y suis arrivé
                     </button>
+                    </div>
                 </div>`;
         }
 
