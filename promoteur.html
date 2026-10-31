@@ -188,15 +188,17 @@
             <p class="aide" id="texte-statut"></p>
         </div>
 
-        <!-- Le code du comptoir (seulement une fois publié) -->
-        <div class="carte cache" id="bloc-code">
-            <h3>Le code de ton lieu</h3>
-            <p class="aide" style="margin-bottom:8px;">
-                Affiche ce code au comptoir. Un client qui arrive avec l'application
-                le saisit, et la visite est comptée.
+        <!-- Ce que voit le client -->
+        <div class="carte cache" id="bloc-public">
+            <h3>Comment un client déclare sa visite</h3>
+            <p class="aide">
+                Ton lieu apparaît dans la liste publique des Coins Chill. Quand un
+                couple arrive, l'un des deux appuie sur <strong>« J'y suis arrivé »</strong>
+                sur la fiche de ton lieu : la visite est comptée, sans code à recopier.
             </p>
-            <div class="code" id="code-lieu">······</div>
-            <p class="aide" id="lien-arrivee"></p>
+            <a class="btn lien" id="lien-public" href="maquis.html" style="display:inline-block; margin-top:6px;">
+                Voir la page des Coins Chill →
+            </a>
         </div>
 
         <!-- Compteur de visites -->
@@ -233,14 +235,19 @@
 
                 <div class="grille">
                     <div>
-                        <label for="f-commune">Commune</label>
-                        <input id="f-commune" type="text" placeholder="Ex : Cocody" required>
+                        <label for="f-commune">Commune / ville</label>
+                        <select id="f-commune"></select>
+                        <input id="f-commune-autre" type="text" class="cache" style="margin-top:8px;"
+                               placeholder="Écris le nom de la commune">
                     </div>
                     <div>
                         <label for="f-quartier">Quartier</label>
-                        <input id="f-quartier" type="text" placeholder="Ex : Angré">
+                        <select id="f-quartier"></select>
+                        <input id="f-quartier-autre" type="text" class="cache" style="margin-top:8px;"
+                               placeholder="Écris le nom du quartier">
                     </div>
                 </div>
+                <p class="aide">Si ta commune ou ton quartier n’est pas dans la liste, choisis « Autre » et écris-le.</p>
 
                 <label for="f-repere">Comment on te trouve</label>
                 <input id="f-repere" type="text" placeholder="Ex : en face de la pharmacie du carrefour">
@@ -284,12 +291,69 @@
     </p>
 </main>
 
+<script src="assets/js/villes.js"></script>
 <script>
 (function () {
     const CLE = 'vc_promoteur';
     const base = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
     const $ = id => document.getElementById(id);
     let jeton = localStorage.getItem(CLE) || '';
+
+    /* ---------- Communes et quartiers (listes déroulantes) ---------- */
+    function valeurChamp(idListe, idTexte) {
+        const choix = $(idListe).value;
+        if (choix === '__autre') return $(idTexte).value.trim();
+        return String(choix || '').trim();
+    }
+
+    function choisirCommune(valeur) {
+        const liste = $('f-commune');
+        vcRemplirCommunes(liste);
+        const connu = valeur && Object.prototype.hasOwnProperty.call(VC_VILLES, valeur);
+        liste.value = connu ? valeur : (valeur ? '__autre' : '');
+        $('f-commune-autre').classList.toggle('cache', liste.value !== '__autre');
+        if (valeur && !connu) $('f-commune-autre').value = valeur;
+        if (!valeur) $('f-commune-autre').value = '';
+        majQuartiers(valeur && connu ? valeur : '', null);
+    }
+
+    function choisirQuartier(valeur) {
+        $('f-quartier').value = '';
+        if (valeur) {
+            const op = Array.from($('f-quartier').options).find(o => o.value === valeur);
+            if (op) {
+                $('f-quartier').value = valeur;
+            } else {
+                $('f-quartier').value = '__autre';
+                $('f-quartier-autre').value = valeur;
+            }
+        }
+        $('f-quartier-autre').classList.toggle('cache', $('f-quartier').value !== '__autre');
+    }
+
+    function majQuartiers(commune, valeur) {
+        vcRemplirQuartiers($('f-quartier'), commune);
+        choisirQuartier(valeur || '');
+    }
+
+    $('f-commune').addEventListener('change', () => {
+        const autre = $('f-commune').value === '__autre';
+        $('f-commune-autre').classList.toggle('cache', !autre);
+        if (autre) $('f-commune-autre').focus();
+        else $('f-commune-autre').value = '';
+        majQuartiers(autre ? '' : $('f-commune').value, '');
+    });
+
+    $('f-quartier').addEventListener('change', () => {
+        const autre = $('f-quartier').value === '__autre';
+        $('f-quartier-autre').classList.toggle('cache', !autre);
+        if (autre) $('f-quartier-autre').focus();
+        else $('f-quartier-autre').value = '';
+    });
+
+    // Au départ : listes prêtes, quartiers vides tant qu'il n'y a pas de commune
+    vcRemplirCommunes($('f-commune'));
+    vcRemplirQuartiers($('f-quartier'), '');
 
     const montrer = (id) => {
         ['ecran-accueil', 'ecran-inscription', 'ecran-connexion', 'ecran-espace']
@@ -395,8 +459,8 @@
         if (!lieu) return;
         $('f-nom').value = lieu.nom || '';
         $('f-type').value = lieu.type || 'maquis';
-        $('f-commune').value = lieu.commune || '';
-        $('f-quartier').value = lieu.quartier || '';
+        choisirCommune(lieu.commune || '');
+        choisirQuartier(lieu.quartier || '');
         $('f-repere').value = lieu.repere || '';
         $('f-tel').value = lieu.telephone ? lieu.telephone.replace(/^\+225/, '') : '';
         $('f-horaires').value = lieu.horaires || '';
@@ -435,12 +499,8 @@
             $('texte-statut').textContent = 'Fiche refusée : ' + (lieu.motif_refus || 'à compléter') + ' Corrige-la et renvoie-la.';
         }
 
-        // Code du comptoir (une fois publié)
-        $('bloc-code').classList.toggle('cache', !lieu || lieu.statut !== 'publie');
-        if (lieu && lieu.statut === 'publie') {
-            $('code-lieu').textContent = lieu.code_visite;
-            $('lien-arrivee').textContent = 'Le client le saisit sur ' + String(d.lien_arrivee).replace(/^https?:\/\//, '');
-        }
+        // Ce que voit le client (une fois publié)
+        $('bloc-public').classList.toggle('cache', !lieu || lieu.statut !== 'publie');
 
         // Visites
         $('bloc-visites').classList.toggle('cache', !lieu);
@@ -468,7 +528,9 @@
         err.textContent = '';
         const tel = chiffres($('f-tel').value);
         if ($('f-nom').value.trim().length < 2) { err.textContent = 'Indique le nom du lieu.'; return; }
-        if ($('f-commune').value.trim().length < 2) { err.textContent = 'Indique la commune ou la ville.'; return; }
+        const commune = valeurChamp('f-commune', 'f-commune-autre');
+        const quartier = valeurChamp('f-quartier', 'f-quartier-autre');
+        if (!commune || commune.length < 2) { err.textContent = 'Indique la commune ou la ville.'; return; }
         if (tel.length !== 10) { err.textContent = 'Le téléphone du lieu doit contenir 10 chiffres.'; return; }
 
         $('btn-fiche').disabled = true;
@@ -478,8 +540,8 @@
                 body: {
                     nom: $('f-nom').value.trim(),
                     type: $('f-type').value,
-                    commune: $('f-commune').value.trim(),
-                    quartier: $('f-quartier').value.trim(),
+                    commune: commune,
+                    quartier: quartier,
                     repere: $('f-repere').value.trim(),
                     telephone: tel,
                     horaires: $('f-horaires').value.trim(),

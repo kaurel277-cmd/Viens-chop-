@@ -123,9 +123,9 @@
     <!-- ===== HERO ===== -->
     <header class="pt-28 pb-16 hero-bg text-white text-center">
         <div class="max-w-3xl mx-auto px-4">
-            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Répertoire en cours de constitution</span>
+            <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Le répertoire des rencontres</span>
             <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4">Coins Chill certifiés 🍹</h1>
-            <p class="text-lg text-white/90">On sélectionne actuellement les premiers lieux sûrs pour vos premiers rancarts. Aucun partenaire n’est encore publié : on préfère prendre le temps de bien vérifier chaque endroit.</p>
+            <p class="text-lg text-white/90">Maquis, restos, cafés, lounges : les lieux inscrits par leurs gérants, vérifiés un par un avant d’apparaître ici.</p>
 
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <a href="#partenaire" class="bg-white text-brandPink font-extrabold px-7 py-3 rounded-xl shadow-lg hover:bg-slate-100 transition">Proposer un lieu 📍</a>
@@ -134,8 +134,8 @@
 
             <div class="mt-10 grid grid-cols-3 gap-3 max-w-md mx-auto">
                 <div class="bg-white/15 rounded-2xl py-3 px-2">
-                    <p class="text-2xl font-extrabold">0</p>
-                    <p class="text-[11px] text-white/80">lieu publié pour le moment</p>
+                    <p class="text-2xl font-extrabold" id="compteur-lieux">—</p>
+                    <p class="text-[11px] text-white/80" id="compteur-lieux-mot">lieu publié</p>
                 </div>
                 <div class="bg-white/15 rounded-2xl py-3 px-2">
                     <p class="text-2xl font-extrabold">6</p>
@@ -149,36 +149,50 @@
         </div>
     </header>
 
-    <!-- ===== ÉTAT DU RÉPERTOIRE ===== -->
-    <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-3xl border-2 border-dashed border-orange-300 p-8 sm:p-10 text-center shadow-sm">
-            <p class="text-6xl mb-5">🚧</p>
-            <span class="bg-orange-100 text-orange-700 text-[11px] font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-full">Bientôt disponible</span>
-            <h2 class="text-3xl font-extrabold mt-5 mb-3">Le premier répertoire arrive bientôt</h2>
-            <p class="text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
-                Nous recrutons et vérifions actuellement les premiers maquis, cafés, restaurants, lounges et terrasses partenaires. Tant qu’un lieu n’a pas été visité et validé, il n’apparaîtra pas ici.
+    <!-- ===== LES LIEUX INSCRITS PAR LES GÉRANTS ===== -->
+    <section id="lieux" class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
+        <div class="text-center mb-8">
+            <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Le répertoire</span>
+            <h2 class="text-3xl font-extrabold mt-2 mb-3">Les Coins Chill inscrits par les gérants 🍹</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">
+                Chaque lieu est inscrit par son gérant, puis validé par notre équipe avant
+                d’apparaître ici. Les lieux certifiés ont été visités et contrôlés.
             </p>
+        </div>
 
-            <div class="grid sm:grid-cols-3 gap-4 text-left mb-8">
-                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 1</p>
-                    <h3 class="font-extrabold mb-1">Proposition du lieu</h3>
-                    <p class="text-sm text-slate-600">Un gérant ou un membre nous propose un endroit adapté aux rencontres.</p>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6 mb-6">
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="filtre-commune" class="block text-xs font-bold text-slate-500 uppercase mb-1">Commune / ville</label>
+                    <select id="filtre-commune" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink"></select>
+                    <input id="filtre-commune-autre" type="text"
+                           class="hidden w-full mt-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                           placeholder="Écris le nom de la commune">
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 2</p>
-                    <h3 class="font-extrabold mb-1">Visite et vérification</h3>
-                    <p class="text-sm text-slate-600">On contrôle l’éclairage, l’accueil, l’accès, le réseau et le retour en transport.</p>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                    <p class="font-extrabold text-brandPink text-sm mb-1">Étape 3</p>
-                    <h3 class="font-extrabold mb-1">Publication certifiée</h3>
-                    <p class="text-sm text-slate-600">Seulement après validation, le lieu reçoit le badge « Certifié sûr ».</p>
+                <div>
+                    <label for="filtre-quartier" class="block text-xs font-bold text-slate-500 uppercase mb-1">Quartier</label>
+                    <select id="filtre-quartier" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink"></select>
+                    <input id="filtre-quartier-autre" type="text"
+                           class="hidden w-full mt-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                           placeholder="Écris le nom du quartier">
                 </div>
             </div>
+            <p id="lieux-compte" class="text-xs text-slate-500 mt-3" aria-live="polite"></p>
+        </div>
 
-            <a href="#partenaire" class="inline-block bg-brand-gradient text-white font-extrabold px-8 py-3.5 rounded-xl shadow-md hover:opacity-90 transition">
-                Je propose un lieu 🚀
+        <div id="lieux-message" class="hidden mb-4 rounded-xl px-4 py-3 text-sm font-semibold"></div>
+
+        <div id="lieux-liste" class="grid sm:grid-cols-2 gap-5"></div>
+
+        <div id="lieux-vide" class="hidden bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
+            <p class="text-4xl mb-3">🪑</p>
+            <p class="font-extrabold mb-1">Aucun lieu ici pour l’instant</p>
+            <p class="text-sm text-slate-500 mb-4" id="lieux-vide-texte">
+                Aucun lieu n’est encore publié. Les gérants inscrivent leur établissement,
+                et il apparaît ici dès qu’il est validé.
+            </p>
+            <a href="promoteur.html" class="inline-block bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition">
+                Je gère un lieu →
             </a>
         </div>
     </section>
@@ -559,6 +573,250 @@
             this.classList.add('hidden');
             document.getElementById('p-success').classList.remove('hidden');
         });
+    </script>
+
+    <script src="assets/js/villes.js"></script>
+    <script>
+    /* ------------------------------------------------------------------
+       LES COINS CHILL INSCRITS PAR LES GÉRANTS
+
+       La liste vient de l'API : seuls les lieux validés par
+       l'administrateur apparaissent. Filtres par commune et par quartier,
+       avec un champ libre si le nom n'est pas dans la liste.
+       ------------------------------------------------------------------ */
+    (function () {
+        const API = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
+        const $ = id => document.getElementById(id);
+        const BASE = API;
+
+        let tous = [];
+        let jeton = localStorage.getItem('vc_access') || '';
+        let rafraichissement = localStorage.getItem('vc_refresh') || '';
+
+        const echapper = t => String(t == null ? '' : t).replace(/[&<>"']/g, c =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        function message(texte, genre) {
+            const m = $('lieux-message');
+            m.className = 'mb-4 rounded-xl px-4 py-3 text-sm font-semibold ' +
+                (genre === 'ok'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-orange-50 text-orange-700 border border-orange-200');
+            m.textContent = texte;
+            m.classList.remove('hidden');
+        }
+
+        /* ---------- Filtres ---------- */
+        function remplirFiltres(communes) {
+            const sel = $('filtre-commune');
+            sel.innerHTML = '<option value="">Toutes les communes</option>';
+            communes.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.commune;
+                o.textContent = c.commune.replace(/^Abidjan — /, '') + ' (' + c.n + ')';
+                sel.appendChild(o);
+            });
+            const autre = document.createElement('option');
+            autre.value = '__autre';
+            autre.textContent = 'Autre commune…';
+            sel.appendChild(autre);
+
+            majQuartiers('');
+        }
+
+        function majQuartiers(commune) {
+            const sel = $('filtre-quartier');
+            sel.innerHTML = '';
+
+            const tousQ = document.createElement('option');
+            tousQ.value = '';
+            tousQ.textContent = 'Tous les quartiers';
+            sel.appendChild(tousQ);
+
+            // Si aucune commune n'est choisie, on propose les quartiers des
+            // lieux réellement présents (pas toute la carte d'Abidjan).
+            const liste = commune
+                ? (window.VC_VILLES[commune] || [])
+                : Array.from(new Set(tous.map(l => l.quartier).filter(Boolean))).sort();
+
+            liste.forEach(q => {
+                const o = document.createElement('option');
+                o.value = q;
+                o.textContent = q;
+                sel.appendChild(o);
+            });
+
+            const autre = document.createElement('option');
+            autre.value = '__autre';
+            autre.textContent = 'Autre quartier…';
+            sel.appendChild(autre);
+
+            $('filtre-quartier-autre').classList.add('hidden');
+            $('filtre-quartier-autre').value = '';
+        }
+
+        /* ---------- Cartes ---------- */
+        const TYPES = { maquis: 'Maquis', restaurant: 'Restaurant', cafe: 'Café',
+                        lounge: 'Lounge', terrasse: 'Terrasse', autre: 'Lieu' };
+        const AMBIANCES = { calme: 'Calme', anime: 'Animée', terrasse: 'Terrasse', famille: 'Familiale' };
+
+        function carte(l) {
+            const morceaux = [];
+            if (l.quartier) morceaux.push(echapper(l.quartier));
+            morceaux.push(echapper(String(l.commune || '').replace(/^Abidjan — /, '')));
+            return `
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="font-extrabold text-lg leading-tight">${echapper(l.nom)}</h3>
+                        ${l.certifie ? '<span class="shrink-0 text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-full">Certifié</span>' : ''}
+                    </div>
+                    <p class="text-xs font-bold text-brandPink uppercase tracking-wider mb-2">
+                        ${TYPES[l.type] || 'Lieu'} · ${morceaux.join(', ')}
+                    </p>
+                    ${l.description ? '<p class="text-sm text-slate-600 leading-relaxed mb-3">' + echapper(l.description) + '</p>' : ''}
+                    <ul class="text-xs text-slate-500 space-y-1 mb-4">
+                        ${l.horaires ? '<li>🕒 ' + echapper(l.horaires) + '</li>' : ''}
+                        ${l.budget ? '<li>💸 environ ' + Number(l.budget).toLocaleString('fr-FR') + ' F par personne</li>' : ''}
+                        ${l.repere ? '<li>📍 ' + echapper(l.repere) + '</li>' : ''}
+                        ${l.ambiance ? '<li>🎶 ' + (AMBIANCES[l.ambiance] || echapper(l.ambiance)) + '</li>' : ''}
+                    </ul>
+                    <button type="button" data-venir="${l.id}" data-nom="${echapper(l.nom)}"
+                            class="mt-auto w-full bg-brand-gradient text-white font-extrabold py-3 rounded-xl shadow-md hover:opacity-90 transition">
+                        J’y suis arrivé 🍹
+                    </button>
+                </div>`;
+        }
+
+        function afficher() {
+            const commune = $('filtre-commune').value;
+            const communeLibre = commune === '__autre' ? $('filtre-commune-autre').value.trim().toLowerCase() : '';
+            const quartier = $('filtre-quartier').value;
+            const quartierLibre = quartier === '__autre' ? $('filtre-quartier-autre').value.trim().toLowerCase() : '';
+
+            const vus = tous.filter(l => {
+                if (commune === '__autre') {
+                    if (communeLibre && !String(l.commune).toLowerCase().includes(communeLibre)) return false;
+                } else if (commune && l.commune !== commune) return false;
+
+                if (quartier === '__autre') {
+                    if (quartierLibre && !String(l.quartier || '').toLowerCase().includes(quartierLibre)) return false;
+                } else if (quartier && l.quartier !== quartier) return false;
+
+                return true;
+            });
+
+            $('lieux-liste').innerHTML = vus.map(carte).join('');
+
+            if (!tous.length) {
+                $('lieux-vide').classList.remove('hidden');
+                $('lieux-vide-texte').textContent = 'Aucun lieu n’est encore publié. Les gérants inscrivent leur établissement, et il apparaît ici dès qu’il est validé.';
+            } else if (!vus.length) {
+                $('lieux-vide').classList.remove('hidden');
+                $('lieux-vide-texte').textContent = 'Aucun lieu ne correspond à ces filtres. Change de commune ou de quartier.';
+            } else {
+                $('lieux-vide').classList.add('hidden');
+            }
+
+            $('lieux-compte').textContent = tous.length
+                ? vus.length + (vus.length > 1 ? ' lieux' : ' lieu') + ' sur ' + tous.length +
+                  ' publié' + (tous.length > 1 ? 's' : '')
+                : '';
+
+            // Écouteurs des boutons
+            document.querySelectorAll('[data-venir]').forEach(b => {
+                b.addEventListener('click', () => declarer(b));
+            });
+        }
+
+        /* ---------- « J'y suis arrivé » ---------- */
+        async function renouveler() {
+            if (!rafraichissement) return false;
+            const r = await fetch(BASE + '/api/auth/refresh', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: rafraichissement })
+            });
+            if (!r.ok) return false;
+            const d = await r.json().catch(() => ({}));
+            if (!d.access_token) return false;
+            jeton = d.access_token;
+            localStorage.setItem('vc_access', jeton);
+            if (d.refresh_token) { rafraichissement = d.refresh_token; localStorage.setItem('vc_refresh', rafraichissement); }
+            return true;
+        }
+
+        async function declarer(bouton) {
+            const lieuId = bouton.dataset.venir;
+            const nom = bouton.dataset.nom || 'ce lieu';
+
+            if (!jeton) {
+                message('Ouvre d’abord l’application Viens chop sur ce téléphone, puis reviens ici.', 'info');
+                return;
+            }
+
+            bouton.disabled = true;
+            try {
+                let r = await fetch(BASE + '/api/visites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + jeton },
+                    body: JSON.stringify({ lieu_id: lieuId })
+                });
+                if (r.status === 401 && await renouveler()) {
+                    r = await fetch(BASE + '/api/visites', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + jeton },
+                        body: JSON.stringify({ lieu_id: lieuId })
+                    });
+                }
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) throw new Error((d.error && d.error.message) || 'Impossible d’enregistrer la visite.');
+                if (d.deja) {
+                    message('Ta visite chez ' + nom + ' était déjà comptée aujourd’hui. Une seule visite par jour et par lieu.', 'info');
+                } else {
+                    message('Bienvenue chez ' + nom + ' ! Ta visite est enregistrée. Bonne rencontre 🍹', 'ok');
+                }
+                bouton.textContent = 'Visite enregistrée ✅';
+            } catch (e) {
+                message(e.message, 'info');
+                bouton.disabled = false;
+            }
+        }
+
+        /* ---------- Démarrage ---------- */
+        (async function () {
+            try {
+                const r = await fetch(BASE + '/api/lieux');
+                const d = await r.json();
+                tous = d.lieux || [];
+                remplirFiltres(d.communes || []);
+            } catch {
+                tous = [];
+                remplirFiltres([]);
+            }
+
+            $('compteur-lieux').textContent = tous.length;
+            $('compteur-lieux-mot').textContent = tous.length > 1 ? 'lieux publiés' : 'lieu publié';
+            afficher();
+        })();
+
+        $('filtre-commune').addEventListener('change', () => {
+            const autre = $('filtre-commune').value === '__autre';
+            $('filtre-commune-autre').classList.toggle('hidden', !autre);
+            if (autre) $('filtre-commune-autre').focus();
+            majQuartiers($('filtre-commune').value === '__autre' ? '' : $('filtre-commune').value);
+            afficher();
+        });
+
+        $('filtre-commune-autre').addEventListener('input', afficher);
+        $('filtre-quartier-autre').addEventListener('input', afficher);
+
+        $('filtre-quartier').addEventListener('change', () => {
+            const autre = $('filtre-quartier').value === '__autre';
+            $('filtre-quartier-autre').classList.toggle('hidden', !autre);
+            if (autre) $('filtre-quartier-autre').focus();
+            $('filtre-quartier-autre').value = '';
+            afficher();
+        });
+    })();
     </script>
 
     <!-- Installation sur l'écran d'accueil -->

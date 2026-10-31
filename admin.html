@@ -528,7 +528,6 @@
                             ${echapper(details)}<br>
                             ${echapper(l.description || '')}<br>
                             Gérant : ${echapper(l.nom_gerant)} · ${echapper(l.promoteur_phone)}<br>
-                            Code comptoir : <b>${echapper(l.code_visite)}</b> ·
                             ${l.visites} visite(s) · <b>${(l.montant_du || 0).toLocaleString('fr-FR')} F à régler</b>
                             ${l.repere ? '<br>Repère : ' + echapper(l.repere) : ''}
                             ${l.motif_refus ? '<br>Motif du refus : ' + echapper(l.motif_refus) : ''}

@@ -21,6 +21,7 @@ import { config } from '../config.js';
 
 export const promoteursRouter = Router();
 export const suggestionsRouter = Router();
+export const lieuxPublicRouter = Router();
 
 const TYPES = ['maquis', 'restaurant', 'cafe', 'lounge', 'terrasse', 'autre'];
 const AMBIANCES = ['calme', 'anime', 'terrasse', 'famille'];
@@ -248,18 +249,20 @@ export const visitesRouter = Router();
 
 visitesRouter.post('/', requireAuth, async (req, res, next) => {
   try {
-    const code = net(req.body && req.body.code, 6).toUpperCase();
-    if (!/^[A-Z2-9]{6}$/.test(code)) {
-      throw new AppError(400, 'CODE_INVALIDE', 'Le code fait 6 caractères, par exemple A3K7PM.');
+    // Plus de code à recopier : le client appuie sur « J'y suis arrivé »
+    // depuis la fiche du lieu, on reçoit simplement son identifiant.
+    const id = String((req.body && req.body.lieu_id) || '');
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      throw new AppError(400, 'LIEU_INVALIDE', 'Choisis un lieu dans la liste.');
     }
 
     const { rows } = await query(
       `select id, nom, commune, quartier, certifie
-         from public.lieux where code_visite = $1 and statut = 'publie'`,
-      [code]
+         from public.lieux where id = $1 and statut = 'publie'`,
+      [id]
     );
     if (!rows.length) {
-      throw new AppError(404, 'LIEU_INTROUVABLE', "Ce code ne correspond à aucun lieu publié.");
+      throw new AppError(404, 'LIEU_INTROUVABLE', "Ce lieu n'est pas (ou plus) publié.");
     }
     const lieu = rows[0];
 
@@ -280,6 +283,38 @@ visitesRouter.post('/', requireAuth, async (req, res, next) => {
       deja: insert.rows.length === 0,
       lieu: { nom: lieu.nom, commune: lieu.commune, quartier: lieu.quartier, certifie: lieu.certifie }
     });
+  } catch (err) { next(err); }
+});
+
+/* ===========================================================================
+   LA LISTE PUBLIQUE — les lieux validés par l'administrateur
+   =========================================================================== */
+
+lieuxPublicRouter.get('/', async (req, res, next) => {
+  try {
+    const commune = net(req.query.commune, 50);
+    const quartier = net(req.query.quartier, 80);
+
+    const { rows } = await query(
+      `select nom, type, commune, quartier, repere, horaires, budget, ambiance,
+              description, certifie, id
+         from public.lieux
+        where statut = 'publie'
+          and ($1 = '' or commune = $1)
+          and ($2 = '' or quartier = $2)
+        order by certifie desc, nom asc
+        limit 200`,
+      [commune, quartier]
+    );
+
+    // Les communes qui ont au moins un lieu : la liste déroulante ne propose
+    // que ce qui existe vraiment, sans jamais bloquer sur une liste vide.
+    const { rows: communes } = await query(
+      `select commune, count(*)::int as n from public.lieux
+        where statut = 'publie' group by commune order by commune asc`
+    );
+
+    res.json({ ok: true, lieux: rows, communes });
   } catch (err) { next(err); }
 });
 

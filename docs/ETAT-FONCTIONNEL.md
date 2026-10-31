@@ -173,7 +173,7 @@ Preuve en direct : `GET /api/health` renvoie les 7 repères
 | Monétisation (Mode Debout) | 🟡 90 % | Encaissement Wave réel : circuit manuel opérationnel (numéro + référence, validation en console) et circuit **automatique Wave Business écrit et testé** (session Checkout, webhook signé, relecture de la session, retour dans l'app) — en veille jusqu'aux clés. Offre de lancement : **100 premiers** (et non 500). Reste : coller le SQL dans Neon, saisir le numéro Wave, puis les clés Wave Business le moment venu. |
 | Extras annoncés (SOS, Check-In, Incognito) | ⛔ 0 % | Annoncés « bientôt » sur les pages, pas de code serveur |
 | Quiz Mode Flirt | 🟡 60 % | Jouable, mais questions écrites dans la page ; la route `/api/safety/quiz` existe sans être utilisée |
-| Répertoire des Coins Chill | 🟢 80 % | Espace promoteurs (inscription du lieu, validation, code du comptoir, visites facturées) ; reste à faire : afficher la liste des lieux publiés sur la page publique |
+| Répertoire des Coins Chill | 🟢 95 % | Espace promoteurs, validation, liste publique filtrable par commune et quartier, visites facturées d'un appui |
 
 
 ## Espace promoteurs et formule « à la visite »
@@ -186,14 +186,21 @@ un jeton promoteur n'ouvre aucune route de membre, et l'inverse est vrai aussi.
 figurer, ni d'abonnement. Il paie **500 FCFA par couple** arrivé grâce à
 l'application (prix réglable dans la console → Réglages).
 
-Le mécanisme, sans matériel :
+Le mécanisme, sans matériel et **sans code à recopier** :
 
 1. la fiche du gérant est validée par l'administrateur (onglet **Coins Chill**) ;
-2. une fois publiée, elle reçoit un **code de 6 caractères** (sans I, O, 0, 1) ;
-3. le gérant affiche ce code au comptoir ;
-4. le client arrive avec l'application et le saisit sur `arrivee.html` ;
-5. la visite est comptée ; **une seule par membre, par lieu et par jour** ;
-6. l'administrateur voit le total à facturer et peut solder (« Visites réglées »).
+2. elle apparaît alors dans la liste publique de `maquis.html`, filtrable par
+   commune et par quartier (listes déroulantes, avec un champ libre en secours) ;
+3. le jour venu, le couple ouvre la fiche du lieu et appuie sur
+   **« J'y suis arrivé »** ;
+4. la visite est comptée ; **une seule par membre, par lieu et par jour** ;
+5. l'administrateur voit le total à facturer et peut solder (« Visites réglées »).
+
+Il faut être connecté à l'application pour déclarer une visite (le jeton est
+partagé entre les pages du même site). La page `arrivee.html` ne demande plus
+rien : elle renvoie vers la liste, pour que les anciens liens continuent de
+fonctionner. Le code de 6 caractères qui existait au premier jet a été supprimé
+le 31/10 : il obligeait le client à recopier un code au comptoir.
 
 Rien ne se publie sans validation : une fiche en attente n'accepte aucune visite.
 Toute modification d'une fiche publiée la renvoie en vérification.

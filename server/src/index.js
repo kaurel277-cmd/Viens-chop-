@@ -15,7 +15,7 @@ import { photosRouter } from './routes/photos.js';
 import { certificationRouter } from './routes/certification.js';
 import { paiementRouter } from './routes/paiement.js';
 import { adminRouter } from './routes/admin.js';
-import { promoteursRouter, suggestionsRouter, visitesRouter } from './routes/promoteurs.js';
+import { promoteursRouter, suggestionsRouter, visitesRouter, lieuxPublicRouter } from './routes/promoteurs.js';
 
 export const app = express();
 
@@ -106,6 +106,7 @@ app.use('/api/admin',   adminRouter);
 app.use('/api/promoteurs', promoteursRouter);   // gérants de lieux (comptes séparés)
 app.use('/api/visites',    visitesRouter);      // code du comptoir = une visite
 app.use('/api/suggestions', suggestionsRouter); // un membre recommande un lieu
+app.use('/api/lieux',      lieuxPublicRouter);   // la liste publique des Coins Chill
 
 app.use((_req, res) => {
   res.status(404).json({ error: { code: 'ROUTE_INCONNUE', message: 'Route inconnue.' } });
