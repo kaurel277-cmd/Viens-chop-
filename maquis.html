@@ -34,6 +34,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/tailwind.css">
     <link rel="stylesheet" href="assets/css/common.css">
+    <!-- Communes et quartiers : chargé tôt, le formulaire s'en sert au démarrage. -->
+    <script src="assets/js/villes.js"></script>
     <link rel="stylesheet" href="assets/css/icons.css">
     <meta name="description" content="Le répertoire des maquis et cafés certifiés Viens chop est en cours de constitution. Découvre nos critères de sécurité et propose un lieu.">
     <!-- CSS non bloquant : le rendu n'attend pas la réponse du CDN -->
@@ -182,10 +184,31 @@
 
         <div id="lieux-message" class="hidden mb-4 rounded-xl px-4 py-3 text-sm font-semibold"></div>
 
+        <!-- Connexion rapide : on compte sa visite sans quitter la page -->
+        <div id="connexion-lieux" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-5">
+            <p class="font-extrabold mb-1">Connecte-toi pour compter ta visite</p>
+            <p class="text-sm text-slate-500 mb-4">Le même compte que dans l’application Viens chop.</p>
+            <div class="grid sm:grid-cols-2 gap-3">
+                <input id="cx-tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07 00 00 00 00"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm">
+                <input id="cx-mdp" type="password" autocomplete="current-password" placeholder="Mot de passe"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm">
+            </div>
+            <button id="cx-btn" type="button"
+                    class="mt-3 w-full sm:w-auto bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition">
+                Se connecter
+            </button>
+            <p id="cx-err" class="text-xs font-semibold text-red-500 mt-2"></p>
+            <p class="text-xs text-slate-500 mt-3">
+                Pas encore de compte ?
+                <a href="inscription.html" class="text-brandPink font-bold">Crée-le en 30 secondes</a>.
+            </p>
+        </div>
+
         <div id="lieux-liste" class="grid sm:grid-cols-2 gap-5"></div>
 
         <div id="lieux-vide" class="hidden bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
-            <p class="text-4xl mb-3">🪑</p>
+            <p class="text-4xl mb-3">🍹</p>
             <p class="font-extrabold mb-1">Aucun lieu ici pour l’instant</p>
             <p class="text-sm text-slate-500 mb-4" id="lieux-vide-texte">
                 Aucun lieu n’est encore publié. Les gérants inscrivent leur établissement,
@@ -316,10 +339,12 @@
     <section id="partenaire" class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div class="grid md:grid-cols-2 gap-12 items-start">
             <div>
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Gérants et membres</span>
-                <h2 class="text-3xl font-extrabold mt-2 mb-4">Tu connais un lieu adapté ? 🏪</h2>
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Recommandation</span>
+                <h2 class="text-3xl font-extrabold mt-2 mb-4">Recommande un lieu 🏪</h2>
                 <p class="text-slate-600 leading-relaxed mb-6">
-                    Nous construisons le premier répertoire. Tu peux proposer ton propre établissement ou recommander un lieu que tu connais.
+                    Tu connais un maquis, un café ou un resto où l’on se sent bien ?
+                    Recommande-le : notre équipe le vérifie avant de le publier.
+                    Si tu es le gérant du lieu, tu as ton propre espace (bouton ci-dessous).
                 </p>
                 <a href="promoteur.html" class="inline-flex items-center gap-2 bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition mb-6">
                     Je gère un lieu : créer mon espace promoteur →
@@ -335,22 +360,16 @@
             <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
                 <form id="partner-form" class="space-y-4" novalidate>
                     <div>
-                        <label for="p-role" class="block text-xs font-bold text-slate-500 uppercase mb-1">Tu es</label>
-                        <select id="p-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
-                            <option value="gerant">Gérant du lieu</option>
-                            <option value="membre">Membre qui propose un lieu</option>
-                        </select>
-                    </div>
-
-                    <div>
                         <label for="p-name" class="block text-xs font-bold text-slate-500 uppercase mb-1">Nom du lieu</label>
                         <input id="p-name" type="text" required placeholder="Ex : Café ou maquis du quartier" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="p-city" class="block text-xs font-bold text-slate-500 uppercase mb-1">Ville / commune</label>
-                            <input id="p-city" type="text" required placeholder="Ex : Yopougon" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink">
+                            <label for="p-city" class="block text-xs font-bold text-slate-500 uppercase mb-1">Commune / ville</label>
+                            <select id="p-city" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandPink"></select>
+                            <input id="p-city-autre" type="text" placeholder="Écris le nom de la commune"
+                                   class="hidden w-full mt-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm">
                         </div>
                         <div>
                             <label for="p-type" class="block text-xs font-bold text-slate-500 uppercase mb-1">Type</label>
@@ -385,18 +404,6 @@
                     </button>
                     <p class="text-[11px] text-center text-slate-400">Nous étudierons la proposition avant tout contact ou visite. Aucun engagement.</p>
                 </form>
-
-                <div id="p-gerant" class="hidden text-center py-8">
-                    <p class="text-5xl mb-4">🏪</p>
-                    <h3 class="text-xl font-extrabold mb-2">Les gérants ont leur propre espace</h3>
-                    <p class="text-sm text-slate-600 mb-5">
-                        Tu inscris ton établissement toi-même : nom, photos de ta fiche, horaires,
-                        budget. C’est gratuit, et tu ne paies que les visites reçues grâce à l’application.
-                    </p>
-                    <a href="promoteur.html" class="inline-block bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition">
-                        Créer mon espace promoteur →
-                    </a>
-                </div>
 
                 <div id="p-success" class="hidden text-center py-8">
                     <p class="text-5xl mb-4">🎉</p>
@@ -514,13 +521,28 @@
         /* Où envoyer la proposition : la même API que le reste du site. */
         const API = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
 
+        /* Commune : liste déroulante, avec un champ libre pour les noms absents. */
+        (function () {
+            if (!window.vcRemplirCommunes) return;
+            const sel = document.getElementById('p-city');
+            window.vcRemplirCommunes(sel, { vide: '— Choisir la commune —' });
+            sel.addEventListener('change', () => {
+                const autre = sel.value === '__autre';
+                document.getElementById('p-city-autre').classList.toggle('hidden', !autre);
+                if (autre) document.getElementById('p-city-autre').focus();
+                else document.getElementById('p-city-autre').value = '';
+            });
+        })();
+
         document.getElementById('partner-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const error = document.getElementById('p-error');
-            const role = document.getElementById('p-role').value;
             const name = document.getElementById('p-name').value.trim();
-            const city = document.getElementById('p-city').value.trim();
+            const selVille = document.getElementById('p-city');
+            const city = selVille.value === '__autre'
+                ? document.getElementById('p-city-autre').value.trim()
+                : selVille.value.trim();
             const type = document.getElementById('p-type').value;
             const phone = document.getElementById('p-phone').value.replace(/\D/g, '');
             const message = document.getElementById('p-message').value.trim();
@@ -539,15 +561,6 @@
 
             error.classList.add('hidden');
 
-            // Un gérant ne passe pas par une simple proposition : il a son
-            // espace, où il inscrit son établissement lui-même. On le lui dit
-            // ici, avec le bouton — pas de redirection surprise.
-            if (role === 'gerant') {
-                this.classList.add('hidden');
-                document.getElementById('p-gerant').classList.remove('hidden');
-                return;
-            }
-
             const bouton = this.querySelector('button[type="submit"]');
             if (bouton) bouton.disabled = true;
 
@@ -556,7 +569,7 @@
                 const r = await fetch(API + '/api/suggestions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role: role, nom: name, ville: city, type: type, phone: phone, message: message })
+                    body: JSON.stringify({ role: 'membre', nom: name, ville: city, type: type, phone: phone, message: message })
                 });
                 if (!r.ok) {
                     const d = await r.json().catch(() => ({}));
@@ -575,7 +588,6 @@
         });
     </script>
 
-    <script src="assets/js/villes.js"></script>
     <script>
     /* ------------------------------------------------------------------
        LES COINS CHILL INSCRITS PAR LES GÉRANTS
@@ -592,6 +604,7 @@
         let tous = [];
         let jeton = localStorage.getItem('vc_access') || '';
         let rafraichissement = localStorage.getItem('vc_refresh') || '';
+        let visiteEnAttente = null;   // le lieu cliqué avant de se connecter
 
         const echapper = t => String(t == null ? '' : t).replace(/[&<>"']/g, c =>
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -675,14 +688,14 @@
                     </p>
                     ${l.description ? '<p class="text-sm text-slate-600 leading-relaxed mb-3">' + echapper(l.description) + '</p>' : ''}
                     <ul class="text-xs text-slate-500 space-y-1 mb-4">
-                        ${l.horaires ? '<li>🕒 ' + echapper(l.horaires) + '</li>' : ''}
-                        ${l.budget ? '<li>💸 environ ' + Number(l.budget).toLocaleString('fr-FR') + ' F par personne</li>' : ''}
+                        ${l.horaires ? '<li>⏱ ' + echapper(l.horaires) + '</li>' : ''}
+                        ${l.budget ? '<li>💰 environ ' + Number(l.budget).toLocaleString('fr-FR') + ' F par personne</li>' : ''}
                         ${l.repere ? '<li>📍 ' + echapper(l.repere) + '</li>' : ''}
                         ${l.ambiance ? '<li>🎶 ' + (AMBIANCES[l.ambiance] || echapper(l.ambiance)) + '</li>' : ''}
                     </ul>
                     <button type="button" data-venir="${l.id}" data-nom="${echapper(l.nom)}"
                             class="mt-auto w-full bg-brand-gradient text-white font-extrabold py-3 rounded-xl shadow-md hover:opacity-90 transition">
-                        J’y suis arrivé 🍹
+                        J’y suis arrivé
                     </button>
                 </div>`;
         }
@@ -749,7 +762,13 @@
             const nom = bouton.dataset.nom || 'ce lieu';
 
             if (!jeton) {
-                message('Ouvre d’abord l’application Viens chop sur ce téléphone, puis reviens ici.', 'info');
+                // On ne renvoie plus l'utilisateur ailleurs : il se connecte ici
+                // même. Le jeton est rangé dans le même espace que l'application,
+                // donc il reste connecté dans les deux.
+                visiteEnAttente = bouton;
+                $('connexion-lieux').classList.remove('hidden');
+                $('cx-err').textContent = '';
+                $('cx-tel').focus();
                 return;
             }
 
@@ -772,7 +791,7 @@
                 if (d.deja) {
                     message('Ta visite chez ' + nom + ' était déjà comptée aujourd’hui. Une seule visite par jour et par lieu.', 'info');
                 } else {
-                    message('Bienvenue chez ' + nom + ' ! Ta visite est enregistrée. Bonne rencontre 🍹', 'ok');
+                    message('Bienvenue chez ' + nom + ' ! Ta visite est enregistrée. Bonne rencontre.', 'ok');
                 }
                 bouton.textContent = 'Visite enregistrée ✅';
             } catch (e) {
@@ -780,6 +799,52 @@
                 bouton.disabled = false;
             }
         }
+
+        /* ---------- Connexion depuis cette page ---------- */
+        async function seConnecter() {
+            const tel = String($('cx-tel').value || '').replace(/\D/g, '').slice(-10);
+            const mdp = $('cx-mdp').value || '';
+            const err = $('cx-err');
+
+            if (tel.length !== 10) { err.textContent = 'Le numéro doit contenir 10 chiffres.'; return; }
+            if (!mdp) { err.textContent = 'Entre ton mot de passe.'; return; }
+
+            $('cx-btn').disabled = true;
+            err.textContent = '';
+            try {
+                const r = await fetch(BASE + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: tel, password: mdp })
+                });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) throw new Error((d.error && d.error.message) || 'Connexion impossible.');
+
+                jeton = d.access_token;
+                rafraichissement = d.refresh_token || '';
+                localStorage.setItem('vc_access', jeton);
+                if (rafraichissement) localStorage.setItem('vc_refresh', rafraichissement);
+
+                $('cx-mdp').value = '';
+                $('connexion-lieux').classList.add('hidden');
+                message('Connecté. Tu peux compter ta visite en appuyant sur le bouton du lieu.', 'ok');
+
+                if (visiteEnAttente) {
+                    const b = visiteEnAttente;
+                    visiteEnAttente = null;
+                    declarer(b);
+                }
+            } catch (e2) {
+                err.textContent = e2.message;
+            } finally {
+                $('cx-btn').disabled = false;
+            }
+        }
+
+        $('cx-btn').addEventListener('click', seConnecter);
+        $('cx-mdp').addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); seConnecter(); }
+        });
 
         /* ---------- Démarrage ---------- */
         (async function () {

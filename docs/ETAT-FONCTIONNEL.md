@@ -200,6 +200,16 @@ Les communes et leurs quartiers vivent dans un seul fichier
 (`assets/js/villes.js`) : choisir une commune remplit la colonne des quartiers
 et il n'y a plus qu'à choisir. Une ligne « Autre » reste disponible partout.
 
+**Les Coins Chill sont dans l'application** : un onglet dédié dans la barre du
+bas, avec les mêmes filtres commune/quartier et le même bouton « J'y suis
+arrivé ». Sur le site, un visiteur non connecté peut se connecter sans quitter
+la page ; le jeton est partagé avec l'application, donc il reste connecté des
+deux côtés.
+
+Le formulaire de la page publique est devenu **« Recommande un lieu »** : le
+champ « Tu es » a été supprimé, puisqu'un gérant a son propre espace (bouton
+juste au-dessus). La commune y est aussi une liste déroulante.
+
 L'administrateur peut **supprimer définitivement un lieu** (console → Coins
 Chill → Supprimer), avec une confirmation qui annonce les visites et le montant
 encore à facturer. Un lieu supprimé disparaît du site et des deux listes.

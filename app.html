@@ -37,6 +37,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/icons.css">
+    <script src="assets/js/villes.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/compte.js"></script>
     <script src="assets/js/media.js"></script>
@@ -470,6 +471,14 @@
             cursor: pointer; padding: 8px 12px; transition: all 0.2s;
         }
         .nav-item { background: none; border: 0; font-family: inherit; flex: 1; }
+        /* Champs de l'écran Coins Chill : même aspect que le reste de l'app */
+        .cc-champ {
+            width: 100%; padding: 13px; border-radius: 12px; font-family: inherit;
+            font-size: 14.5px; color: #fff; background: #111B21;
+            border: 1px solid rgba(255,255,255,.14);
+        }
+        .cc-champ:focus { outline: 2px solid #FF6B00; outline-offset: 1px; }
+        select.cc-champ option { background: #14212A; color: #fff; }
         .nav-item i { font-size: 20px; }
         .nav-item.active { color: #FF6B00; }
         .nav-item .notif-dot {
@@ -812,7 +821,7 @@
             </div>
 
             <p id="app-version" style="text-align:center; font-size:11px; color:rgba(255,255,255,.28); margin-top:22px;">
-                Viens chop · version 13
+                Viens chop · version 14
             </p>
 
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
@@ -1075,6 +1084,44 @@
         </div>
     </div>
 
+    <!-- ==================== COINS CHILL ==================== -->
+    <div id="coins-chill" class="screen">
+        <div class="wa-header">
+            <button class="wa-icon-btn" onclick="goTo('discover')" aria-label="Retour au fil" type="button">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h2 style="flex:1; text-align:center;">Coins Chill</h2>
+            <span style="width:40px;"></span>
+        </div>
+
+        <div style="flex:1; overflow-y:auto; padding:16px;">
+            <p style="font-size:13px; color:rgba(233,237,239,.62); margin-bottom:14px; line-height:1.5;">
+                Les lieux inscrits par leurs gérants et validés par l'équipe.
+                Une fois sur place, appuie sur <strong>« J'y suis arrivé »</strong>.
+            </p>
+
+            <div style="display:grid; gap:10px; margin-bottom:14px;">
+                <select id="cc-commune" class="cc-champ"></select>
+                <select id="cc-quartier" class="cc-champ"></select>
+                <input id="cc-commune-autre" class="cc-champ" type="text" placeholder="Écris le nom de la commune"
+                       style="display:none;">
+                <input id="cc-quartier-autre" class="cc-champ" type="text" placeholder="Écris le nom du quartier"
+                       style="display:none;">
+            </div>
+
+            <p id="cc-compte" style="font-size:12px; color:rgba(233,237,239,.5); margin-bottom:10px;"></p>
+            <div id="cc-message" style="display:none; margin-bottom:12px; padding:12px 14px; border-radius:12px;
+                 font-size:13px; font-weight:600; line-height:1.5;"></div>
+
+            <div id="cc-liste" style="display:grid; gap:12px;"></div>
+
+            <div id="cc-vide" style="display:none; text-align:center; padding:28px 12px; color:rgba(233,237,239,.55); font-size:13.5px; line-height:1.6;">
+                <div style="font-size:30px; margin-bottom:10px;"><i class="fa-solid fa-martini-glass-citrus" style="opacity:.5;"></i></div>
+                <p id="cc-vide-texte">Aucun lieu publié pour le moment.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== FAUX APPEL OVERLAY ==================== -->
     <div id="fake-call-overlay">
         <div class="call-avatar">📞</div>
@@ -1187,6 +1234,10 @@
             <span>Discussions</span>
             <span class="notif-dot" id="chat-notif" style="display:none;"></span>
         </button>
+        <button type="button" class="nav-item" onclick="switchTab('coins-chill', this)">
+            <i class="fa-solid fa-martini-glass-citrus"></i>
+            <span>Coins Chill</span>
+        </button>
         <button type="button" class="nav-item" onclick="showQuiz(this)">
             <i class="fa-solid fa-gamepad"></i>
             <span>Mode Flirt</span>
@@ -1256,7 +1307,7 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
 
-            const navScreens = ['discover', 'chat', 'discussions'];
+            const navScreens = ['discover', 'chat', 'discussions', 'coins-chill'];
             document.getElementById('bottom-nav').style.display = navScreens.includes(screenId) ? 'flex' : 'none';
         }
 
@@ -4337,5 +4388,214 @@
     </script>
 
 
+
+    <!-- ==================== COINS CHILL : la liste ==================== -->
+    <script>
+    (function () {
+        // La liste des lieux publiés, telle que la voit le membre.
+        // Elle se recharge à chaque ouverture de l'écran : un lieu validé à
+        // l'instant apparaît sans redémarrer l'application.
+        const $ = id => document.getElementById(id);
+        let tous = null;
+        let deja = false;
+
+        const TYPES = { maquis: 'Maquis', restaurant: 'Restaurant', cafe: 'Café',
+                        lounge: 'Lounge', terrasse: 'Terrasse', autre: 'Lieu' };
+        const AMBIANCES = { calme: 'Calme', anime: 'Animée', terrasse: 'Terrasse', famille: 'Familiale' };
+        const echapper = t => String(t == null ? '' : t).replace(/[&<>"']/g, c =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        function message(texte, genre) {
+            const m = $('cc-message');
+            const couleurs = {
+                ok: 'background:rgba(37,211,102,.14); border:1px solid rgba(37,211,102,.4); color:#8ff0b6;',
+                info: 'background:rgba(255,176,32,.14); border:1px solid rgba(255,176,32,.4); color:#ffcf7a;',
+                non: 'background:rgba(229,72,77,.16); border:1px solid rgba(229,72,77,.45); color:#ffa8aa;'
+            };
+            m.style.cssText = 'display:block; margin-bottom:12px; padding:12px 14px; border-radius:12px;' +
+                'font-size:13px; font-weight:600; line-height:1.5;' + (couleurs[genre] || couleurs.info);
+            m.textContent = texte;
+        }
+
+        function remplirFiltres(communes) {
+            const sel = $('cc-commune');
+            sel.innerHTML = '<option value="">Toutes les communes</option>';
+            communes.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.commune;
+                o.textContent = window.vcNomCourt(c.commune) + ' (' + c.n + ')';
+                sel.appendChild(o);
+            });
+            const autre = document.createElement('option');
+            autre.value = '__autre';
+            autre.textContent = 'Autre commune…';
+            sel.appendChild(autre);
+            majQuartiers('');
+        }
+
+        function majQuartiers(commune) {
+            const sel = $('cc-quartier');
+            sel.innerHTML = '<option value="">Tous les quartiers</option>';
+            const liste = commune
+                ? (window.VC_VILLES[commune] || [])
+                : Array.from(new Set((tous || []).map(l => l.quartier).filter(Boolean))).sort();
+            liste.forEach(q => {
+                const o = document.createElement('option');
+                o.value = q;
+                o.textContent = q;
+                sel.appendChild(o);
+            });
+            const autre = document.createElement('option');
+            autre.value = '__autre';
+            autre.textContent = 'Autre quartier…';
+            sel.appendChild(autre);
+            $('cc-quartier-autre').style.display = 'none';
+            $('cc-quartier-autre').value = '';
+        }
+
+        function carte(l) {
+            const morceaux = [];
+            if (l.quartier) morceaux.push(echapper(l.quartier));
+            morceaux.push(echapper(window.vcNomCourt(l.commune)));
+            const lignes = [];
+            const ico = n => '<i class="fa-solid fa-' + n + '" style="width:16px; opacity:.65;"></i> ';
+            if (l.horaires) lignes.push(ico('clock') + echapper(l.horaires));
+            if (l.budget) lignes.push(ico('money-bill-wave') + 'environ ' + Number(l.budget).toLocaleString('fr-FR') + ' F par personne');
+            if (l.repere) lignes.push(ico('location-dot') + echapper(l.repere));
+            if (l.ambiance) lignes.push(ico('music') + (AMBIANCES[l.ambiance] || echapper(l.ambiance)));
+
+            return '<div style="background:#111B21; border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:16px;">' +
+                '<div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px;">' +
+                    '<h3 style="font-size:16px; font-weight:800; line-height:1.25;">' + echapper(l.nom) + '</h3>' +
+                    (l.certifie ? '<span style="flex-shrink:0; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; background:rgba(37,211,102,.16); color:#6ee7a0; border:1px solid rgba(37,211,102,.35); padding:3px 8px; border-radius:99px;">Certifié</span>' : '') +
+                '</div>' +
+                '<p style="font-size:11.5px; font-weight:800; color:#FF6B00; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">' +
+                    (TYPES[l.type] || 'Lieu') + ' · ' + morceaux.join(', ') + '</p>' +
+                (l.description ? '<p style="font-size:13.5px; color:rgba(233,237,239,.75); line-height:1.55; margin-bottom:10px;">' + echapper(l.description) + '</p>' : '') +
+                (lignes.length ? '<ul style="list-style:none; font-size:12.5px; color:rgba(233,237,239,.62); line-height:1.7; margin-bottom:14px;">' +
+                    lignes.map(x => '<li>' + x + '</li>').join('') + '</ul>' : '') +
+                '<button type="button" data-venir="' + l.id + '" data-nom="' + echapper(l.nom) + '" ' +
+                    'style="width:100%; padding:13px; border:0; border-radius:12px; font-family:inherit; font-size:14px; font-weight:800; color:#fff; cursor:pointer; background:linear-gradient(135deg,#FF6B00,#FF1E56);">' +
+                    'J’y suis arrivé</button>' +
+                '</div>';
+        }
+
+        function afficher() {
+            const commune = $('cc-commune').value;
+            const communeLibre = commune === '__autre' ? $('cc-commune-autre').value.trim().toLowerCase() : '';
+            const quartier = $('cc-quartier').value;
+            const quartierLibre = quartier === '__autre' ? $('cc-quartier-autre').value.trim().toLowerCase() : '';
+
+            const vus = (tous || []).filter(l => {
+                if (commune === '__autre') {
+                    if (communeLibre && !String(l.commune).toLowerCase().includes(communeLibre)) return false;
+                } else if (commune && l.commune !== commune) return false;
+
+                if (quartier === '__autre') {
+                    if (quartierLibre && !String(l.quartier || '').toLowerCase().includes(quartierLibre)) return false;
+                } else if (quartier && l.quartier !== quartier) return false;
+                return true;
+            });
+
+            $('cc-liste').innerHTML = vus.map(carte).join('');
+
+            if (!tous || !tous.length) {
+                $('cc-vide').style.display = 'block';
+                $('cc-vide-texte').textContent = 'Aucun lieu publié pour le moment. Les gérants inscrivent leur établissement, et il apparaît ici dès qu’il est validé.';
+            } else if (!vus.length) {
+                $('cc-vide').style.display = 'block';
+                $('cc-vide-texte').textContent = 'Aucun lieu ne correspond à ces filtres. Change de commune ou de quartier.';
+            } else {
+                $('cc-vide').style.display = 'none';
+            }
+
+            $('cc-compte').textContent = (tous && tous.length)
+                ? vus.length + (vus.length > 1 ? ' lieux' : ' lieu') + ' sur ' +
+                  tous.length + ' publié' + (tous.length > 1 ? 's' : '')
+                : '';
+
+            document.querySelectorAll('#cc-liste [data-venir]').forEach(b => {
+                b.addEventListener('click', () => declarer(b));
+            });
+        }
+
+        async function declarer(bouton) {
+            const nom = bouton.dataset.nom || 'ce lieu';
+            const C = window.VCAPI;
+            if (!C || !C.isLoggedIn()) {
+                message('Connecte-toi pour compter ta visite.', 'non');
+                goTo('login');
+                return;
+            }
+
+            bouton.disabled = true;
+            bouton.textContent = 'Enregistrement…';
+            try {
+                const d = await C.request('/api/visites', { method: 'POST', body: { lieu_id: bouton.dataset.venir } });
+                if (d.deja) {
+                    message('Ta visite chez ' + nom + ' était déjà comptée aujourd’hui. Une seule visite par jour et par lieu.', 'info');
+                } else {
+                    message('Bienvenue chez ' + nom + ' ! Ta visite est enregistrée. Bonne rencontre.', 'ok');
+                }
+                bouton.textContent = 'Visite enregistrée ✅';
+            } catch (e) {
+                message(e.message || 'Impossible d’enregistrer la visite pour le moment.', 'non');
+                bouton.disabled = false;
+                bouton.textContent = 'J’y suis arrivé';
+            }
+        }
+
+        async function charger() {
+            if (deja) return;
+            try {
+                const d = await window.VCAPI.request('/api/lieux', { auth: false });
+                tous = d.lieux || [];
+                remplirFiltres(d.communes || []);
+            } catch {
+                tous = [];
+                remplirFiltres([]);
+            }
+            deja = true;
+            afficher();
+        }
+
+        /* On charge à la première ouverture de l'écran, puis on rafraîchit à
+           chaque retour : un lieu validé entre-temps doit apparaître. */
+        const ancienGoTo = window.goTo;
+        window.goTo = function (id) {
+            ancienGoTo(id);
+            if (id === 'coins-chill') {
+                deja = false;
+                $('cc-message').style.display = 'none';
+                charger();
+            }
+        };
+
+        const selCommune = $('cc-commune');
+        const selQuartier = $('cc-quartier');
+        window.vcRemplirCommunes(selCommune, { avecVide: false });
+        selCommune.innerHTML = '<option value="">Toutes les communes</option>' + selCommune.innerHTML;
+        selCommune.insertAdjacentHTML('beforeend', '<option value="__autre">Autre commune…</option>');
+
+        selCommune.addEventListener('change', () => {
+            const autre = selCommune.value === '__autre';
+            $('cc-commune-autre').style.display = autre ? 'block' : 'none';
+            if (autre) $('cc-commune-autre').focus();
+            majQuartiers(autre ? '' : selCommune.value);
+            afficher();
+        });
+        selQuartier.addEventListener('change', () => {
+            const autre = selQuartier.value === '__autre';
+            $('cc-quartier-autre').style.display = autre ? 'block' : 'none';
+            if (autre) $('cc-quartier-autre').focus();
+            $('cc-quartier-autre').value = '';
+            afficher();
+        });
+        $('cc-commune-autre').addEventListener('input', afficher);
+        $('cc-quartier-autre').addEventListener('input', afficher);
+
+        majQuartiers('');
+    })();
+    </script>
 </body>
 </html>
