@@ -57,7 +57,7 @@ elles sont donc gardées telles quelles.
 
 ---
 
-## 3. Bugs trouvés et corrigés dans cette version (15)
+## 3. Bugs trouvés et corrigés dans cette version
 
 1. **Accueil impossible à faire défiler avec deux doigts.** La classe
    `overflow-x-hidden` sur le `<body>` d'`index.html` bloquait le défilement
