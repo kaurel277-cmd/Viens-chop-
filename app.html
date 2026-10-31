@@ -632,15 +632,18 @@
                             <button class="tag" data-choisi="Femme" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
                         </div>
                     </div>
-                    <div>
+                    <div id="bloc-recherche" style="display:none;">
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
                         <div id="tags-recherche" style="display:flex; gap:10px; margin-top:8px;">
                             <button class="tag" data-choisi="Homme" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
                             <button class="tag" data-choisi="Femme" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
-                            <button class="tag" data-choisi="Tous" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
+                            <!-- « Tous » n'est plus proposé : un homme cherche une femme,
+                                 une femme cherche un homme ou une femme. -->
+                            <button class="tag" id="tag-tous" data-choisi="Tous" onclick="selectSeeking(this,'Tous')" type="button" style="display:none;">🌍 Tous</button>
                         </div>
+                        <p id="recherche-note" style="font-size:11.5px; color:rgba(255,255,255,.42); margin-top:8px; line-height:1.5;"></p>
                         <p id="recap-choix" aria-live="polite"
-                           style="font-size:12px; color:rgba(255,255,255,.55); margin-top:10px; line-height:1.5;"></p>
+                           style="font-size:12px; color:rgba(255,255,255,.55); margin-top:6px; line-height:1.5;"></p>
                     </div>
                 </div>
                 <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()" type="button">Continuer →</button>
@@ -809,7 +812,7 @@
             </div>
 
             <p id="app-version" style="text-align:center; font-size:11px; color:rgba(255,255,255,.28); margin-top:22px;">
-                Viens chop · version 8
+                Viens chop · version 9
             </p>
 
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
@@ -1399,7 +1402,11 @@
             // On recoche ce qui est déjà enregistré : la personne voit son
             // choix réel, et peut le changer.
             cocherTag('genre', libelleGenre(me.gender));
-            cocherTag('recherche', libelleRecherche(me.seeking));
+            // La règle reprend la main : un homme ne peut chercher qu'une femme.
+            appliquerRegleRecherche(libelleGenre(me.gender));
+            if (libelleGenre(me.gender) === 'Femme') {
+                cocherTag('recherche', libelleRecherche(me.seeking));
+            }
 
             // Artistes déjà choisis (l'emoji est retiré, comme à l'enregistrement).
             const propres = new Set((me.artists || []).map(a => String(a).trim().toLowerCase()));
@@ -1498,6 +1505,18 @@
            quand le clavier se referme : on ferme donc le clavier AVANT tout
            changement, et la page ne bouge plus sous le doigt. */
         function choisirTag(el, val, groupe) {
+            // « Je recherche » est verrouillé pour un homme, et « Tous » n'existe
+            // plus : si l'appel vient d'ailleurs, on réapplique la règle.
+            if (groupe === 'recherche') {
+                if (selectedGender === 'Homme' && val !== 'Femme') {
+                    appliquerRegleRecherche('Homme');
+                    return;
+                }
+                if (val === 'Tous') {
+                    appliquerRegleRecherche(selectedGender);
+                    return;
+                }
+            }
             // On referme le clavier avant de changer l'affichage : plus de
             // décalage de page sous le doigt.
             const actif = document.activeElement;
@@ -1507,9 +1526,81 @@
             boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
             el.classList.add('selected');
             el.dataset.choisi = val;
-            if (groupe === 'genre') selectedGender = val;
-            else selectedSeeking = val;
+            if (groupe === 'genre') {
+                selectedGender = val;
+                // Le genre décide de « je recherche » : la personne n'a pas à
+                // le choisir quand il n'y a qu'une possibilité.
+                appliquerRegleRecherche(val);
+            } else {
+                selectedSeeking = val;
+                rechercheImposee = false;
+            }
             majRecapChoix();
+        }
+
+        /* ---------- La règle « je suis » → « je recherche » ----------
+           Un homme : uniquement une femme (c'est automatique, il n'a pas
+           d'autre choix).
+           Une femme : un homme (par défaut) ou une femme.
+           Rien n'est proposé avant que le genre soit indiqué. */
+        let rechercheImposee = false;   // « une femme » posée d'office pour un homme
+
+        function appliquerRegleRecherche(genre) {
+            const bloc = document.getElementById('bloc-recherche');
+            const boite = document.getElementById('tags-recherche');
+            const note = document.getElementById('recherche-note');
+            const tagHomme = boite ? boite.querySelector('[data-choisi="Homme"]') : null;
+            const tagFemme = boite ? boite.querySelector('[data-choisi="Femme"]') : null;
+            const tagTous = document.getElementById('tag-tous');
+
+            if (!boite) return;
+
+            if (genre !== 'Homme' && genre !== 'Femme') {
+                // Pas encore de genre : on n'invente rien.
+                if (bloc) bloc.style.display = 'none';
+                reinitialiserChoixRecherche();
+                return;
+            }
+
+            if (bloc) bloc.style.display = 'block';
+            if (tagTous) tagTous.style.display = 'none';
+
+            if (genre === 'Homme') {
+                // Une seule issue : une femme. Le choix est posé et verrouillé.
+                if (tagHomme) tagHomme.style.display = 'none';
+                if (tagFemme) { tagFemme.style.display = ''; tagFemme.classList.add('selected'); }
+                boite.querySelectorAll('.tag').forEach(t => {
+                    if (t !== tagFemme) t.classList.remove('selected');
+                });
+                selectedSeeking = 'Femme';
+                rechercheImposee = true;
+                if (note) note.textContent = 'Automatique : un homme cherche une femme.';
+            } else {
+                // Une femme : un homme ou une femme, un homme par défaut.
+                if (tagHomme) tagHomme.style.display = '';
+                if (tagFemme) tagFemme.style.display = '';
+                const dejaLa = boite.querySelector('.tag.selected');
+                // Un choix que la personne n'a pas fait (celui imposé à un homme)
+                // ne la suit pas : une femme repart sur un homme.
+                if (rechercheImposee || !dejaLa || !['Homme', 'Femme'].includes(dejaLa.dataset.choisi)) {
+                    boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+                    if (tagHomme) tagHomme.classList.add('selected');
+                    selectedSeeking = 'Homme';
+                } else {
+                    selectedSeeking = dejaLa.dataset.choisi;
+                }
+                rechercheImposee = false;
+                if (note) note.textContent = 'Tu peux chercher un homme ou une femme.';
+            }
+            majRecapChoix();
+        }
+
+        function reinitialiserChoixRecherche() {
+            const boite = document.getElementById('tags-recherche');
+            if (boite) boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+            const note = document.getElementById('recherche-note');
+            if (note) note.textContent = '';
+            selectedSeeking = '';
         }
 
         /* Ce que l'application a réellement compris, écrit en clair sous les
@@ -1560,6 +1651,7 @@
             selectedSeeking = '';
             const recap = document.getElementById('recap-choix');
             if (recap) recap.textContent = '';
+            appliquerRegleRecherche('');
         }
         function toggleArtist(el) {
             el.classList.toggle('selected');
@@ -1619,8 +1711,11 @@
             if(!city) { alert("Choisis ta commune ou ta ville !"); return; }
 
             const genreChoisi = choixDuGroupe('genre');
-            const rechercheChoisie = choixDuGroupe('recherche');
             if(!genreChoisi) { alert("Indique si tu es un homme ou une femme !"); return; }
+            // « Je recherche » découle du genre : un homme cherche une femme,
+            // une femme cherche un homme (ou une femme si elle l'a choisi).
+            appliquerRegleRecherche(genreChoisi);
+            const rechercheChoisie = choixDuGroupe('recherche') || selectedSeeking;
             if(!rechercheChoisie) { alert("Indique qui tu recherches !"); return; }
 
             selectedGender = genreChoisi;
@@ -2993,10 +3088,10 @@
                 const ligne = document.getElementById('my-genre-recherche');
                 if (ligne) {
                     const nomsGenre = { Homme: 'Un homme', Femme: 'Une femme' };
-                    const nomsRech = { Homme: 'des hommes', Femme: 'des femmes', Tous: 'tout le monde' };
+                    const nomsRech = { Homme: 'des hommes', Femme: 'des femmes' };
                     const g = typeof libelleGenre === 'function' ? libelleGenre(compte.gender) : '';
                     const r = typeof libelleRecherche === 'function' ? libelleRecherche(compte.seeking) : 'Tous';
-                    ligne.textContent = (nomsGenre[g] || 'Non précisé') + ' · je cherche ' + (nomsRech[r] || 'tout le monde');
+                    ligne.textContent = (nomsGenre[g] || 'Non précisé') + ' · je cherche ' + (nomsRech[r] || 'des femmes');
                 }
 
                 const photos = compte.photos || [];

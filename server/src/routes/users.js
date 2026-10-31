@@ -5,11 +5,10 @@ import { AppError } from '../errors.js';
 
 export const usersRouter = Router();
 
-/* Rien n'est désigné à la place de la personne : si « je recherche » n'est
-   pas fourni, on ne touche pas à la valeur existante. (Avant, un simple envoi
-   du genre posait d'office « des femmes » — un choix que personne n'avait
-   fait.) Un profil sans « je recherche » voit tout le monde : c'est le filtre
-   par défaut de feed.js. */
+/* La règle du site, tenue par le serveur et pas seulement par l'écran :
+     - un homme ne cherche qu'une femme (M -> F, sans autre possibilité) ;
+     - une femme cherche un homme (F) ou une femme (F) ;
+   « Tout le monde » n'est plus proposé. */
 
 /* L'écran d'inscription parle en français (« Homme », « Femme », « Tous »),
    le serveur stocke des lettres. On accepte les deux pour ne jamais perdre
@@ -54,9 +53,21 @@ usersRouter.post('/me', requireAuth, async (req, res, next) => {
       throw new AppError(400, 'ARTISTES_INVALIDE', '12 artistes maximum.');
     }
 
-    // « Je recherche » : uniquement le choix de la personne. Jamais de défaut
-    // déduit du genre.
-    const seeking = recherche !== undefined ? recherche : undefined;
+    // Le genre de la personne, avant ou après cette mise à jour : c'est lui qui
+    // décide de ce qu'elle peut rechercher.
+    const { rows: avant } = await query('select gender, seeking from public.users where id = $1', [req.user.id]);
+    const genreFinal = gender || (avant[0] && avant[0].gender) || null;
+
+    let seeking = recherche !== undefined ? recherche : undefined;
+    if (genreFinal === 'M') {
+      // Un homme : une femme, point.
+      seeking = 'F';
+    } else if (genreFinal === 'F') {
+      // Une femme : un homme (par défaut) ou une femme. « Tout le monde » n'est
+      // plus accepté.
+      if (seeking === 'A') seeking = undefined;
+      if (seeking === undefined && avant[0] && !avant[0].seeking) seeking = 'M';
+    }
 
     const { rows } = await query(
       `update public.users set
