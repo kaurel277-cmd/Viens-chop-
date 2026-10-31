@@ -5,7 +5,11 @@ import { AppError } from '../errors.js';
 
 export const usersRouter = Router();
 
-const SEEKING_RULE = { M: 'F', F: 'A' };
+/* Rien n'est désigné à la place de la personne : si « je recherche » n'est
+   pas fourni, on ne touche pas à la valeur existante. (Avant, un simple envoi
+   du genre posait d'office « des femmes » — un choix que personne n'avait
+   fait.) Un profil sans « je recherche » voit tout le monde : c'est le filtre
+   par défaut de feed.js. */
 
 /* L'écran d'inscription parle en français (« Homme », « Femme », « Tous »),
    le serveur stocke des lettres. On accepte les deux pour ne jamais perdre
@@ -50,9 +54,9 @@ usersRouter.post('/me', requireAuth, async (req, res, next) => {
       throw new AppError(400, 'ARTISTES_INVALIDE', '12 artistes maximum.');
     }
 
-    // « Je recherche » : le choix de la personne est respecté quand il est fourni,
-    // sinon on retombe sur la règle par défaut liée au genre.
-    const seeking = recherche !== undefined ? recherche : (gender ? SEEKING_RULE[gender] : undefined);
+    // « Je recherche » : uniquement le choix de la personne. Jamais de défaut
+    // déduit du genre.
+    const seeking = recherche !== undefined ? recherche : undefined;
 
     const { rows } = await query(
       `update public.users set
@@ -64,7 +68,8 @@ usersRouter.post('/me', requireAuth, async (req, res, next) => {
          artists  = coalesce($7::text[], artists),
          bio      = coalesce($8, bio)
        where id = $1
-       returning id, pseudo, age, is_adult, gender, seeking, commune, artists, bio, plan`,
+       returning id, pseudo, age, is_adult, gender, seeking, commune, artists, bio,
+                 plan, birth_date`,
       [
         req.user.id,
         pseudo ?? null,

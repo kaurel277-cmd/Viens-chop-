@@ -567,7 +567,7 @@
 
             <!-- STEP 1: Infos de base -->
             <div id="setup-step-1" class="anim-slide-up">
-                <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">On fait connaissance 👋</h2>
+                <h2 id="setup-titre" style="font-size:24px; font-weight:800; margin-bottom:4px;">On fait connaissance 👋</h2>
                 <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:28px;">C'est rapide, sans pression !</p>
 
                 <div style="display:flex; flex-direction:column; gap:14px;">
@@ -619,17 +619,17 @@
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je suis</label>
-                        <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectGender(this,'Homme')" type="button">🙋‍♂️ Un Homme</button>
-                            <button class="tag" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
+                        <div id="tags-genre" style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" data-choisi="Homme" onclick="selectGender(this,'Homme')" type="button">🙋‍♂️ Un Homme</button>
+                            <button class="tag" data-choisi="Femme" onclick="selectGender(this,'Femme')" type="button">🙋‍♀️ Une Femme</button>
                         </div>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px;">Je recherche</label>
-                        <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="tag" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
-                            <button class="tag" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
+                        <div id="tags-recherche" style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="tag" data-choisi="Homme" onclick="selectSeeking(this,'Homme')" type="button">🙋‍♂️ Homme</button>
+                            <button class="tag" data-choisi="Femme" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
+                            <button class="tag" data-choisi="Tous" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
                         </div>
                     </div>
                 </div>
@@ -775,6 +775,14 @@
             <button class="btn-secondary" style="margin-top:16px;" onclick="addMyPhoto()" type="button">
                 <i class="fa-solid fa-camera"></i> Ajouter une photo
             </button>
+
+            <div style="margin-top:16px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div>
+                    <h3 style="font-size:14px; font-weight:800;">Je suis · Je recherche</h3>
+                    <p id="my-genre-recherche" style="font-size:12px; color:rgba(255,255,255,.55); margin-top:4px;">—</p>
+                </div>
+                <button class="btn-secondary" style="width:auto; flex:0 0 auto; padding:10px 14px;" onclick="ouvrirModificationProfil()" type="button">Modifier</button>
+            </div>
 
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
                 <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:rgba(255,255,255,.6); margin-bottom:8px;">
@@ -1326,10 +1334,70 @@
                 if (nom && !nom.value && compte.name && !/^membre\d+$/i.test(compte.name)) nom.value = compte.name;
                 const naiss = document.getElementById('setup-birth');
                 if (naiss && !naiss.value && compte.birth) naiss.value = compte.birth;
+                profilEnModification = false;
+                reinitialiserChoixProfil();
                 goTo('profile-setup');
                 return;
             }
             goTo('discover');
+        }
+
+        /* ---------- Modifier son profil (dont « je suis / je recherche ») ----------
+           Sans cet écran, un profil enregistré avec le mauvais « je recherche »
+           ne pouvait plus être corrigé. On réutilise l'écran d'inscription,
+           pré-rempli avec ce qui est déjà enregistré. */
+        let profilEnModification = false;
+
+        function libelleGenre(valeur) {
+            const v = String(valeur || '').trim().toUpperCase();
+            if (v === 'M' || v === 'H' || v.startsWith('H')) return 'Homme';
+            if (v === 'F' || v.startsWith('F')) return 'Femme';
+            return '';
+        }
+        function libelleRecherche(valeur) {
+            const v = String(valeur || '').trim().toUpperCase();
+            if (v === 'M' || v === 'H' || v.startsWith('H')) return 'Homme';
+            if (v === 'F' || v.startsWith('F')) return 'Femme';
+            return 'Tous';
+        }
+
+        function ouvrirModificationProfil() {
+            const C = window.VCCompte;
+            const me = C && C.current ? C.current() : null;
+            if (!me) return;
+
+            profilEnModification = true;
+            reinitialiserChoixProfil();
+
+            const nom = document.getElementById('setup-name');
+            if (nom) nom.value = (me.name && !/^membre\d+$/i.test(me.name)) ? me.name : '';
+            const naiss = document.getElementById('setup-birth');
+            // Le serveur renvoie parfois « 1996-07-07T00:00:00.000Z » : un champ
+            // date n'accepte que les 10 premiers caractères.
+            if (naiss) naiss.value = String(me.birth || '').slice(0, 10);
+            const ville = document.getElementById('setup-city');
+            if (ville && me.commune) {
+                [...ville.options].forEach(o => {
+                    if (o.text === me.commune || o.value === me.commune) ville.value = o.value || o.text;
+                });
+            }
+
+            // On recoche ce qui est déjà enregistré : la personne voit son
+            // choix réel, et peut le changer.
+            cocherTag('genre', libelleGenre(me.gender));
+            cocherTag('recherche', libelleRecherche(me.seeking));
+
+            // Artistes déjà choisis (l'emoji est retiré, comme à l'enregistrement).
+            const propres = new Set((me.artists || []).map(a => String(a).trim().toLowerCase()));
+            document.querySelectorAll('#setup-step-2 .tag').forEach(t => {
+                const texte = t.textContent.replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]/gu, '').trim().toLowerCase();
+                t.classList.toggle('selected', propres.has(texte));
+            });
+
+            if (typeof profileStep1 === 'function') profileStep1();
+            const titre = document.getElementById('setup-titre');
+            if (titre) titre.textContent = 'Modifier mon profil ✏️';
+            goTo('profile-setup');
         }
 
         /* ---------- Bouton « retour » du téléphone ----------
@@ -1405,15 +1473,49 @@
         let selectedGender = '';
         let selectedSeeking = '';
 
-        function selectGender(el, val) {
-            selectedGender = val;
-            el.parentElement.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+        /* « Je suis » et « Je recherche » sont deux choix SÉPARÉS : toucher
+           l'un ne désigne jamais l'autre. La valeur retenue est celle qui est
+           visiblement cochée à l'écran (data-choisi), donc plus de reste d'un
+           ancien choix qui partait tout seul à l'enregistrement. */
+        function choisirTag(el, val, groupe) {
+            const boite = el.parentElement;
+            boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
             el.classList.add('selected');
+            el.dataset.choisi = val;
+            if (groupe === 'genre') selectedGender = val;
+            else selectedSeeking = val;
         }
-        function selectSeeking(el, val) {
-            selectedSeeking = val;
-            el.parentElement.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
-            el.classList.add('selected');
+        function selectGender(el, val) { choisirTag(el, val, 'genre'); }
+        function selectSeeking(el, val) { choisirTag(el, val, 'recherche'); }
+
+        /* On lit l'écran, pas une variable : ce qui n'est pas coché ne part pas. */
+        function choixDuGroupe(groupe) {
+            const boite = document.getElementById(groupe === 'genre' ? 'tags-genre' : 'tags-recherche');
+            const coche = boite ? boite.querySelector('.tag.selected') : null;
+            return coche ? String(coche.dataset.choisi || '') : '';
+        }
+        function cocherTag(groupe, val) {
+            if (!val) return;
+            const boite = document.getElementById(groupe === 'genre' ? 'tags-genre' : 'tags-recherche');
+            if (!boite) return;
+            const cible = Array.from(boite.querySelectorAll('.tag'))
+                .find(t => String(t.dataset.choisi || '') === val);
+            if (!cible) return;
+            if (groupe === 'genre') {
+                choisirTag(cible, val, 'genre');
+            } else {
+                choisirTag(cible, val, 'recherche');
+            }
+        }
+        /* Écran vierge à chaque entrée : aucun choix hérité d'une fois précédente. */
+        function reinitialiserChoixProfil() {
+            ['tags-genre', 'tags-recherche'].forEach(id => {
+                const boite = document.getElementById(id);
+                if (!boite) return;
+                boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+            });
+            selectedGender = '';
+            selectedSeeking = '';
         }
         function toggleArtist(el) {
             el.classList.toggle('selected');
@@ -1471,10 +1573,15 @@
             }
             if (age > 99) { alert("Cette date de naissance n'est pas valide."); return; }
             if(!city) { alert("Choisis ta commune ou ta ville !"); return; }
-            if(!selectedGender) { alert("Indique si tu es un homme ou une femme !"); return; }
-            if(!selectedSeeking) { alert("Indique qui tu recherches !"); return; }
 
-            userProfile = { name, age, birth, city, gender: selectedGender, seeking: selectedSeeking };
+            const genreChoisi = choixDuGroupe('genre');
+            const rechercheChoisie = choixDuGroupe('recherche');
+            if(!genreChoisi) { alert("Indique si tu es un homme ou une femme !"); return; }
+            if(!rechercheChoisie) { alert("Indique qui tu recherches !"); return; }
+
+            selectedGender = genreChoisi;
+            selectedSeeking = rechercheChoisie;
+            userProfile = { name, age, birth, city, gender: genreChoisi, seeking: rechercheChoisie };
             document.getElementById('setup-step-1').style.display = 'none';
             document.getElementById('setup-step-2').style.display = 'block';
             document.getElementById('setup-step-2').classList.add('anim-slide-up');
@@ -1626,6 +1733,19 @@
                 await window.rechargerFil();
             } else {
                 loadProfile(0);
+            }
+
+            // Modification depuis « Mon profil » : on revient au profil, pas au fil.
+            if (profilEnModification) {
+                profilEnModification = false;
+                const titre = document.getElementById('setup-titre');
+                if (titre) titre.textContent = 'On fait connaissance 👋';
+                if (typeof window.ouvrirMonProfil === 'function') {
+                    window.ouvrirMonProfil();
+                } else {
+                    goTo('mon-profil');
+                }
+                return;
             }
             goTo('discover');
         }
@@ -2242,7 +2362,7 @@
             const nameEl = document.getElementById('setup-name');
             if (nameEl && me.name) nameEl.value = me.name;
             const birthEl = document.getElementById('setup-birth');
-            if (birthEl && me.birth) birthEl.value = me.birth;
+            if (birthEl && me.birth) birthEl.value = String(me.birth).slice(0, 10);
             const cityEl = document.getElementById('setup-city');
             if (cityEl && me.commune) {
                 [...cityEl.options].forEach(o => { if (o.text === me.commune || o.value === me.commune) cityEl.value = o.value || o.text; });
@@ -2825,6 +2945,15 @@
                 if (compte.commune) sub.push(compte.commune);
                 if (compte.phone) sub.push('+' + C.formatPhone(compte.phone));
                 document.getElementById('my-sub').textContent = sub.join(' · ');
+
+                const ligne = document.getElementById('my-genre-recherche');
+                if (ligne) {
+                    const nomsGenre = { Homme: 'Un homme', Femme: 'Une femme' };
+                    const nomsRech = { Homme: 'des hommes', Femme: 'des femmes', Tous: 'tout le monde' };
+                    const g = typeof libelleGenre === 'function' ? libelleGenre(compte.gender) : '';
+                    const r = typeof libelleRecherche === 'function' ? libelleRecherche(compte.seeking) : 'Tous';
+                    ligne.textContent = (nomsGenre[g] || 'Non précisé') + ' · je cherche ' + (nomsRech[r] || 'tout le monde');
+                }
 
                 const photos = compte.photos || [];
                 grille.innerHTML = '';
