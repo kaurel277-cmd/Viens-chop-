@@ -1,6 +1,6 @@
 # Viens chop — ce qui marche vraiment
 
-Mis à jour le 30/10/2026, après vérification en production
+Mis à jour le 31/10/2026, après vérification en production
 (`https://viens-chop-api.onrender.com` + `https://kaurel277-cmd.github.io/Viens-chop-/`).
 
 Légende : ✅ opérationnel · 🟡 partiel · ⛔ pas encore fait
@@ -225,3 +225,24 @@ Toute modification d'une fiche publiée la renvoie en vérification.
 
 **Activation** : passer `database/MIGRATION-PROMOTEURS.sql` dans Neon, puis
 redéployer l'API sur Render (la page et les routes sont déjà dans le dépôt).
+
+## Version 15 — corrections du 31/10 (audit complet)
+
+Cinq corrections, toutes vérifiées : le détail est dans
+`docs/AUDIT-COMPLET-2026-10-31.md`.
+
+1. **Défilement de l'accueil** : `overflow-x-hidden` retiré du `<body>` de
+   `index.html`. La page défile de nouveau au doigt (et à la molette).
+2. **Titre d'onglet** : `app.html` s'appelle « Application » — plus de doublon
+   avec l'accueil.
+3. **Filtres Coins Chill** dans l'application : `aria-label` sur les listes
+   commune et quartier.
+4. **Communes et quartiers mis en forme par l'API** : `yopougon` devient
+   `Yopougon`, `abidjan — port-bouët` devient `Abidjan — Port-bouët`. Une même
+   commune ne peut plus apparaître deux fois dans les filtres.
+5. **Un seul WhatsApp** : `07 14 18 99 68` (`wa.me/2250714189968`) dans la FAQ
+   et dans le pied de page des 7 pages.
+
+Reste à trancher : l'offre « 1 mois Debout offert aux 100 premiers » n'a pas
+d'automatisme en base ; `CORS_ORIGIN` n'est pas encore renseigné sur Render ;
+deux fiches de test sont encore publiées.

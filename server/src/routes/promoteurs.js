@@ -27,6 +27,30 @@ const TYPES = ['maquis', 'restaurant', 'cafe', 'lounge', 'terrasse', 'autre'];
 const AMBIANCES = ['calme', 'anime', 'terrasse', 'famille'];
 
 const net = (v, max) => String(v == null ? '' : v).trim().replace(/\s+/g, ' ').slice(0, max);
+/**
+ * Met un nom de lieu en forme : « yopougon » → « Yopougon »,
+ * « abidjan — port-bouët » → « Abidjan — Port-Bouët ». Les petits mots
+ * (de, du, la, des…) restent en minuscules sauf en tête.
+ * Sert à garder des communes et des quartiers comparables entre eux.
+ */
+const PETITS_MOTS = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'au', 'aux', 'en', 'sur', 'et', 'd', 'l']);
+function enForme(v, max) {
+  const propre = net(v, max);
+  if (!propre) return '';
+  const mots = propre.split(/(\s+)/);
+  let rang = 0;
+  return mots.map(mot => {
+    if (/^\s+$/.test(mot) || !mot) return mot;
+    const iMot = rang++;
+    return mot.split('-').map((morceau, i) => {
+      const bas = morceau.toLowerCase();
+      const petit = iMot > 0 && i === 0 && PETITS_MOTS.has(bas);
+      const [premier, ...suite] = Array.from(bas);
+      return (petit ? bas : (premier || '').toUpperCase() + suite.join('')) + '';
+    }).join('-');
+  }).join('');
+}
+
 const entier = (v, min, max) => {
   const n = Number(String(v == null ? '' : v).replace(/[^\d]/g, ''));
   return Number.isFinite(n) && n >= min && n <= max ? Math.round(n) : null;
@@ -182,7 +206,7 @@ promoteursRouter.post('/lieu', async (req, res, next) => {
     const b = req.body || {};
 
     const nom = net(b.nom, 80);
-    const commune = net(b.commune, 50);
+    const commune = enForme(b.commune, 50);
     const telephone = normalizePhone(b.telephone);
 
     if (nom.length < 2) throw new AppError(400, 'NOM_INVALIDE', 'Indique le nom du lieu (2 lettres minimum).');
@@ -197,7 +221,7 @@ promoteursRouter.post('/lieu', async (req, res, next) => {
       nom,
       type,
       commune,
-      quartier: net(b.quartier, 80) || null,
+      quartier: enForme(b.quartier, 80) || null,
       repere: net(b.repere, 200) || null,
       telephone,
       horaires: net(b.horaires, 120) || null,

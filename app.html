@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Viens chop">
     <meta name="mobile-web-app-capable" content="yes">
-<title>Viens chop</title>
+<title>Application</title>
     <!-- Partage sur WhatsApp, Facebook, X : sans ces balises, un lien partagé
          n'affiche ni image ni titre. -->
     <meta property="og:type" content="website">
@@ -821,7 +821,7 @@
             </div>
 
             <p id="app-version" style="text-align:center; font-size:11px; color:rgba(255,255,255,.28); margin-top:22px;">
-                Viens chop · version 14
+                Viens chop · version 15
             </p>
 
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
@@ -1101,8 +1101,8 @@
             </p>
 
             <div style="display:grid; gap:10px; margin-bottom:14px;">
-                <select id="cc-commune" class="cc-champ"></select>
-                <select id="cc-quartier" class="cc-champ"></select>
+                <select id="cc-commune" class="cc-champ" aria-label="Filtrer par commune"></select>
+                <select id="cc-quartier" class="cc-champ" aria-label="Filtrer par quartier"></select>
                 <input id="cc-commune-autre" class="cc-champ" type="text" placeholder="Écris le nom de la commune"
                        style="display:none;">
                 <input id="cc-quartier-autre" class="cc-champ" type="text" placeholder="Écris le nom du quartier"
