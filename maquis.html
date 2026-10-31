@@ -307,6 +307,9 @@
                 <p class="text-slate-600 leading-relaxed mb-6">
                     Nous construisons le premier répertoire. Tu peux proposer ton propre établissement ou recommander un lieu que tu connais.
                 </p>
+                <a href="promoteur.html" class="inline-flex items-center gap-2 bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition mb-6">
+                    Je gère un lieu : créer mon espace promoteur →
+                </a>
                 <ul class="space-y-3 text-sm text-slate-700">
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pour les gérants :</strong> mets ton lieu en avant auprès des futurs membres.</span></li>
                     <li class="flex items-start gap-3"><span class="text-emerald-500 font-bold mt-0.5">✓</span> <span><strong>Pour les membres :</strong> recommande un endroit public, propre et rassurant.</span></li>
@@ -368,6 +371,18 @@
                     </button>
                     <p class="text-[11px] text-center text-slate-400">Nous étudierons la proposition avant tout contact ou visite. Aucun engagement.</p>
                 </form>
+
+                <div id="p-gerant" class="hidden text-center py-8">
+                    <p class="text-5xl mb-4">🏪</p>
+                    <h3 class="text-xl font-extrabold mb-2">Les gérants ont leur propre espace</h3>
+                    <p class="text-sm text-slate-600 mb-5">
+                        Tu inscris ton établissement toi-même : nom, photos de ta fiche, horaires,
+                        budget. C’est gratuit, et tu ne paies que les visites reçues grâce à l’application.
+                    </p>
+                    <a href="promoteur.html" class="inline-block bg-brand-gradient text-white font-extrabold px-6 py-3 rounded-xl shadow-md hover:opacity-90 transition">
+                        Créer mon espace promoteur →
+                    </a>
+                </div>
 
                 <div id="p-success" class="hidden text-center py-8">
                     <p class="text-5xl mb-4">🎉</p>
@@ -482,14 +497,10 @@
             });
         })();
 
-        /* ------------------------------------------------------------
-           CONFIG — remplace par ton numéro WhatsApp Business
-           Format international sans « + ». Ex. "2250700000000"
-           Tant qu'il est vide, la proposition reste locale (démo).
-           ------------------------------------------------------------ */
-        const WHATSAPP_NUMBER = "";
+        /* Où envoyer la proposition : la même API que le reste du site. */
+        const API = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
 
-        document.getElementById('partner-form').addEventListener('submit', function (e) {
+        document.getElementById('partner-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const error = document.getElementById('p-error');
@@ -514,23 +525,37 @@
 
             error.classList.add('hidden');
 
-            const proposal = { role, name, city, type, phone: '+225' + phone, message };
-            console.log('Proposition de lieu Viens chop :', proposal);
-
-            // Envoi réel si un numéro WhatsApp est configuré (sinon le message de succès reste local).
-            if (/^\d{8,15}$/.test(WHATSAPP_NUMBER)) {
-                const text = [
-                    "Bonjour Viens chop 👋 Proposition de lieu partenaire",
-                    "Rôle : " + (role || "—"),
-                    "Lieu : " + name,
-                    "Ville/commune : " + city,
-                    "Type : " + (type || "—"),
-                    "Téléphone : +225 " + phone,
-                    message ? "Précisions : " + message : ""
-                ].filter(Boolean).join("\n");
-                window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text), "_blank", "noopener");
+            // Un gérant ne passe pas par une simple proposition : il a son
+            // espace, où il inscrit son établissement lui-même. On le lui dit
+            // ici, avec le bouton — pas de redirection surprise.
+            if (role === 'gerant') {
+                this.classList.add('hidden');
+                document.getElementById('p-gerant').classList.remove('hidden');
+                return;
             }
 
+            const bouton = this.querySelector('button[type="submit"]');
+            if (bouton) bouton.disabled = true;
+
+            // Enregistrement réel côté API (plus de message de succès dans le vide).
+            try {
+                const r = await fetch(API + '/api/suggestions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: role, nom: name, ville: city, type: type, phone: phone, message: message })
+                });
+                if (!r.ok) {
+                    const d = await r.json().catch(() => ({}));
+                    throw new Error((d.error && d.error.message) || 'Envoi impossible pour le moment.');
+                }
+            } catch (err) {
+                error.textContent = err.message + ' Réessaie dans un instant.';
+                error.classList.remove('hidden');
+                if (bouton) bouton.disabled = false;
+                return;
+            }
+
+            if (bouton) bouton.disabled = false;
             this.classList.add('hidden');
             document.getElementById('p-success').classList.remove('hidden');
         });

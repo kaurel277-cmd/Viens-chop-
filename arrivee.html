@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FF6B00">
+    <title>J'y suis arrivé</title>
+    <meta name="description" content="Tu es dans un Coin Chill Viens chop : entre le code affiché au comptoir.">
+    <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #0B141A; color: #E9EDEF; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .boite { width: 100%; max-width: 420px; }
+        .logo {
+            width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 18px;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56);
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+        }
+        h1 { font-size: 22px; text-align: center; margin-bottom: 8px; }
+        p.intro { font-size: 14px; color: rgba(233,237,239,.62); text-align: center;
+                  line-height: 1.6; margin-bottom: 20px; }
+        label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: .06em; color: rgba(233,237,239,.62); margin-bottom: 8px; text-align: center; }
+        input {
+            width: 100%; padding: 18px; border-radius: 14px; text-align: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 28px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase;
+            color: #FF8A3D; background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.18);
+        }
+        input:focus { outline: 2px solid #FF6B00; outline-offset: 1px; }
+        .btn {
+            display: block; width: 100%; margin-top: 14px; padding: 16px; border: none;
+            border-radius: 14px; font-family: inherit; font-size: 16px; font-weight: 800;
+            background: linear-gradient(135deg, #FF6B00, #FF1E56); color: #fff; cursor: pointer;
+        }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        .btn.clair { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); }
+        .msg { margin-top: 16px; padding: 16px; border-radius: 14px; font-size: 14.5px; line-height: 1.6; }
+        .msg.ok   { background: rgba(37,211,102,.12); border: 1px solid rgba(37,211,102,.35); }
+        .msg.info { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.35); }
+        .msg.non  { background: rgba(229,72,77,.14); border: 1px solid rgba(229,72,77,.4); }
+        .cache { display: none !important; }
+        a { color: #FF8A3D; }
+        .bas { text-align: center; font-size: 12px; color: rgba(233,237,239,.5); margin-top: 24px; }
+        .bas a { text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="boite">
+    <div class="logo" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12l-6 8-6-8z"/><path d="M12 11v8"/><path d="M8 21h8"/>
+        </svg>
+    </div>
+    <h1 id="titre">Tu es sur place ?</h1>
+    <p class="intro" id="intro">Entre le code affiché au comptoir de ton Coin Chill. Il fait 6 caractères.</p>
+
+    <form id="form-code" novalidate>
+        <label for="code">Code du lieu</label>
+        <input id="code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters"
+               spellcheck="false" maxlength="6" placeholder="ABC123" aria-describedby="msg">
+        <button class="btn" id="btn-envoyer" type="submit">Valider ma visite</button>
+    </form>
+
+    <div class="msg cache" id="msg" role="status" aria-live="polite"></div>
+
+    <div class="msg non cache" id="msg-non-connecte" role="alert">
+        <p>Ouvre d'abord l'application Viens chop sur ce téléphone, puis reviens sur cette page.</p>
+        <a class="btn clair" href="app.html" style="text-align:center; text-decoration:none;">Ouvrir l'application</a>
+    </div>
+
+    <p class="bas"><a href="index.html">← Viens chop</a></p>
+</div>
+
+<script>
+(function () {
+    const base = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
+    const $ = id => document.getElementById(id);
+
+    let access = localStorage.getItem('vc_access') || '';
+    let refresh = localStorage.getItem('vc_refresh') || '';
+
+    if (!access) {
+        $('form-code').classList.add('cache');
+        $('intro').classList.add('cache');
+        $('titre').textContent = 'Un instant…';
+        $('msg-non-connecte').classList.remove('cache');
+        return;
+    }
+
+    function message(texte, type) {
+        const m = $('msg');
+        m.className = 'msg ' + type;
+        m.textContent = texte;
+        m.classList.remove('cache');
+    }
+
+    /** Le jeton de l'app dure 15 minutes : on le renouvelle si besoin. */
+    async function renouveler() {
+        if (!refresh) return false;
+        const r = await fetch(base + '/api/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refresh })
+        });
+        if (!r.ok) return false;
+        const d = await r.json().catch(() => ({}));
+        if (!d.access_token) return false;
+        access = d.access_token;
+        localStorage.setItem('vc_access', access);
+        if (d.refresh_token) { refresh = d.refresh_token; localStorage.setItem('vc_refresh', refresh); }
+        return true;
+    }
+
+    async function envoyer(code, reessai) {
+        const r = await fetch(base + '/api/visites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + access },
+            body: JSON.stringify({ code: code })
+        });
+        const d = await r.json().catch(() => ({}));
+
+        if (r.status === 401 && !reessai && await renouveler()) {
+            return envoyer(code, true);
+        }
+        if (!r.ok) {
+            throw new Error((d.error && d.error.message) || 'Erreur ' + r.status);
+        }
+        return d;
+    }
+
+    $('code').addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    });
+
+    $('form-code').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = $('code').value.trim().toUpperCase();
+        if (code.length !== 6) {
+            message('Le code fait 6 caractères, par exemple ABC123.', 'non');
+            return;
+        }
+        $('btn-envoyer').disabled = true;
+        try {
+            const d = await envoyer(code, false);
+            const lieu = d.lieu || {};
+            if (d.deja) {
+                message('Ta visite chez ' + (lieu.nom || 'ce lieu') + ' était déjà comptée aujourd\'hui. Une seule visite par jour et par lieu est enregistrée.', 'info');
+            } else {
+                message('Bienvenue chez ' + (lieu.nom || 'ce lieu') +
+                        (lieu.quartier ? ' (' + lieu.quartier + ')' : '') +
+                        ' ! Ta visite est enregistrée. Bonne rencontre 🍹', 'ok');
+            }
+            $('form-code').classList.add('cache');
+            $('titre').textContent = 'C\'est noté';
+            $('intro').classList.add('cache');
+        } catch (e2) {
+            message(e2.message, 'non');
+        } finally {
+            $('btn-envoyer').disabled = false;
+        }
+    });
+})();
+</script>
+</body>
+</html>

@@ -80,9 +80,15 @@ adminRouter.get('/stats', async (_req, res, next) => {
       paiements = rows[0].n;
     }
     const { rows: m } = await query('select count(*)::int as n from public.matches');
+    // Fiches de lieux en attente de validation (0 si la migration n'est pas passée)
+    let lieux = 0;
+    try {
+      const { rows } = await query("select count(*)::int as n from public.lieux where statut = 'en_attente'");
+      lieux = rows[0].n;
+    } catch { /* table absente : la console reste utilisable */ }
     res.json({ ok: true, stats: {
       comptes: u[0].n, signalements: r[0].n, verifications: verif,
-      photos: photos, paiements: paiements, matchs: m[0].n
+      photos: photos, paiements: paiements, matchs: m[0].n, lieux: lieux
     } });
   } catch (err) { next(err); }
 });
@@ -344,9 +350,114 @@ adminRouter.post('/reglages', async (req, res, next) => {
     await journal('reglages_paiement', null, { prix: r.prix_debout, duree: r.duree_jours });
     res.json({ ok: true, reglages: r, offre: o });
   } catch (err) {
-    if (err && ['PRIX_INVALIDE', 'DUREE_INVALIDE', 'NUMERO_INVALIDE'].includes(err.code)) {
+    if (err && ['PRIX_INVALIDE', 'DUREE_INVALIDE', 'NUMERO_INVALIDE', 'PRIX_VISITE_INVALIDE'].includes(err.code)) {
       return next(new AppError(400, err.code, err.message));
     }
     next(err);
   }
+});
+
+/* ---------------------------------------------------------------------------
+   COINS CHILL — les fiches envoyées par les promoteurs
+   --------------------------------------------------------------------------- */
+adminRouter.get('/lieux', async (_req, res, next) => {
+  try {
+    const { rows } = await query(
+      `select l.id, l.nom, l.type, l.commune, l.quartier, l.repere, l.telephone,
+              l.horaires, l.budget, l.ambiance, l.description, l.statut,
+              l.motif_refus, l.certifie, l.code_visite, l.prix_visite,
+              l.created_at, l.updated_at, l.published_at,
+              p.nom_gerant, p.phone as promoteur_phone,
+              (select count(*)::int from public.visites v where v.lieu_id = l.id) as visites,
+              (select coalesce(sum(v.prix), 0)::int from public.visites v
+                where v.lieu_id = l.id and not v.reglee) as montant_du,
+              (select count(*)::int from public.visites v
+                where v.lieu_id = l.id and not v.reglee) as a_regler
+         from public.lieux l
+         join public.promoteurs p on p.id = l.promoteur_id
+        order by (l.statut = 'en_attente') desc, l.created_at desc
+        limit 300`
+    );
+    res.json({ ok: true, lieux: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.get('/suggestions', async (_req, res, next) => {
+  try {
+    const { rows } = await query(
+      `select id, role, nom, ville, type, phone, message, traite, created_at
+         from public.suggestions_lieux order by traite asc, created_at desc limit 200`
+    );
+    res.json({ ok: true, suggestions: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/suggestions/:id/traite', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      'update public.suggestions_lieux set traite = true where id = $1 returning id',
+      [req.params.id]
+    );
+    if (!rows.length) throw new AppError(404, 'SUGGESTION_INTROUVABLE', 'Suggestion introuvable.');
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/lieux/:id/publier', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `update public.lieux
+          set statut = 'publie', motif_refus = null, reviewed_at = now(),
+              published_at = coalesce(published_at, now()), updated_at = now()
+        where id = $1 returning id, nom`,
+      [req.params.id]
+    );
+    if (!rows.length) throw new AppError(404, 'LIEU_INTROUVABLE', 'Lieu introuvable.');
+    await journal('lieu_publie', rows[0].id, { nom: rows[0].nom });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/lieux/:id/refuser', async (req, res, next) => {
+  try {
+    const motif = String((req.body || {}).motif || '').trim().slice(0, 300) || 'Fiche incomplète.';
+    const { rows } = await query(
+      `update public.lieux
+          set statut = 'refuse', motif_refus = $2, reviewed_at = now(), updated_at = now()
+        where id = $1 returning id, nom`,
+      [req.params.id, motif]
+    );
+    if (!rows.length) throw new AppError(404, 'LIEU_INTROUVABLE', 'Lieu introuvable.');
+    await journal('lieu_refuse', rows[0].id, { nom: rows[0].nom, motif });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post('/lieux/:id/certifie', async (req, res, next) => {
+  try {
+    const certifie = (req.body || {}).certifie !== false;
+    const { rows } = await query(
+      'update public.lieux set certifie = $2, updated_at = now() where id = $1 returning id, certifie',
+      [req.params.id, certifie]
+    );
+    if (!rows.length) throw new AppError(404, 'LIEU_INTROUVABLE', 'Lieu introuvable.');
+    await journal('lieu_certifie', rows[0].id, { certifie });
+    res.json({ ok: true, certifie: rows[0].certifie });
+  } catch (err) { next(err); }
+});
+
+/* Marque les visites du lieu comme réglées (le gérant a payé). */
+adminRouter.post('/lieux/:id/regler', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `update public.visites
+          set reglee = true, regle_at = now()
+        where lieu_id = $1 and not reglee
+        returning prix`,
+      [req.params.id]
+    );
+    const montant = rows.reduce((n, r) => n + r.prix, 0);
+    if (rows.length) await journal('visites_reglees', req.params.id, { nombre: rows.length, montant });
+    res.json({ ok: true, reglees: rows.length, montant });
+  } catch (err) { next(err); }
 });

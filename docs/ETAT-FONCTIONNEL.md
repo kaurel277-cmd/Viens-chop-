@@ -173,4 +173,30 @@ Preuve en direct : `GET /api/health` renvoie les 7 repères
 | Monétisation (Mode Debout) | 🟡 90 % | Encaissement Wave réel : circuit manuel opérationnel (numéro + référence, validation en console) et circuit **automatique Wave Business écrit et testé** (session Checkout, webhook signé, relecture de la session, retour dans l'app) — en veille jusqu'aux clés. Offre de lancement : **100 premiers** (et non 500). Reste : coller le SQL dans Neon, saisir le numéro Wave, puis les clés Wave Business le moment venu. |
 | Extras annoncés (SOS, Check-In, Incognito) | ⛔ 0 % | Annoncés « bientôt » sur les pages, pas de code serveur |
 | Quiz Mode Flirt | 🟡 60 % | Jouable, mais questions écrites dans la page ; la route `/api/safety/quiz` existe sans être utilisée |
-| Répertoire des maquis | 🟡 40 % | Page et formulaire de proposition ; pas encore de liste de lieux en base |
+| Répertoire des Coins Chill | 🟢 80 % | Espace promoteurs (inscription du lieu, validation, code du comptoir, visites facturées) ; reste à faire : afficher la liste des lieux publiés sur la page publique |
+
+
+## Espace promoteurs et formule « à la visite »
+
+Les gérants de maquis, restos, cafés et lounges inscrivent leur établissement
+eux-mêmes sur `promoteur.html`. Comptes **séparés** des comptes de rencontre :
+un jeton promoteur n'ouvre aucune route de membre, et l'inverse est vrai aussi.
+
+**La formule est à la visite** (décidée le 31/10) : le gérant ne paie pas pour
+figurer, ni d'abonnement. Il paie **500 FCFA par couple** arrivé grâce à
+l'application (prix réglable dans la console → Réglages).
+
+Le mécanisme, sans matériel :
+
+1. la fiche du gérant est validée par l'administrateur (onglet **Coins Chill**) ;
+2. une fois publiée, elle reçoit un **code de 6 caractères** (sans I, O, 0, 1) ;
+3. le gérant affiche ce code au comptoir ;
+4. le client arrive avec l'application et le saisit sur `arrivee.html` ;
+5. la visite est comptée ; **une seule par membre, par lieu et par jour** ;
+6. l'administrateur voit le total à facturer et peut solder (« Visites réglées »).
+
+Rien ne se publie sans validation : une fiche en attente n'accepte aucune visite.
+Toute modification d'une fiche publiée la renvoie en vérification.
+
+**Activation** : passer `database/MIGRATION-PROMOTEURS.sql` dans Neon, puis
+redéployer l'API sur Render (la page et les routes sont déjà dans le dépôt).

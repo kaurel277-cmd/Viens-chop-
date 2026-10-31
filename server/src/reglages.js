@@ -19,7 +19,9 @@ const DEFAUTS = {
   paiement_actif: 'oui',
   wave_numero: '',
   wave_nom: '',
-  operateurs: 'wave'
+  operateurs: 'wave',
+  // Formule promoteurs : prix d'une visite reçue grâce à l'application
+  prix_visite: '500'
 };
 
 const TTL_MS = 10 * 1000;          // une modif dans la console se voit tout de suite
@@ -97,6 +99,16 @@ export async function ecrireReglages(patch = {}) {
   if ('wave_nom' in patch) {
     const nom = String(patch.wave_nom || '').trim().slice(0, 60);
     aEcrire.push(['wave_nom', nom]);
+  }
+
+  if ('prix_visite' in patch) {
+    const prix = Number(String(patch.prix_visite).replace(/[^\d]/g, ''));
+    if (!Number.isInteger(prix) || prix < 0 || prix > 100000) {
+      const e = new Error("Le prix d'une visite doit être un nombre entier entre 0 et 100 000 FCFA.");
+      e.code = 'PRIX_VISITE_INVALIDE';
+      throw e;
+    }
+    aEcrire.push(['prix_visite', String(prix)]);
   }
 
   if ('paiement_actif' in patch) {

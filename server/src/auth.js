@@ -29,6 +29,41 @@ export function verifyAccessToken(token) {
 }
 
 /* ---------------------------------------------------------------------------
+   Promoteurs (gérants de lieux) : même JWT, mais un « kind » différent.
+   --------------------------------------------------------------------------- */
+export function signPromoteurToken(promoteur) {
+  return jwt.sign(
+    { sub: promoteur.id, kind: 'promoteur' },
+    config.jwtSecret,
+    { expiresIn: config.jwtTtl }
+  );
+}
+
+export async function requirePromoteur(req, _res, next) {
+  try {
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+    if (!token) throw new AppError(401, 'NON_AUTHENTIFIE', 'Connexion promoteur requise.');
+
+    const payload = verifyAccessToken(token);
+    if (payload.kind !== 'promoteur') {
+      throw new AppError(401, 'TOKEN_INVALIDE', 'Connexion promoteur requise.');
+    }
+
+    const { rows } = await query(
+      'select id, phone, nom_gerant from public.promoteurs where id = $1',
+      [payload.sub]
+    );
+    if (!rows.length) throw new AppError(401, 'COMPTE_INTROUVABLE', 'Compte promoteur introuvable.');
+
+    req.promoteur = rows[0];
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Middleware : exige un Bearer token valide et charge l'utilisateur.
    --------------------------------------------------------------------------- */
 export async function requireAuth(req, _res, next) {
@@ -38,6 +73,11 @@ export async function requireAuth(req, _res, next) {
     if (!token) throw new AppError(401, 'NON_AUTHENTIFIE', 'Authentification requise.');
 
     const payload = verifyAccessToken(token);
+    // Un jeton de promoteur n'ouvre AUCUNE route de membre (et l'inverse est
+    // vrai aussi) : les deux mondes ne se croisent jamais.
+    if (payload.kind === 'promoteur') {
+      throw new AppError(401, 'TOKEN_INVALIDE', 'Ce jeton appartient à un compte promoteur.');
+    }
     // Les colonnes de la clé de secours sont lues via to_jsonb : si la
     // migration n'a pas encore été passée, elles valent simplement null au
     // lieu de faire échouer TOUTES les routes authentifiées (fil, profil,

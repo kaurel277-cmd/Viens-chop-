@@ -137,6 +137,7 @@
             <button role="tab" data-onglet="verifications" aria-selected="false" type="button">Vérifications</button>
             <button role="tab" data-onglet="photos" aria-selected="false" type="button">Photos à vérifier</button>
             <button role="tab" data-onglet="paiements" aria-selected="false" type="button">Paiements</button>
+            <button role="tab" data-onglet="lieux" aria-selected="false" type="button">Coins Chill</button>
             <button role="tab" data-onglet="reglages" aria-selected="false" type="button">Réglages</button>
             <button role="tab" data-onglet="journal" aria-selected="false" type="button">Journal</button>
         </nav>
@@ -244,7 +245,8 @@
             $('stats').innerHTML =
                 stat(v.comptes, 'comptes') + stat(v.signalements, 'signalements ouverts') +
                 stat(v.verifications, 'vérifications en attente') + stat(v.photos, 'photos à vérifier') +
-                stat(v.paiements || 0, 'paiements à valider') + stat(v.matchs, 'matchs');
+                stat(v.paiements || 0, 'paiements à valider') +
+                stat(v.lieux || 0, 'lieux à valider') + stat(v.matchs, 'matchs');
         } catch (e) {
             if (e.status === 401 || e.status === 403) { sortir(); return; }
             if (e.status === 503) {
@@ -267,6 +269,7 @@
             if (onglet === 'verifications') return await afficherVerifications(p);
             if (onglet === 'photos') return await afficherPhotos(p);
             if (onglet === 'paiements') return await afficherPaiements(p);
+            if (onglet === 'lieux') return await afficherLieux(p);
             if (onglet === 'reglages') return await afficherReglages(p);
             if (onglet === 'journal') return await afficherJournal(p);
         } catch (e) {
@@ -490,6 +493,124 @@
         }));
     }
 
+    /* ---------------- Coins Chill (lieux + suggestions) ---------------- */
+    const STATUT_LIEU = { en_attente: ['warn', 'en attente'], publie: ['ok', 'publié'], refuse: ['danger', 'refusé'] };
+
+    async function afficherLieux(p) {
+        p.innerHTML = '<div class="empty">Chargement…</div>';
+        const [d, sg] = await Promise.all([appel('/api/admin/lieux'), appel('/api/admin/suggestions')]);
+        const lieux = d.lieux || [];
+        const suggestions = sg.suggestions || [];
+
+        const attente = lieux.filter(l => l.statut === 'en_attente');
+        const publies = lieux.filter(l => l.statut !== 'en_attente');
+        const du = lieux.reduce((n, l) => n + (l.montant_du || 0), 0);
+
+        let html = '';
+
+        if (!lieux.length) {
+            html += '<div class="empty">Aucune fiche pour le moment. Les gérants s\'inscrivent sur <b>promoteur.html</b>.</div>';
+        }
+
+        const carte = (l) => {
+            const [classe, libelle] = STATUT_LIEU[l.statut] || ['warn', l.statut];
+            const details = [l.type, l.quartier ? l.quartier + ', ' + l.commune : l.commune,
+                             l.budget ? l.budget.toLocaleString('fr-FR') + ' F/pers.' : null,
+                             l.horaires].filter(Boolean).join(' · ');
+            return `
+                <div class="card">
+                    <div class="img">🍹</div>
+                    <div class="body">
+                        <h3>${echapper(l.nom)} ${l.certifie ? '✅' : ''}</h3>
+                        <div class="meta">
+                            <span class="tag ${classe}">${libelle}</span>
+                            ${l.certifie ? '<span class="tag ok">certifié</span>' : ''}
+                            ${echapper(details)}<br>
+                            ${echapper(l.description || '')}<br>
+                            Gérant : ${echapper(l.nom_gerant)} · ${echapper(l.promoteur_phone)}<br>
+                            Code comptoir : <b>${echapper(l.code_visite)}</b> ·
+                            ${l.visites} visite(s) · <b>${(l.montant_du || 0).toLocaleString('fr-FR')} F à régler</b>
+                            ${l.repere ? '<br>Repère : ' + echapper(l.repere) : ''}
+                            ${l.motif_refus ? '<br>Motif du refus : ' + echapper(l.motif_refus) : ''}
+                        </div>
+                        <div class="actions">
+                            ${l.statut !== 'publie'
+                                ? '<button class="btn small good" data-publier="' + l.id + '" type="button">Publier</button>'
+                                : '<button class="btn small" data-retirer="' + l.id + '" type="button">Retirer</button>'}
+                            ${l.statut !== 'refuse'
+                                ? '<button class="btn small danger" data-refuser="' + l.id + '" type="button">Refuser</button>' : ''}
+                            <button class="btn small" data-certifie="' + l.id + '" data-valeur="${l.certifie ? '0' : '1'}" type="button">
+                                ${l.certifie ? 'Retirer le badge' : 'Certifier'}
+                            </button>
+                            ${l.a_regler ? '<button class="btn small good" data-regler="' + l.id + '" type="button">Visites réglées</button>' : ''}
+                        </div>
+                    </div>
+                </div>`;
+        };
+
+        if (attente.length) html += '<h3 style="margin:6px 0 10px; font-size:15px;">À valider (' + attente.length + ')</h3>';
+        html += attente.map(carte).join('');
+        if (publies.length) html += '<h3 style="margin:16px 0 10px; font-size:15px;">Fiches publiées (' + publies.length + ')</h3>';
+        html += publies.map(carte).join('');
+
+        if (lieux.length) {
+            html += '<p style="margin:12px 0 20px; font-size:12px; color:rgba(233,237,239,.55)">' +
+                    'Total des visites à facturer : <b>' + du.toLocaleString('fr-FR') + ' F</b></p>';
+        }
+
+        html += '<h3 style="margin:16px 0 10px; font-size:15px;">Lieux proposés par les membres (' + suggestions.length + ')</h3>';
+        if (!suggestions.length) {
+            html += '<div class="empty">Aucune proposition pour le moment.</div>';
+        } else {
+            html += suggestions.map(s2 => `
+                <div class="card">
+                    <div class="img">📍</div>
+                    <div class="body">
+                        <h3>${echapper(s2.nom)} ${s2.traite ? '<span class="tag ok">traité</span>' : ''}</h3>
+                        <div class="meta">
+                            ${echapper(s2.ville)}${s2.type ? ' · ' + echapper(s2.type) : ''} ·
+                            ${s2.role === 'gerant' ? 'gérant' : 'membre'}<br>
+                            ${echapper(s2.phone || '')}<br>
+                            ${echapper(s2.message || '')}<br>
+                            ${date(s2.created_at)}
+                        </div>
+                        ${s2.traite ? '' : '<div class="actions"><button class="btn small" data-suggestion="' + s2.id + '" type="button">Marquer comme traité</button></div>'}
+                    </div>
+                </div>`).join('');
+        }
+
+        p.innerHTML = html;
+
+        const agir = async (btn, chemin, corps, apres) => {
+            btn.disabled = true;
+            try {
+                await appel(chemin, { method: 'POST', body: corps });
+                toast(apres);
+                await rafraichir();
+            } catch (e) {
+                toast(e.message, true);
+                btn.disabled = false;
+            }
+        };
+
+        p.querySelectorAll('[data-publier]').forEach(b => b.addEventListener('click', () =>
+            agir(b, '/api/admin/lieux/' + b.dataset.publier + '/publier', {}, 'Fiche publiée.')));
+        p.querySelectorAll('[data-retirer]').forEach(b => b.addEventListener('click', () =>
+            agir(b, '/api/admin/lieux/' + b.dataset.retirer + '/refuser', { motif: 'Retirée de la publication.' }, 'Fiche retirée.')));
+        p.querySelectorAll('[data-refuser]').forEach(b => b.addEventListener('click', () => {
+            const motif = prompt('Pourquoi refuser cette fiche ? (le gérant verra ce message)') || '';
+            if (!motif.trim()) return;
+            agir(b, '/api/admin/lieux/' + b.dataset.refuser + '/refuser', { motif: motif.trim() }, 'Fiche refusée.');
+        }));
+        p.querySelectorAll('[data-certifie]').forEach(b => b.addEventListener('click', () =>
+            agir(b, '/api/admin/lieux/' + b.dataset.certifie + '/certifie',
+                 { certifie: b.dataset.valeur === '1' }, 'Badge mis à jour.')));
+        p.querySelectorAll('[data-regler]').forEach(b => b.addEventListener('click', () =>
+            agir(b, '/api/admin/lieux/' + b.dataset.regler + '/regler', {}, 'Visites marquées comme réglées.')));
+        p.querySelectorAll('[data-suggestion]').forEach(b => b.addEventListener('click', () =>
+            agir(b, '/api/admin/suggestions/' + b.dataset.suggestion + '/traite', {}, 'Proposition traitée.')));
+    }
+
     /* ---------------- Réglages du paiement ---------------- */
     async function afficherReglages(p) {
         const r = await appel('/api/admin/reglages');
@@ -519,6 +640,13 @@
                 <label for="r-duree" style="font-size:12px;">Durée (jours)</label>
                 <input id="r-duree" type="number" min="1" max="366" value="${echapper(g.duree_jours || '30')}" style="margin:6px 0 12px;">
 
+                <label for="r-visite" style="font-size:12px;">Prix d'une visite d'un Coin Chill (FCFA)</label>
+                <input id="r-visite" type="number" min="0" max="100000" step="50"
+                       value="${echapper(g.prix_visite || '500')}" style="margin:6px 0 12px;">
+                <div class="meta" style="margin:-6px 0 12px; font-size:11.5px;">
+                    Ce que paie un gérant pour chaque couple arrivé avec l'application.
+                </div>
+
                 <label for="r-actif" style="font-size:12px;">Paiement ouvert</label>
                 <select id="r-actif" style="margin:6px 0 16px;">
                     <option value="oui"${g.paiement_actif === 'oui' ? ' selected' : ''}>Oui, on accepte les paiements</option>
@@ -547,6 +675,7 @@
                         wave_nom: $('r-nom').value,
                         prix_debout: $('r-prix').value,
                         duree_jours: $('r-duree').value,
+                        prix_visite: $('r-visite').value,
                         paiement_actif: $('r-actif').value
                     }
                 });

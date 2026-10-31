@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FF6B00">
+    <title>Espace promoteur</title>
+    <meta name="description" content="Gérants de maquis, restaurants, cafés et lounges : inscris ton établissement sur Viens chop. Gratuit : tu ne paies que les visites reçues grâce à l'application.">
+    <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+    <style>
+        /* Page autonome : aucune dépendance externe, tout est ici. */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --fond: #0B141A;
+            --carte: #111B21;
+            --bord: rgba(255,255,255,.10);
+            --texte: #E9EDEF;
+            --doux: rgba(233,237,239,.62);
+            --orange: #FF6B00;
+            --rose: #FF1E56;
+            --vert: #25D366;
+            --rouge: #E5484D;
+        }
+        body {
+            font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--fond); color: var(--texte);
+            min-height: 100vh; padding: 0 0 40px;
+            line-height: 1.5;
+        }
+        a { color: inherit; }
+        header {
+            padding: 16px; display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--bord); position: sticky; top: 0;
+            background: rgba(11,20,26,.96); backdrop-filter: blur(8px); z-index: 5;
+        }
+        header .logo {
+            width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--orange), var(--rose));
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        header h1 { font-size: 15px; font-weight: 800; }
+        header p { font-size: 11px; color: var(--doux); }
+        main { max-width: 640px; margin: 0 auto; padding: 20px 16px; }
+        h2 { font-size: 21px; line-height: 1.25; margin-bottom: 8px; }
+        .intro { color: var(--doux); font-size: 14px; margin-bottom: 18px; }
+        .carte {
+            background: var(--carte); border: 1px solid var(--bord);
+            border-radius: 16px; padding: 18px; margin-bottom: 14px;
+        }
+        .carte h3 { font-size: 15px; margin-bottom: 10px; }
+        label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: .06em; color: var(--doux); margin: 12px 0 6px; }
+        input, select, textarea {
+            width: 100%; padding: 13px; border-radius: 11px; font-size: 15px;
+            font-family: inherit; color: var(--texte); background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.16);
+        }
+        input:focus, select:focus, textarea:focus { outline: 2px solid var(--orange); outline-offset: 1px; }
+        select option { background: #14212A; color: #fff; }
+        textarea { min-height: 84px; resize: vertical; }
+        .btn {
+            display: block; width: 100%; padding: 15px; border: none; border-radius: 12px;
+            font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+            background: linear-gradient(135deg, var(--orange), var(--rose)); color: #fff;
+        }
+        .btn:hover { opacity: .92; }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        .btn.secondaire { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--texte); }
+        .btn.lien { background: none; border: none; color: var(--doux); font-weight: 700; font-size: 13px;
+                    text-decoration: underline; padding: 10px; width: auto; }
+        .erreur { color: #FF8B8E; font-size: 13px; margin-top: 10px; min-height: 18px; }
+        .aide { font-size: 12px; color: var(--doux); margin-top: 6px; }
+        .pill { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px;
+                border-radius: 99px; margin-bottom: 8px; }
+        .pill.attente { background: rgba(251,191,36,.16); color: #FBBF24; }
+        .pill.publie  { background: rgba(37,211,102,.16); color: var(--vert); }
+        .pill.refuse  { background: rgba(229,72,77,.18); color: #FF7B7F; }
+        .code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 30px;
+            font-weight: 800; letter-spacing: .18em; color: var(--orange);
+            background: rgba(255,107,0,.10); border: 1px dashed rgba(255,107,0,.5);
+            border-radius: 12px; padding: 14px; text-align: center; margin: 6px 0 10px;
+        }
+        .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .chiffre { background: rgba(255,255,255,.05); border: 1px solid var(--bord);
+                   border-radius: 12px; padding: 12px; }
+        .chiffre b { display: block; font-size: 21px; }
+        .chiffre span { font-size: 11.5px; color: var(--doux); }
+        ul.avantages { list-style: none; font-size: 13.5px; color: var(--doux); }
+        ul.avantages li { margin-bottom: 8px; padding-left: 22px; position: relative; }
+        ul.avantages li::before { content: '✓'; position: absolute; left: 0; color: var(--vert); font-weight: 800; }
+        .cache { display: none !important; }
+        .lien-bas { text-align: center; font-size: 12px; color: var(--doux); margin-top: 22px; }
+        .lien-bas a { color: var(--orange); text-decoration: none; font-weight: 700; }
+        @media (min-width: 560px) { h2 { font-size: 25px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12l-6 8-6-8z"/><path d="M12 11v8"/><path d="M8 21h8"/>
+        </svg>
+    </div>
+    <div>
+        <h1>Espace promoteur</h1>
+        <p>Viens chop · Coins Chill</p>
+    </div>
+</header>
+
+<main>
+
+    <!-- ================= 1. Accueil (personne connectée) ================= -->
+    <section id="ecran-accueil">
+        <h2>Tu gères un maquis, un resto, un café ?</h2>
+        <p class="intro">Inscris ton établissement et fais-le découvrir aux couples qui se rencontrent sur Viens chop.</p>
+
+        <div class="carte">
+            <h3>Ce que ça te coûte : rien tant que personne ne vient</h3>
+            <ul class="avantages">
+                <li>Inscription et fiche <strong>gratuites</strong>, sans abonnement.</li>
+                <li>Tu paies uniquement les <strong>visites reçues grâce à l'app</strong> :
+                    <strong>500 FCFA par couple</strong> qui se présente avec le code de ton lieu.</li>
+                <li>Zéro visite = <strong>zéro franc à payer</strong>.</li>
+                <li>Chaque fiche est vérifiée avant publication.</li>
+            </ul>
+        </div>
+
+        <button class="btn" id="btn-vers-inscription" type="button">Créer mon espace promoteur</button>
+        <button class="btn secondaire" id="btn-vers-connexion" type="button" style="margin-top:10px;">J'ai déjà un compte</button>
+    </section>
+
+    <!-- ================= 2. Inscription ================= -->
+    <section id="ecran-inscription" class="cache">
+        <h2>Créer mon espace</h2>
+        <p class="intro">Trois champs, et tu remplis la fiche de ton lieu juste après.</p>
+        <form id="form-inscription" novalidate>
+            <div class="carte">
+                <label for="i-gerant">Ton nom (le gérant)</label>
+                <input id="i-gerant" type="text" autocomplete="name" placeholder="Ex : Kouassi" required>
+
+                <label for="i-tel">Ton numéro de téléphone</label>
+                <input id="i-tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07 00 00 00 00" required>
+                <p class="aide">10 chiffres. C'est avec ce numéro que tu te connecteras.</p>
+
+                <label for="i-mdp">Mot de passe</label>
+                <input id="i-mdp" type="password" autocomplete="new-password" placeholder="6 caractères minimum" required>
+            </div>
+            <button class="btn" id="btn-inscription" type="submit">Créer mon espace</button>
+            <p class="erreur" id="err-inscription" role="alert"></p>
+            <button class="btn lien" id="btn-inscription-retour" type="button">← Retour</button>
+        </form>
+    </section>
+
+    <!-- ================= 3. Connexion ================= -->
+    <section id="ecran-connexion" class="cache">
+        <h2>Me connecter</h2>
+        <p class="intro">Ton numéro et ton mot de passe promoteur.</p>
+        <form id="form-connexion" novalidate>
+            <div class="carte">
+                <label for="c-tel">Numéro de téléphone</label>
+                <input id="c-tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07 00 00 00 00" required>
+
+                <label for="c-mdp">Mot de passe</label>
+                <input id="c-mdp" type="password" autocomplete="current-password" placeholder="Ton mot de passe" required>
+            </div>
+            <button class="btn" id="btn-connexion" type="submit">Entrer</button>
+            <p class="erreur" id="err-connexion" role="alert"></p>
+            <button class="btn lien" id="btn-connexion-retour" type="button">← Retour</button>
+        </form>
+    </section>
+
+    <!-- ================= 4. Mon espace (connecté) ================= -->
+    <section id="ecran-espace" class="cache">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
+            <div>
+                <p class="aide" id="bonjour">Bonjour</p>
+                <h2 id="titre-espace" style="font-size:19px;">Mon établissement</h2>
+            </div>
+            <button class="btn lien" id="btn-sortir" type="button">Quitter</button>
+        </div>
+
+        <!-- État de la fiche -->
+        <div class="carte" id="bloc-statut">
+            <span class="pill" id="pill-statut">En attente</span>
+            <p class="aide" id="texte-statut"></p>
+        </div>
+
+        <!-- Le code du comptoir (seulement une fois publié) -->
+        <div class="carte cache" id="bloc-code">
+            <h3>Le code de ton lieu</h3>
+            <p class="aide" style="margin-bottom:8px;">
+                Affiche ce code au comptoir. Un client qui arrive avec l'application
+                le saisit, et la visite est comptée.
+            </p>
+            <div class="code" id="code-lieu">······</div>
+            <p class="aide" id="lien-arrivee"></p>
+        </div>
+
+        <!-- Compteur de visites -->
+        <div class="carte cache" id="bloc-visites">
+            <h3>Les visites reçues</h3>
+            <div class="grille" style="margin-top:8px;">
+                <div class="chiffre"><b id="v-total">0</b><span id="v-total-lab">visite au total</span></div>
+                <div class="chiffre"><b id="v-mois">0</b><span>ce mois-ci</span></div>
+                <div class="chiffre"><b id="v-regler">0</b><span id="v-regler-lab">à régler</span></div>
+                <div class="chiffre"><b id="v-montant">0 F</b><span>montant dû</span></div>
+            </div>
+            <p class="aide" style="margin-top:10px;">
+                Le règlement se fait auprès de l'équipe Viens chop, qui remet le compteur à zéro.
+            </p>
+        </div>
+
+        <!-- La fiche -->
+        <form id="form-fiche" novalidate>
+            <div class="carte">
+                <h3 id="titre-fiche">Ma fiche</h3>
+
+                <label for="f-nom">Nom du lieu</label>
+                <input id="f-nom" type="text" placeholder="Ex : Maquis Chez Kouassi" required>
+
+                <label for="f-type">Type de lieu</label>
+                <select id="f-type">
+                    <option value="maquis">Maquis</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="cafe">Café</option>
+                    <option value="lounge">Lounge</option>
+                    <option value="terrasse">Terrasse</option>
+                    <option value="autre">Autre</option>
+                </select>
+
+                <div class="grille">
+                    <div>
+                        <label for="f-commune">Commune</label>
+                        <input id="f-commune" type="text" placeholder="Ex : Cocody" required>
+                    </div>
+                    <div>
+                        <label for="f-quartier">Quartier</label>
+                        <input id="f-quartier" type="text" placeholder="Ex : Angré">
+                    </div>
+                </div>
+
+                <label for="f-repere">Comment on te trouve</label>
+                <input id="f-repere" type="text" placeholder="Ex : en face de la pharmacie du carrefour">
+                <p class="aide">Une indication simple vaut mieux qu'une adresse compliquée.</p>
+
+                <label for="f-tel">Téléphone du lieu</label>
+                <input id="f-tel" type="tel" inputmode="numeric" placeholder="07 00 00 00 00" required>
+
+                <label for="f-horaires">Horaires</label>
+                <input id="f-horaires" type="text" placeholder="Ex : 18h - 2h, tous les jours">
+
+                <div class="grille">
+                    <div>
+                        <label for="f-budget">Budget par personne</label>
+                        <input id="f-budget" type="number" inputmode="numeric" min="0" max="500000" step="500" placeholder="Ex : 5000">
+                    </div>
+                    <div>
+                        <label for="f-ambiance">Ambiance</label>
+                        <select id="f-ambiance">
+                            <option value="">—</option>
+                            <option value="calme">Calme</option>
+                            <option value="anime">Animée</option>
+                            <option value="terrasse">Terrasse</option>
+                            <option value="famille">Familiale</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label for="f-desc">En deux phrases</label>
+                <textarea id="f-desc" maxlength="400" placeholder="Ce qu'on y mange, ce qui fait son charme, pourquoi un couple s'y sent bien."></textarea>
+            </div>
+
+            <button class="btn" id="btn-fiche" type="submit">Enregistrer et envoyer à la vérification</button>
+            <p class="erreur" id="err-fiche" role="alert"></p>
+            <p class="aide" id="aide-fiche" style="text-align:center; margin-top:8px;"></p>
+        </form>
+    </section>
+
+    <p class="lien-bas">
+        <a href="index.html">← Retour au site</a> · <a href="maquis.html">Voir les Coins Chill</a>
+    </p>
+</main>
+
+<script>
+(function () {
+    const CLE = 'vc_promoteur';
+    const base = new URLSearchParams(location.search).get('api') || 'https://viens-chop-api.onrender.com';
+    const $ = id => document.getElementById(id);
+    let jeton = localStorage.getItem(CLE) || '';
+
+    const montrer = (id) => {
+        ['ecran-accueil', 'ecran-inscription', 'ecran-connexion', 'ecran-espace']
+            .forEach(e => $(e).classList.toggle('cache', e !== id));
+        window.scrollTo(0, 0);
+    };
+
+    async function appel(chemin, options) {
+        const o = options || {};
+        const r = await fetch(base + chemin, {
+            method: o.method || 'GET',
+            headers: Object.assign(
+                { 'Content-Type': 'application/json' },
+                jeton ? { Authorization: 'Bearer ' + jeton } : {},
+                o.headers || {}
+            ),
+            body: o.body ? JSON.stringify(o.body) : undefined
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+            const e = new Error((data.error && data.error.message) || 'Erreur ' + r.status);
+            e.code = data.error && data.error.code;
+            e.status = r.status;
+            throw e;
+        }
+        return data;
+    }
+
+    const chiffres = v => String(v || '').replace(/\D/g, '').slice(-10);
+
+    /* ---------------- Accueil ---------------- */
+    $('btn-vers-inscription').addEventListener('click', () => montrer('ecran-inscription'));
+    $('btn-vers-connexion').addEventListener('click', () => montrer('ecran-connexion'));
+    $('btn-inscription-retour').addEventListener('click', () => montrer('ecran-accueil'));
+    $('btn-connexion-retour').addEventListener('click', () => montrer('ecran-accueil'));
+
+    /* ---------------- Inscription ---------------- */
+    $('form-inscription').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const err = $('err-inscription');
+        err.textContent = '';
+        const tel = chiffres($('i-tel').value);
+        if ($('i-gerant').value.trim().length < 2) { err.textContent = 'Indique ton nom.'; return; }
+        if (tel.length !== 10) { err.textContent = 'Le numéro doit contenir 10 chiffres, par exemple 07 00 00 00 00.'; return; }
+        if ($('i-mdp').value.length < 6) { err.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; return; }
+
+        $('btn-inscription').disabled = true;
+        try {
+            const r = await appel('/api/promoteurs/inscription', {
+                method: 'POST',
+                body: { nom_gerant: $('i-gerant').value.trim(), phone: tel, password: $('i-mdp').value }
+            });
+            jeton = r.access_token;
+            localStorage.setItem(CLE, jeton);
+            $('i-mdp').value = '';
+            await chargerEspace();
+            $('aide-fiche').textContent = 'Compte créé. Remplis la fiche de ton lieu juste en dessous.';
+        } catch (e2) {
+            err.textContent = e2.message;
+        } finally {
+            $('btn-inscription').disabled = false;
+        }
+    });
+
+    /* ---------------- Connexion ---------------- */
+    $('form-connexion').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const err = $('err-connexion');
+        err.textContent = '';
+        const tel = chiffres($('c-tel').value);
+        if (tel.length !== 10) { err.textContent = 'Le numéro doit contenir 10 chiffres.'; return; }
+        $('btn-connexion').disabled = true;
+        try {
+            const r = await appel('/api/promoteurs/connexion', {
+                method: 'POST',
+                body: { phone: tel, password: $('c-mdp').value }
+            });
+            jeton = r.access_token;
+            localStorage.setItem(CLE, jeton);
+            $('c-mdp').value = '';
+            await chargerEspace();
+        } catch (e2) {
+            err.textContent = e2.message;
+        } finally {
+            $('btn-connexion').disabled = false;
+        }
+    });
+
+    /* ---------------- Mon espace ---------------- */
+    $('btn-sortir').addEventListener('click', () => {
+        jeton = '';
+        localStorage.removeItem(CLE);
+        montrer('ecran-accueil');
+    });
+
+    const LIBELLES = {
+        en_attente: ['attente', 'En attente de vérification'],
+        publie:     ['publie', 'Publié'],
+        refuse:     ['refuse',  'Refusé']
+    };
+
+    function remplirFiche(lieu) {
+        if (!lieu) return;
+        $('f-nom').value = lieu.nom || '';
+        $('f-type').value = lieu.type || 'maquis';
+        $('f-commune').value = lieu.commune || '';
+        $('f-quartier').value = lieu.quartier || '';
+        $('f-repere').value = lieu.repere || '';
+        $('f-tel').value = lieu.telephone ? lieu.telephone.replace(/^\+225/, '') : '';
+        $('f-horaires').value = lieu.horaires || '';
+        $('f-budget').value = lieu.budget == null ? '' : lieu.budget;
+        $('f-ambiance').value = lieu.ambiance || '';
+        $('f-desc').value = lieu.description || '';
+    }
+
+    async function chargerEspace() {
+        montrer('ecran-espace');
+        let d;
+        try {
+            d = await appel('/api/promoteurs/moi');
+        } catch (e) {
+            if (e.status === 401) { jeton = ''; localStorage.removeItem(CLE); montrer('ecran-accueil'); return; }
+            $('texte-statut').textContent = e.message;
+            return;
+        }
+
+        $('bonjour').textContent = 'Bonjour ' + (d.promoteur.nom_gerant || '');
+        const lieu = d.lieu;
+
+        // Statut
+        const pill = $('pill-statut');
+        const [classe, libelle] = LIBELLES[lieu ? lieu.statut : 'en_attente'] || LIBELLES.en_attente;
+        pill.className = 'pill ' + classe;
+        pill.textContent = lieu ? libelle : 'Fiche à remplir';
+
+        if (!lieu) {
+            $('texte-statut').textContent = 'Remplis la fiche de ton établissement en bas de page : elle sera vérifiée avant publication.';
+        } else if (lieu.statut === 'en_attente') {
+            $('texte-statut').textContent = 'Ta fiche est en cours de vérification. Tu peux la corriger, chaque envoi repart en vérification.';
+        } else if (lieu.statut === 'publie') {
+            $('texte-statut').textContent = 'Ta fiche est publiée. Les clients arrivés avec l\'application comptent une visite.';
+        } else {
+            $('texte-statut').textContent = 'Fiche refusée : ' + (lieu.motif_refus || 'à compléter') + ' Corrige-la et renvoie-la.';
+        }
+
+        // Code du comptoir (une fois publié)
+        $('bloc-code').classList.toggle('cache', !lieu || lieu.statut !== 'publie');
+        if (lieu && lieu.statut === 'publie') {
+            $('code-lieu').textContent = lieu.code_visite;
+            $('lien-arrivee').textContent = 'Le client le saisit sur ' + String(d.lien_arrivee).replace(/^https?:\/\//, '');
+        }
+
+        // Visites
+        $('bloc-visites').classList.toggle('cache', !lieu);
+        if (lieu) {
+            $('v-total').textContent = d.visites.total;
+            $('v-total-lab').textContent = d.visites.total > 1 ? 'visites au total' : 'visite au total';
+            $('v-mois').textContent = d.visites.ce_mois;
+            $('v-regler').textContent = d.visites.a_regler || 0;
+            $('v-regler-lab').textContent = (d.visites.a_regler || 0) > 1 ? 'à régler' : 'à régler';
+            $('v-montant').textContent = (d.visites.montant_du || 0).toLocaleString('fr-FR') + ' F';
+        }
+
+        remplirFiche(lieu);
+        $('titre-fiche').textContent = lieu ? 'Modifier ma fiche' : 'La fiche de mon lieu';
+        $('btn-fiche').textContent = lieu ? 'Enregistrer les modifications' : 'Envoyer ma fiche';
+        if (lieu && lieu.statut === 'publie') {
+            $('aide-fiche').textContent = 'Attention : toute modification remet la fiche en vérification.';
+        }
+    }
+
+    /* ---------------- Enregistrer la fiche ---------------- */
+    $('form-fiche').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const err = $('err-fiche');
+        err.textContent = '';
+        const tel = chiffres($('f-tel').value);
+        if ($('f-nom').value.trim().length < 2) { err.textContent = 'Indique le nom du lieu.'; return; }
+        if ($('f-commune').value.trim().length < 2) { err.textContent = 'Indique la commune ou la ville.'; return; }
+        if (tel.length !== 10) { err.textContent = 'Le téléphone du lieu doit contenir 10 chiffres.'; return; }
+
+        $('btn-fiche').disabled = true;
+        try {
+            await appel('/api/promoteurs/lieu', {
+                method: 'POST',
+                body: {
+                    nom: $('f-nom').value.trim(),
+                    type: $('f-type').value,
+                    commune: $('f-commune').value.trim(),
+                    quartier: $('f-quartier').value.trim(),
+                    repere: $('f-repere').value.trim(),
+                    telephone: tel,
+                    horaires: $('f-horaires').value.trim(),
+                    budget: $('f-budget').value,
+                    ambiance: $('f-ambiance').value,
+                    description: $('f-desc').value.trim()
+                }
+            });
+            await chargerEspace();
+            $('aide-fiche').textContent = 'Fiche enregistrée et envoyée en vérification.';
+        } catch (e2) {
+            err.textContent = e2.message;
+        } finally {
+            $('btn-fiche').disabled = false;
+        }
+    });
+
+    /* ---------------- Démarrage ---------------- */
+    if (jeton) chargerEspace();
+    else montrer('ecran-accueil');
+})();
+</script>
+</body>
+</html>
