@@ -542,6 +542,9 @@
                                 ${l.certifie ? 'Retirer le badge' : 'Certifier'}
                             </button>
                             ${l.a_regler ? '<button class="btn small good" data-regler="' + l.id + '" type="button">Visites réglées</button>' : ''}
+                            <button class="btn small danger" data-supprimer="${l.id}"
+                                    data-nom="${echapper(l.nom)}" data-du="${l.montant_du || 0}"
+                                    data-visites="${l.visites || 0}" type="button">Supprimer</button>
                         </div>
                     </div>
                 </div>`;
@@ -608,6 +611,28 @@
             agir(b, '/api/admin/lieux/' + b.dataset.regler + '/regler', {}, 'Visites marquées comme réglées.')));
         p.querySelectorAll('[data-suggestion]').forEach(b => b.addEventListener('click', () =>
             agir(b, '/api/admin/suggestions/' + b.dataset.suggestion + '/traite', {}, 'Proposition traitée.')));
+
+        p.querySelectorAll('[data-supprimer]').forEach(b => b.addEventListener('click', async () => {
+            const du = Number(b.dataset.du || 0);
+            const visites = Number(b.dataset.visites || 0);
+            let texte = 'Supprimer définitivement « ' + b.dataset.nom + ' » ?\n\n' +
+                'La fiche disparaît du site et le gérant devra la recréer.';
+            if (visites) {
+                texte += '\n\n' + visites + ' visite(s) enregistrée(s) seront aussi supprimées';
+                texte += du ? ', dont ' + du.toLocaleString('fr-FR') + ' F encore à facturer.' : '.';
+            }
+            if (!confirm(texte)) return;
+
+            b.disabled = true;
+            try {
+                await appel('/api/admin/lieux/' + b.dataset.supprimer, { method: 'DELETE' });
+                toast('Lieu supprimé.');
+                await rafraichir();
+            } catch (e) {
+                toast(e.message, true);
+                b.disabled = false;
+            }
+        }));
     }
 
     /* ---------------- Réglages du paiement ---------------- */

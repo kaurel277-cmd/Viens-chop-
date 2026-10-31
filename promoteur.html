@@ -82,6 +82,9 @@
             border-radius: 12px; padding: 14px; text-align: center; margin: 6px 0 10px;
         }
         .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Sur téléphone, commune et quartier l'un sous l'autre : sur deux
+           colonnes, le libellé « Choisis une commune » était coupé. */
+        @media (max-width: 560px) { .grille { grid-template-columns: 1fr; } }
         .chiffre { background: rgba(255,255,255,.05); border: 1px solid var(--bord);
                    border-radius: 12px; padding: 12px; }
         .chiffre b { display: block; font-size: 21px; }
@@ -314,7 +317,13 @@
         $('f-commune-autre').classList.toggle('cache', liste.value !== '__autre');
         if (valeur && !connu) $('f-commune-autre').value = valeur;
         if (!valeur) $('f-commune-autre').value = '';
-        majQuartiers(valeur && connu ? valeur : '', null);
+
+        if (valeur && !connu) {
+            // Commune hors liste : quartier libre
+            vcRemplirQuartiers($('f-quartier'), '', { desactiverSiVide: false });
+        } else {
+            majQuartiers(connu ? valeur : '', null);
+        }
     }
 
     function choisirQuartier(valeur) {
@@ -332,7 +341,9 @@
     }
 
     function majQuartiers(commune, valeur) {
-        vcRemplirQuartiers($('f-quartier'), commune);
+        // Sans commune, la liste des quartiers est grisée : un quartier
+        // n'appartient à rien tant qu'on ne sait pas de quelle commune il s'agit.
+        vcRemplirQuartiers($('f-quartier'), commune, { desactiverSiVide: true });
         choisirQuartier(valeur || '');
     }
 
@@ -341,7 +352,16 @@
         $('f-commune-autre').classList.toggle('cache', !autre);
         if (autre) $('f-commune-autre').focus();
         else $('f-commune-autre').value = '';
-        majQuartiers(autre ? '' : $('f-commune').value, '');
+
+        if (autre) {
+            // Commune écrite à la main : on ne connaît pas ses quartiers, donc
+            // on laisse écrire le quartier librement.
+            vcRemplirQuartiers($('f-quartier'), '', { desactiverSiVide: false });
+            $('f-quartier').value = '__autre';
+            $('f-quartier-autre').classList.remove('cache');
+        } else {
+            majQuartiers($('f-commune').value, '');
+        }
     });
 
     $('f-quartier').addEventListener('change', () => {
@@ -353,7 +373,7 @@
 
     // Au départ : listes prêtes, quartiers vides tant qu'il n'y a pas de commune
     vcRemplirCommunes($('f-commune'));
-    vcRemplirQuartiers($('f-quartier'), '');
+    vcRemplirQuartiers($('f-quartier'), '', { desactiverSiVide: true });
 
     const montrer = (id) => {
         ['ecran-accueil', 'ecran-inscription', 'ecran-connexion', 'ecran-espace']

@@ -446,6 +446,31 @@ adminRouter.post('/lieux/:id/certifie', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/* Supprime définitivement un lieu (et ses visites). */
+adminRouter.delete('/lieux/:id', async (req, res, next) => {
+  try {
+    const { rows: avant } = await query(
+      `select l.id, l.nom, l.statut, p.phone as promoteur_phone,
+              (select count(*)::int from public.visites v where v.lieu_id = l.id) as visites,
+              (select coalesce(sum(v.prix), 0)::int from public.visites v
+                where v.lieu_id = l.id and not v.reglee) as montant_du
+         from public.lieux l join public.promoteurs p on p.id = l.promoteur_id
+        where l.id = $1`,
+      [req.params.id]
+    );
+    if (!avant.length) throw new AppError(404, 'LIEU_INTROUVABLE', 'Lieu introuvable.');
+
+    await query('delete from public.lieux where id = $1', [req.params.id]);
+
+    await journal('lieu_supprime', req.params.id, {
+      nom: avant[0].nom, statut: avant[0].statut,
+      visites: avant[0].visites, montant_du: avant[0].montant_du
+    });
+
+    res.json({ ok: true, supprime: avant[0].nom });
+  } catch (err) { next(err); }
+});
+
 /* Marque les visites du lieu comme réglées (le gérant a payé). */
 adminRouter.post('/lieux/:id/regler', async (req, res, next) => {
   try {

@@ -196,6 +196,14 @@ Le mécanisme, sans matériel et **sans code à recopier** :
 4. la visite est comptée ; **une seule par membre, par lieu et par jour** ;
 5. l'administrateur voit le total à facturer et peut solder (« Visites réglées »).
 
+Les communes et leurs quartiers vivent dans un seul fichier
+(`assets/js/villes.js`) : choisir une commune remplit la colonne des quartiers
+et il n'y a plus qu'à choisir. Une ligne « Autre » reste disponible partout.
+
+L'administrateur peut **supprimer définitivement un lieu** (console → Coins
+Chill → Supprimer), avec une confirmation qui annonce les visites et le montant
+encore à facturer. Un lieu supprimé disparaît du site et des deux listes.
+
 Il faut être connecté à l'application pour déclarer une visite (le jeton est
 partagé entre les pages du même site). La page `arrivee.html` ne demande plus
 rien : elle renvoie vers la liste, pour que les anciens liens continuent de
