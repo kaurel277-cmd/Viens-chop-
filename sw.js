@@ -13,7 +13,7 @@
        JAMAIS être servi depuis un cache : on veut la vérité, ou une erreur.
    --------------------------------------------------------------------------- */
 
-const VERSION = 'vienschop-v5';
+const VERSION = 'vienschop-v6';
 const COQUILLE = [
   './',
   './index.html',
@@ -76,7 +76,10 @@ self.addEventListener('fetch', (e) => {
   if (estPage || estCode) {
     e.respondWith((async () => {
       try {
-        const frais = await fetch(req);
+        // no-store : sans ça, le cache HTTP du navigateur peut resservir une
+        // page vieille de dix minutes alors que le site vient d'être mis à
+        // jour. Une page fraîche coûte quelques kilo-octets.
+        const frais = await fetch(req, { cache: 'no-store' });
         const cache = await caches.open(VERSION);
         cache.put(req, frais.clone());
         return frais;

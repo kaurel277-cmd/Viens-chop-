@@ -132,6 +132,7 @@
             padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 600;
             cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.15);
             background: rgba(255,255,255,0.06);
+            touch-action: manipulation;   /* pas de délai ni de zoom au double tap */
         }
         .tag.selected { background: linear-gradient(135deg, #FF6B00, #FF1E56); border-color: transparent; }
         .badge {
@@ -631,6 +632,8 @@
                             <button class="tag" data-choisi="Femme" onclick="selectSeeking(this,'Femme')" type="button">🙋‍♀️ Femme</button>
                             <button class="tag" data-choisi="Tous" onclick="selectSeeking(this,'Tous')" type="button">🌍 Tous</button>
                         </div>
+                        <p id="recap-choix" aria-live="polite"
+                           style="font-size:12px; color:rgba(255,255,255,.55); margin-top:10px; line-height:1.5;"></p>
                     </div>
                 </div>
                 <button class="btn-primary" style="margin-top:24px;" onclick="profileStep2()" type="button">Continuer →</button>
@@ -797,6 +800,10 @@
                     Rien ne passe par le disque de Render, qui est effacé à chaque déploiement.
                 </p>
             </div>
+
+            <p id="app-version" style="text-align:center; font-size:11px; color:rgba(255,255,255,.28); margin-top:22px;">
+                Viens chop · version 6
+            </p>
 
             <div style="margin-top:26px; padding:16px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
@@ -1477,13 +1484,40 @@
            l'un ne désigne jamais l'autre. La valeur retenue est celle qui est
            visiblement cochée à l'écran (data-choisi), donc plus de reste d'un
            ancien choix qui partait tout seul à l'enregistrement. */
+        /* Un tap ne touche qu'une ligne.
+           Au départ on bloquait le choix arrivé très peu de temps après le
+           précédent — mauvaise idée : quelqu'un qui enchaîne vite deux choix
+           voyait le second ignoré. Le vrai problème était le décalage de page
+           quand le clavier se referme : on ferme donc le clavier AVANT tout
+           changement, et la page ne bouge plus sous le doigt. */
         function choisirTag(el, val, groupe) {
+            // On referme le clavier avant de changer l'affichage : plus de
+            // décalage de page sous le doigt.
+            const actif = document.activeElement;
+            if (actif && actif !== el && typeof actif.blur === 'function') actif.blur();
+
             const boite = el.parentElement;
             boite.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
             el.classList.add('selected');
             el.dataset.choisi = val;
             if (groupe === 'genre') selectedGender = val;
             else selectedSeeking = val;
+            majRecapChoix();
+        }
+
+        /* Ce que l'application a réellement compris, écrit en clair sous les
+           deux lignes : si jamais un choix partait tout seul, ça se verrait. */
+        function majRecapChoix() {
+            const el = document.getElementById('recap-choix');
+            if (!el) return;
+            const g = choixDuGroupe('genre');
+            const r = choixDuGroupe('recherche');
+            if (!g && !r) { el.textContent = ''; return; }
+            const qui = g === 'Homme' ? 'Tu es un homme' : g === 'Femme' ? 'Tu es une femme' : '';
+            const quoi = r === 'Homme' ? 'tu cherches des hommes'
+                       : r === 'Femme' ? 'tu cherches des femmes'
+                       : r === 'Tous' ? 'tu cherches tout le monde' : '';
+            el.textContent = [qui, quoi].filter(Boolean).join(' · ');
         }
         function selectGender(el, val) { choisirTag(el, val, 'genre'); }
         function selectSeeking(el, val) { choisirTag(el, val, 'recherche'); }
@@ -1501,11 +1535,12 @@
             const cible = Array.from(boite.querySelectorAll('.tag'))
                 .find(t => String(t.dataset.choisi || '') === val);
             if (!cible) return;
-            if (groupe === 'genre') {
-                choisirTag(cible, val, 'genre');
-            } else {
-                choisirTag(cible, val, 'recherche');
-            }
+            // Pré-remplissage : on ne passe pas par le garde-fou de 400 ms.
+            const boiteCible = cible.parentElement;
+            boiteCible.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+            cible.classList.add('selected');
+            if (groupe === 'genre') selectedGender = val; else selectedSeeking = val;
+            majRecapChoix();
         }
         /* Écran vierge à chaque entrée : aucun choix hérité d'une fois précédente. */
         function reinitialiserChoixProfil() {
@@ -1516,6 +1551,8 @@
             });
             selectedGender = '';
             selectedSeeking = '';
+            const recap = document.getElementById('recap-choix');
+            if (recap) recap.textContent = '';
         }
         function toggleArtist(el) {
             el.classList.toggle('selected');
