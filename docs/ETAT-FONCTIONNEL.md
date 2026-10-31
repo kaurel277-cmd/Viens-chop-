@@ -164,7 +164,7 @@ Preuve en direct : `GET /api/health` renvoie les 7 repères
 | Sécurité minimum avant lancement | ✅ 100 % | Signaler + bloquer partout, faux appel, modération des photos, selfie |
 | Console d'administration | ✅ 100 % | Stats, signalements, selfies, photos, journal |
 | Plateforme (PWA, hors ligne, vitesse) | ✅ 100 % | Installable, page hors ligne, service worker v2 |
-| Monétisation (Mode Debout) | 🟡 85 % | Encaissement Wave réel, validation en console, activation automatique. Reste : coller le SQL et saisir le numéro Wave. Les 15 % restants = paiement automatique (compte marchand) |
+| Monétisation (Mode Debout) | 🟡 90 % | Encaissement Wave réel : circuit manuel opérationnel (numéro + référence, validation en console) et circuit **automatique Wave Business écrit et testé** (session Checkout, webhook signé, relecture de la session, retour dans l'app) — en veille jusqu'aux clés. Offre de lancement : **100 premiers** (et non 500). Reste : coller le SQL dans Neon, saisir le numéro Wave, puis les clés Wave Business le moment venu. |
 | Extras annoncés (SOS, Check-In, Incognito) | ⛔ 0 % | Annoncés « bientôt » sur les pages, pas de code serveur |
 | Quiz Mode Flirt | 🟡 60 % | Jouable, mais questions écrites dans la page ; la route `/api/safety/quiz` existe sans être utilisée |
 | Répertoire des maquis | 🟡 40 % | Page et formulaire de proposition ; pas encore de liste de lieux en base |

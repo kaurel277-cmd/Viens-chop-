@@ -45,7 +45,8 @@ healthRouter.get('/', async (_req, res) => {
   if (verifications) features.push('verifications');
   if (moderation) features.push('moderation');
   if (paiements) features.push('paiement');
-  if (config.paiementWebhookSecret) features.push('paiement-auto');
+  if (config.waveApiKey) features.push('paiement-auto');
+  if (config.waveWebhookSecret) features.push('paiement-webhook');
   if (config.adminToken) features.push('admin');
 
   res.json({

@@ -327,6 +327,14 @@
     },
     declarer(reference) {
       return request('/api/paiement/declarer', { method: 'POST', body: { reference } });
+    },
+    /** Paiement automatique : le serveur demande une session à Wave. */
+    checkout() {
+      return request('/api/paiement/checkout', { method: 'POST' });
+    },
+    /** Au retour de Wave : on redemande l'état au serveur (jamais à l'URL). */
+    verifier() {
+      return request('/api/paiement/verifier', { method: 'POST' });
     }
   };
 

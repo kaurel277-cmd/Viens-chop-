@@ -1043,8 +1043,22 @@
                 </p>
             </div>
 
+            <!-- Paiement automatique Wave Business : un bouton, on paie dans Wave -->
+            <div id="vip-auto" style="display:none; margin-bottom:14px;">
+                <button class="btn-primary" id="vip-bouton-wave" onclick="payerAvecWave()" type="button"
+                        style="width:100%; font-size:16px; padding:16px;">
+                    🐧 Payer avec Wave
+                </button>
+                <p style="color:rgba(255,255,255,.45); font-size:11px; line-height:1.5; margin-top:8px;">
+                    Tu paies dans l'application Wave. Ton Mode Debout s'active tout seul dès que le paiement passe.
+                </p>
+            </div>
+
             <!-- Étape 1 et 2 : payer par Wave, puis coller l'identifiant -->
             <div id="vip-form" style="display:none; text-align:left;">
+                <p id="vip-ou" style="display:none; font-size:11px; font-weight:700; color:rgba(255,255,255,.35); text-transform:uppercase; letter-spacing:.5px; text-align:center; margin-bottom:12px;">
+                    ou paie sur ce numéro
+                </p>
                 <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; margin-bottom:14px;">
                     <p style="font-size:12px; color:rgba(255,255,255,.55); line-height:1.6; margin-bottom:8px;">
                         <strong style="color:#fff;">1.</strong> Envoie <strong id="vip-montant" style="color:#FF6B00;">700 FCFA</strong>
@@ -1897,6 +1911,8 @@
             }
 
             const o = await chargerOffrePay(true);
+            const auto = document.getElementById('vip-auto');
+            const ou = document.getElementById('vip-ou');
             if (!o) {
                 form.style.display = 'none';
                 vipErreur('Impossible de charger le paiement. Vérifie ta connexion et réessaie.', '#fbbf24');
@@ -1909,6 +1925,9 @@
 
             let moi = null;
             try { moi = await window.VCAPI.paiement.moi(); } catch (e) { moi = null; }
+
+            if (auto) auto.style.display = 'none';
+            if (ou) ou.style.display = 'none';
 
             if (moi && moi.debout) {
                 prixBloc.style.display = 'none';
@@ -1930,11 +1949,27 @@
                 attente.style.display = 'block';
                 attente.style.background = 'rgba(251,191,36,.12)';
                 attente.style.borderColor = 'rgba(251,191,36,.4)';
-                attente.querySelector('p').textContent = '⏳ Demande en attente';
+                attente.querySelector('p').textContent = '⏳ Paiement en cours';
                 attente.querySelector('p').style.color = '#fbbf24';
-                detail.textContent = 'Référence ' + (moi.en_attente.reference || '') +
-                    ' envoyée le ' + dateFr(moi.en_attente.cree_le) +
-                    '. On vérifie ton paiement, ton Mode Debout s\'active tout seul.';
+
+                const lien = moi.en_attente.lien;
+                if (lien) {
+                    // Session Wave encore ouverte : on repropose le lien plutôt
+                    // que de laisser la personne bloquée.
+                    detail.innerHTML = 'Ta session de paiement Wave est ouverte jusqu\'au ' +
+                        dateFr(moi.en_attente.cree_le) + '. Termine-la pour activer ton Mode Debout.';
+                    const relance = document.createElement('button');
+                    relance.type = 'button';
+                    relance.className = 'btn-primary';
+                    relance.style.cssText = 'margin-top:10px; width:100%;';
+                    relance.textContent = 'Reprendre mon paiement Wave';
+                    relance.onclick = () => { location.href = lien; };
+                    if (!detail.querySelector('button')) detail.appendChild(relance);
+                } else {
+                    detail.textContent = 'Référence ' + (moi.en_attente.reference || '') +
+                        ' envoyée le ' + dateFr(moi.en_attente.cree_le) +
+                        '. On vérifie ton paiement, ton Mode Debout s\'active tout seul.';
+                }
                 return;
             }
 
@@ -1943,6 +1978,7 @@
 
             if (!o.disponible) {
                 form.style.display = 'none';
+                if (auto) auto.style.display = 'none';
                 const derniere = moi && moi.historique && moi.historique[0];
                 vipErreur(derniere && derniere.statut === 'rejected'
                     ? 'Ta dernière demande (' + derniere.reference + ') a été refusée. Le paiement en ligne ouvre très bientôt : écris-nous si tu penses à une erreur.'
@@ -1951,12 +1987,94 @@
                 return;
             }
 
+            // Paiement automatique (Wave Business) : un bouton suffit.
+            // Sinon, repli sur le numéro à créditer.
+            const numeroOk = !!(o.numero || o.numero_lisible);
+            if (auto) auto.style.display = o.auto ? 'block' : 'none';
+            if (ou) ou.style.display = (o.auto && numeroOk) ? 'block' : 'none';
             form.style.display = 'block';
             document.getElementById('vip-numero').textContent = o.numero_lisible || o.numero;
             document.getElementById('vip-nom').textContent = o.nom ? 'Au nom de ' + o.nom : '';
             bouton.disabled = false;
             bouton.textContent = "J'ai payé — envoyer la preuve";
         }
+
+        /* Paiement automatique : le serveur crée la session chez Wave et nous
+           renvoie le lien. Wave impose de l'ouvrir dans le vrai navigateur
+           (pas dans une webview), ce qui est notre cas : c'est un site. */
+        let checkoutEnCours = false;
+        async function payerAvecWave() {
+            if (checkoutEnCours) return;
+            const bouton = document.getElementById('vip-bouton-wave');
+            checkoutEnCours = true;
+            if (bouton) { bouton.disabled = true; bouton.textContent = 'Préparation du paiement…'; }
+            vipErreur('');
+
+            try {
+                const r = await window.VCAPI.paiement.checkout();
+                if (r.deja_paye) {
+                    await preparerPaiement();
+                    majAbonnement();
+                    return;
+                }
+                if (r.url) { location.href = r.url; return; }
+                throw new Error('sans lien');
+            } catch (err) {
+                const raisons = {
+                    WAVE_INDISPONIBLE: "Wave ne répond pas pour le moment. Tu peux payer sur le numéro affiché ci-dessous.",
+                    PAIEMENT_AUTO_INDISPONIBLE: "Le paiement automatique n'est pas actif. Pais sur le numéro affiché et envoie la preuve.",
+                    PAIEMENT_INDISPONIBLE: "Le paiement n'est pas ouvert. Réessaie plus tard.",
+                    DEMANDE_EN_ATTENTE: 'Tu as déjà une demande en attente.',
+                    TROP_DE_DEMANDES: 'Trop de tentatives. Réessaie dans un quart d\'heure.',
+                    RESEAU: 'Pas de connexion. Vérifie ton réseau.'
+                };
+                vipErreur(raisons[err.code] || 'Impossible d\'ouvrir le paiement Wave. Réessaie dans un instant.');
+                const o = document.getElementById('vip-form');
+                if (o) o.style.display = 'block';
+            } finally {
+                checkoutEnCours = false;
+                if (bouton) { bouton.disabled = false; bouton.textContent = '🐧 Payer avec Wave'; }
+            }
+        }
+
+        /* Retour de Wave : ?paiement=ok|echec. On ne croit jamais cette adresse,
+           on demande l'état au serveur, qui relit la session chez Wave. */
+        (async function retourPaiement() {
+            const etat = new URLSearchParams(location.search).get('paiement');
+            if (!etat) return;
+            try { history.replaceState({}, '', location.pathname + location.search.replace(/[?&]paiement=[^&]*/, '')); } catch (e) {}
+
+            // Ce script s'exécute avant le module de compte : on attend qu'il
+            // soit prêt (jusqu'à 10 s), sinon le retour de Wave ne servirait à rien.
+            for (let i = 0; i < 40; i++) {
+                const C = window.VCCompte;
+                if (C && C.isLoggedIn && C.isLoggedIn() && window.VCAPI) break;
+                await new Promise(r => setTimeout(r, 250));
+            }
+            const C = window.VCCompte;
+            if (!C || !C.isLoggedIn || !C.isLoggedIn() || !window.VCAPI) return;
+
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const r = await window.VCAPI.paiement.verifier();
+                    if (r.debout || r.statut === 'paye' || r.statut === 'debout') {
+                        // On ne touche qu'à l'affichage : les variables du module
+                        // des discussions ne sont pas dans cette portée.
+                        const compteur = document.getElementById('likes-left');
+                        if (compteur) compteur.textContent = '∞';
+                        const toast = document.createElement('div');
+                        toast.setAttribute('role', 'status');
+                        toast.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:16px;z-index:10000;text-align:center;' +
+                            'font-weight:700;font-size:14px;color:#fff;background:linear-gradient(135deg,#34d399,#059669);';
+                        toast.textContent = '👑 Bienvenue en Mode Debout ! Ton accès est actif.';
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 5000);
+                        return;
+                    }
+                } catch (e) { /* on réessaiera */ }
+                await new Promise(r => setTimeout(r, 2500));
+            }
+        })();
 
         async function copierNumeroWave() {
             const o = offrePay || await chargerOffrePay(true);
@@ -2026,7 +2144,17 @@
             }
 
             try {
-                const moi = await window.VCAPI.paiement.moi();
+                let moi = await window.VCAPI.paiement.moi();
+                // Une session Wave est peut-être déjà payée sans que le webhook
+                // soit passé (Render endormi) : on demande une vérification une
+                // fois, puis on relit l'état.
+                if (!moi.debout && moi.en_attente && moi.en_attente.lien && !window.__verifPayFaite) {
+                    window.__verifPayFaite = true;
+                    try {
+                        const v = await window.VCAPI.paiement.verifier();
+                        if (v.debout || v.statut === 'paye') moi = await window.VCAPI.paiement.moi();
+                    } catch (e) { /* on garde l'état affiché */ }
+                }
                 if (moi.debout) {
                     // On ne peut pas appeler afficherLikes() d'ici : cette
                     // fonction vit dans le module des discussions. On écrit

@@ -1,11 +1,14 @@
 # Payer le Mode Debout — comment ça marche
 
-Mis à jour le 30/10/2026.
+Mis à jour le 31/10/2026.
 
 Le paiement est **réel** : ce n'est plus un bouton qui affiche « Paiement
 confirmé » sans rien encaisser. Il fonctionne aujourd'hui **sans compte
 marchand**, en deux temps : la personne paie sur ton numéro Wave, puis tu
 valides dans la console.
+
+Avec ton **Wave Business**, le même circuit peut se faire tout seul (section 4).
+Le code est en place et attend seulement ses deux clés.
 
 ---
 
@@ -84,26 +87,68 @@ demandes attendent.
 
 ---
 
-## 4. Le jour où tu auras un compte marchand
+## 4. Le paiement automatique (Wave Business) — quand tu voudras
 
-Rien à refaire côté base : le circuit automatique utilise **la même table**.
+Le circuit automatique est **écrit, testé et en veille**. Tant que les trois
+valeurs ci-dessous ne sont pas posées sur Render, l'écran affiche simplement le
+numéro Wave et la validation reste manuelle. Rien ne casse, rien ne change.
 
-1. Ouvre un compte Wave Business (ou CinetPay).
-2. Sur Render → *Environment* → ajoute `PAIEMENT_WEBHOOK_SECRET` (une longue
-   chaîne aléatoire).
-3. Donne au fournisseur l'adresse à appeler :
-   `https://viens-chop-api.onrender.com/api/paiement/webhook/wave`.
-4. Il doit envoyer, en `POST` JSON :
+Dès qu'elles sont posées, la fenêtre affiche **« 🐧 Payer avec Wave »** : la
+personne paie dans l'application Wave, revient sur le site, et son Mode Debout
+s'active **tout seul**. Tu n'as plus rien à valider (l'onglet Paiements sert
+alors d'historique).
 
-   ```json
-   { "reference": "TX1234567890", "montant": 700, "statut": "paid" }
-   ```
+### A. Prendre les deux valeurs dans Wave Business
 
-   avec l'en-tête `x-signature` =
-   `HMAC-SHA256("reference|montant|statut", PAIEMENT_WEBHOOK_SECRET)` en hexadécimal.
+1. Ouvre **business.wave.com** → ton compte marchand.
+2. **Développeurs** (ou **API**) → **Créer une clé API**.
+3. Copie la clé : elle commence par `wave_sn_…` et **ne s'affiche qu'une fois**.
+   Si tu as coché « signature de requête », copie aussi le secret `wave_sn_AKS_…`.
+4. Ouvre l'onglet **Webhooks** → **Ajouter un webhook**.
+5. URL à déclarer : `https://viens-chop-api.onrender.com/api/paiement/webhook/wave`
+6. Événements à cocher : `checkout.session.completed` et
+   `checkout.session.payment_failed`.
+7. Copie le **secret de signature** : `wave_sn_WHS_…`
 
-Dès que la variable est posée, `/api/health` affiche `paiement-auto` et les
-paiements se valident sans toi. Le circuit manuel continue de fonctionner.
+### B. Poser les valeurs sur Render
+
+1. Ouvre **dashboard.render.com** → ton service `viens-chop-api`.
+2. Onglet **Environment** → **Add Environment Variable**, trois fois :
+
+| Key | Value |
+|---|---|
+| `WAVE_API_KEY` | la clé `wave_sn_…` |
+| `WAVE_WEBHOOK_SECRET` | le secret `wave_sn_WHS_…` |
+| `SITE_URL` | `https://kaurel277-cmd.github.io/Viens-chop-` |
+
+3. (Seulement si tu as coché la signature de requête) une quatrième :
+   `WAVE_SIGNING_SECRET` = le secret `wave_sn_AKS_…`.
+4. **Save Changes** → Render redéploie seul (2 minutes).
+
+### C. Vérifier
+
+`https://viens-chop-api.onrender.com/api/health` doit afficher deux voyants de
+plus : **`paiement-auto`** et **`paiement-webhook`**.
+`/api/paiement/offre` répond alors `"auto": true`.
+
+### D. Faire un vrai test à 100 FCFA
+
+1. **admin.html → Réglages** → **Prix** = `100` → **Enregistrer**.
+2. Sur ton téléphone : **Mon profil → Mon abonnement → Payer avec Wave**,
+   paie réellement 100 FCFA (tu récupères l'argent : c'est ton compte).
+3. Tu dois revenir sur le site et voir **« 👑 Bienvenue en Mode Debout »**,
+   sans avoir touché à la console.
+4. **Réglages** → remets **Prix** = `700` → **Enregistrer**.
+
+### Ce qui reste vrai dans les deux cas
+
+- Le montant vient **toujours** du serveur, jamais du navigateur.
+- Un webhook avec une signature inventée est refusé (401).
+- Un webhook rejoué ne rajoute pas 30 jours : la durée ne s'ajoute qu'une fois.
+- Le webhook **relit la session chez Wave** avant d'activer quoi que ce soit :
+  même un appel parfaitement signé ne suffit pas.
+- Si Render est endormi et manque le webhook, la personne est activée à son
+  retour sur le site (`/api/paiement/verifier` redemande l'état à Wave).
 
 ---
 
@@ -114,7 +159,10 @@ paiements se valident sans toi. Le circuit manuel continue de fonctionner.
 | Repère | Ce qu'il prouve |
 |---|---|
 | `paiement` | la migration « paiements » est passée (tables `payments` + `reglages`) |
-| `paiement-auto` | `PAIEMENT_WEBHOOK_SECRET` est posé |
+| `paiement-auto` | `WAVE_API_KEY` est posé : la fenêtre propose « Payer avec Wave » |
+| `paiement-webhook` | `WAVE_WEBHOOK_SECRET` est posé : Wave peut confirmer tout seul |
 
-`GET /api/paiement/offre` (public) répond `disponible: true` quand le numéro
-Wave est renseigné **et** que l'interrupteur est sur « ouvert ».
+`GET /api/paiement/offre` (public) répond `disponible: true` dès que le
+paiement est ouvert **et** qu'il y a un moyen de payer : la clé Wave, ou le
+numéro à créditer. Sans l'un des deux, les pages disent « bientôt » plutôt que
+d'inviter à payer dans le vide.

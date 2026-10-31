@@ -39,9 +39,20 @@ export const config = {
   recuperationRateLimitMax: Number(process.env.RECUPERATION_RATE_LIMIT_MAX || 10),
   // Déclarations de paiement (preuves Wave) : 6 par quart d'heure et par IP.
   paiementRateLimitMax: Number(process.env.PAIEMENT_RATE_LIMIT_MAX || 6),
+  checkoutRateLimitMax: Number(process.env.CHECKOUT_RATE_LIMIT_MAX || 12),
 
-  // Paiement automatique. Vide = le circuit manuel seul (ce qui est le cas
-  // aujourd'hui). Dès que tu as un compte marchand, tu colles le secret ici
-  // et le webhook devient actif, sans toucher au reste.
-  paiementWebhookSecret: process.env.PAIEMENT_WEBHOOK_SECRET || ''
+  // --- Wave Business (Wave Checkout API, docs.wave.com) -------------------
+  // Clé API : wave_sn_prod_… (tableau de bord Wave Business → Développeurs).
+  // Vide = l'application garde le circuit manuel (numéro + référence).
+  waveApiKey: process.env.WAVE_API_KEY || '',
+  // Secret du webhook : wave_sn_WHS_… Sert à vérifier que l'appel vient de Wave.
+  waveWebhookSecret: process.env.WAVE_WEBHOOK_SECRET || '',
+  // Secret de signature de requête : wave_sn_AKS_… Uniquement si tu as coché
+  // « request signing » en créant la clé API.
+  waveSigningSecret: process.env.WAVE_SIGNING_SECRET || '',
+  // adresse de l'API Wave (une valeur locale permet de tester sans réseau)
+  waveApiUrl: process.env.WAVE_API_URL || 'https://api.wave.com',
+
+  // Adresse du site, pour revenir dans l'application après le paiement.
+  siteUrl: (process.env.SITE_URL || 'https://kaurel277-cmd.github.io/Viens-chop-').replace(/\/$/, '')
 };

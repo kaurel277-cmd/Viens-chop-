@@ -10,6 +10,7 @@
    disponible » au lieu de faire planter l'API.
    --------------------------------------------------------------------------- */
 import { query } from './db.js';
+import { waveDisponible } from './wave.js';
 
 const DEFAUTS = {
   prix_debout: '700',
@@ -127,7 +128,11 @@ export async function offre() {
     numero_lisible: numeroLisible(compte),
     nom: r.wave_nom || '',
     actif: r.paiement_actif === 'oui',
-    disponible: r.paiement_actif === 'oui' && compte.length === 10
+    // Deux façons d'être utilisable : le paiement automatique Wave Business,
+    // ou le numéro à créditer à la main. Sans l'un des deux, on annonce
+    // « bientôt » plutôt que d'inviter à payer dans le vide.
+    disponible: r.paiement_actif === 'oui' && (waveDisponible() || compte.length === 10),
+    auto: waveDisponible()
   };
 }
 

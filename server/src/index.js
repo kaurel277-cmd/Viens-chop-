@@ -29,6 +29,10 @@ app.use('/api/certification', express.json({ limit: '600kb' }));
 // ~4,1 Mo : on laisse 5 Mo de marge, sinon Express refuserait la vidéo avant
 // même d'arriver à la route.
 app.use('/api/matches', express.json({ limit: '5mb' }));
+// Le webhook Wave est traité AVANT express.json() : sa signature porte sur le
+// texte exact reçu. Il faut donc le garder tel quel (Buffer), et non un objet
+// JSON re-sérialisé — sinon la vérification échouerait à chaque appel.
+app.use('/api/paiement/webhook', express.raw({ type: '*/*', limit: '1mb' }));
 app.use(express.json({ limit: '100kb' }));
 
 if (config.rateLimitEnabled) {
@@ -64,6 +68,15 @@ if (config.rateLimitEnabled) {
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: { code: 'TROP_D_ESSAIS', message: 'Trop d\'essais. Réessaie dans un quart d\'heure.' } }
+  }));
+
+  // Ouverture de paiement : 12 par quart d'heure, largement suffisant.
+  app.use('/api/paiement/checkout', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: config.checkoutRateLimitMax,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: { code: 'TROP_DE_DEMANDES', message: 'Trop de tentatives. Réessaie dans un quart d\'heure.' } }
   }));
 
   // Preuve de paiement : une personne n'a aucune raison d'en envoyer 20.

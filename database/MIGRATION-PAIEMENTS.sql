@@ -39,8 +39,11 @@ on conflict (cle) do nothing;
 -- 2. Paiements : deux colonnes de plus + le statut « refusé »
 --    (la table public.payments existe déjà depuis le schéma initial)
 -- ----------------------------------------------------------------------------
-alter table public.payments add column if not exists note       text;
-alter table public.payments add column if not exists decided_at timestamptz;
+alter table public.payments add column if not exists note           text;
+alter table public.payments add column if not exists decided_at     timestamptz;
+alter table public.payments add column if not exists checkout_url   text;      -- lien Wave à ouvrir
+alter table public.payments add column if not exists transaction_id text;      -- n° de transaction Wave
+alter table public.payments add column if not exists mode           text not null default 'manuel';
 
 alter table public.payments drop constraint if exists payments_status_check;
 alter table public.payments add constraint payments_status_check
@@ -116,6 +119,6 @@ select
     to_regclass('public.reglages') is not null                            as reglages,
     exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'payments'
-               and column_name = 'note')                                  as colonne_note,
+               and column_name = 'checkout_url')                          as colonne_lien,
     exists (select 1 from pg_trigger
              where tgname = 'payments_activate')                          as declencheur;
