@@ -13,7 +13,7 @@
        JAMAIS être servi depuis un cache : on veut la vérité, ou une erreur.
    --------------------------------------------------------------------------- */
 
-const VERSION = 'vienschop-v9';
+const VERSION = 'vienschop-v10';
 const COQUILLE = [
   './',
   './index.html',
