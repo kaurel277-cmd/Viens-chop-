@@ -64,7 +64,7 @@ window.vcRemplirQuartiers = function (select, commune, { avecVide = true } = {})
   if (avecVide) {
     const o = document.createElement('option');
     o.value = '';
-    o.textContent = liste.length ? '— Choisis un quartier —' : '— Choisis d’abord la commune —';
+    o.textContent = liste.length ? '— Choisir —' : '— Choisir —';
     select.appendChild(o);
   }
   liste.forEach(q => {
